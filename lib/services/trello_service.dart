@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/board.dart';
+import '../models/list.dart';
 
 /// Service for interacting with the Trello API.
 
@@ -24,6 +25,10 @@ class TrelloService {
       throw Exception('Erreur: impossible de charger les boards');
     }
   }
+
+  //---------------------------------------------------------------------------//
+  //                                 WORKSPACES                                //
+  //---------------------------------------------------------------------------//
 
   /// **Créer un Workspace**
   Future<Map<String, dynamic>?> createWorkspace(String name, String displayName, String desc) async {
@@ -114,22 +119,58 @@ class TrelloService {
   }
 
 
+  //---------------------------------------------------------------------------//
+  //                                  LISTS                                    //
+  //---------------------------------------------------------------------------//
 
+  /// **Récupérer les listes d'un Board**
+  Future<List<Map<String, dynamic>>> getListsByBoard(String boardId) async {
+    final url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
 
+    final response = await http.get(url);
 
-
-    /// **Récupérer les listes d'un Board**
-    Future<List<Map<String, dynamic>>> getListsByBoard(String boardId) async {
-      final url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
-
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        return List<Map<String, dynamic>>.from(json.decode(response.body));
-      } else {
-        throw Exception('Erreur: impossible de charger les listes du board $boardId');
-      }
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les listes du board $boardId');
     }
+  }
 
+  /// **Créer une nouvelle liste dans un Board**
+  Future<ListModel?> createList(String boardId, String name) async {
+    final url = Uri.parse('$baseUrl/lists?key=$apiKey&token=$token');
 
+    final response = await http.post(url, body: {
+      'name': name,
+      'idBoard': boardId,
+    });
+
+    if (response.statusCode == 200) {
+      return ListModel.fromJson(json.decode(response.body));
+    } else {
+      return null;
+    }
+  }
+
+  /// **Mettre à jour le nom d'une List**
+  Future<bool> updateList(String listId, String newName) async {
+    final url = Uri.parse('$baseUrl/lists/$listId?key=$apiKey&token=$token');
+
+    final response = await http.put(url, body: {
+      'name': newName,
+    });
+
+    return response.statusCode == 200;
+  }
+
+  /// **Supprimer une List**
+  Future<bool> deleteList(String listId) async {
+    final url = Uri.parse('$baseUrl/lists/$listId/closed?key=$apiKey&token=$token');
+
+    final response = await http.put(url, body: {
+      'value': 'true',
+    });
+
+    return response.statusCode == 200;
+  }
 }

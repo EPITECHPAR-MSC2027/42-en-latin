@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/list_provider.dart';
 import '../models/list.dart';
+import '../screens/manage_lists_screen.dart';
 
 class ListsScreen extends StatelessWidget {
   final String boardId;
@@ -14,7 +15,21 @@ class ListsScreen extends StatelessWidget {
     final listProvider = Provider.of<ListProvider>(context, listen: false);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Listes de $boardName')),
+      appBar: AppBar(
+        title: Text('Listes de $boardName'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Gérer les Listes',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ManageListsScreen(boardId: boardId, boardName: boardName)),
+              );
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder(
         future: listProvider.fetchListsByBoard(boardId),
         builder: (context, snapshot) {
