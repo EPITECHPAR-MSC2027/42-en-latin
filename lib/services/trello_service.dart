@@ -112,4 +112,23 @@ class TrelloService {
     }
   }
 
+
+
+
+
+
+    /// **Récupérer les listes d'un Board**
+    Future<List<Map<String, dynamic>>> getListsByBoard(String boardId) async {
+      final url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
+
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(json.decode(response.body));
+      } else {
+        throw Exception('Erreur: impossible de charger les listes du board $boardId');
+      }
+    }
+
+
 }

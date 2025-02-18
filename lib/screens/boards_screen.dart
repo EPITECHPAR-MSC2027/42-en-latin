@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/workspace_provider.dart';
+import '../models/board.dart';
+import 'lists_screen.dart';
 
 class BoardsScreen extends StatelessWidget {
   final String workspaceId;
@@ -32,12 +34,22 @@ class BoardsScreen extends StatelessWidget {
               return ListView.builder(
                 itemCount: provider.workspaceBoards.length,
                 itemBuilder: (context, index) {
-                  final board = provider.workspaceBoards[index];
+                  final Board board = provider.workspaceBoards[index];
+
                   return ListTile(
                     title: Text(board.name),
                     subtitle: Text(board.desc.isNotEmpty ? board.desc : 'Pas de description'),
+                    trailing: const Icon(Icons.arrow_forward),
                     onTap: () {
-                      // Ici, tu peux ajouter une navigation vers l'écran des détails du board
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ListsScreen(
+                            boardId: board.id,
+                            boardName: board.name,
+                          ),
+                        ),
+                      );
                     },
                   );
                 },
