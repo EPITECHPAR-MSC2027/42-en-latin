@@ -3,15 +3,18 @@ import 'package:http/http.dart' as http;
 import '../models/board.dart';
 
 /// Service for interacting with the Trello API.
+
 class TrelloService {
   final String apiKey;
   final String token;
   final String baseUrl = 'https://api.trello.com/1';
 
+  /// Base URL for Trello API
+  final String baseUrl = "https://api.trello.com/1";
+
   /// Creates an instance of [TrelloService].
   TrelloService({required this.apiKey, required this.token});
 
-  /// **Récupère tous les Boards de l'utilisateur**
   Future<List<Board>> getBoards() async {
     final url = Uri.parse('$baseUrl/members/me/boards?key=$apiKey&token=$token');
     final response = await http.get(url);
