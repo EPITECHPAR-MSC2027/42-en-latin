@@ -97,4 +97,19 @@ class TrelloService {
       return [];
     }
   }
+
+  /// **Récupérer les boards d'un workspace spécifique**
+  Future<List<Board>> getBoardsByWorkspace(String workspaceId) async {
+    final url = Uri.parse('$baseUrl/organizations/$workspaceId/boards?key=$apiKey&token=$token');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> boardsJson = json.decode(response.body);
+      return boardsJson.map((json) => Board.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur: impossible de charger les boards du workspace $workspaceId');
+    }
+  }
+
 }

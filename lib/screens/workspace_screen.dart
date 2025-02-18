@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/workspace_provider.dart';
+import '../models/workspace.dart';
 
 class WorkspaceScreen extends StatelessWidget {
   const WorkspaceScreen({super.key});
@@ -25,13 +26,14 @@ class WorkspaceScreen extends StatelessWidget {
               return ListView.builder(
                 itemCount: provider.workspaces.length,
                 itemBuilder: (context, index) {
-                  final workspace = provider.workspaces[index];
+                  final Workspace workspace = provider.workspaces[index];
+
                   return ListTile(
-                    title: Text(workspace['displayName']),
-                    subtitle: Text(workspace['desc'] ?? 'Aucune description'),
+                    title: Text(workspace.displayName),
+                    subtitle: Text(workspace.desc ?? 'Aucune description'),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => provider.removeWorkspace(workspace['id']),
+                      onPressed: () => provider.removeWorkspace(workspace.id),
                     ),
                     onTap: () {
                       _editWorkspaceDialog(context, workspace, provider);
@@ -52,7 +54,7 @@ class WorkspaceScreen extends StatelessWidget {
 
   void _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) {
     String name = '', displayName = '', desc = '';
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -79,9 +81,9 @@ class WorkspaceScreen extends StatelessWidget {
     );
   }
 
-  void _editWorkspaceDialog(BuildContext context, Map<String, dynamic> workspace, WorkspaceProvider provider) {
-    String newDisplayName = workspace['displayName'];
-    String newDesc = workspace['desc'] ?? '';
+  void _editWorkspaceDialog(BuildContext context, Workspace workspace, WorkspaceProvider provider) {
+    String newDisplayName = workspace.displayName;
+    String newDesc = workspace.desc ?? '';
 
     showDialog(
       context: context,
@@ -106,7 +108,7 @@ class WorkspaceScreen extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {
-              provider.editWorkspace(workspace['id'], newDisplayName, newDesc);
+              provider.editWorkspace(workspace.id, newDisplayName, newDesc);
               Navigator.pop(context);
             },
             child: const Text('Enregistrer'),
