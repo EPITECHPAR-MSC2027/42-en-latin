@@ -9,8 +9,6 @@ class TrelloService {
   final String token;
   final String baseUrl = 'https://api.trello.com/1';
 
-  /// Base URL for Trello API
-  final String baseUrl = "https://api.trello.com/1";
 
   /// Creates an instance of [TrelloService].
   TrelloService({required this.apiKey, required this.token});
