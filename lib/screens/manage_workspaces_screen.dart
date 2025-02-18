@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/workspace_provider.dart';
 import '../models/workspace.dart';
 
-class WorkspaceScreen extends StatelessWidget {
-  const WorkspaceScreen({super.key});
+class ManageWorkspacesScreen extends StatelessWidget {
+  const ManageWorkspacesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

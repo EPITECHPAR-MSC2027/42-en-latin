@@ -1,3 +1,4 @@
+import 'package:fluter/models/board.dart';
 import 'package:flutter/material.dart';
 import '../services/trello_service.dart';
 import '../models/workspace.dart';
@@ -7,6 +8,8 @@ class WorkspaceProvider with ChangeNotifier {
 
   List<Workspace> _workspaces = [];
   List<Workspace> get workspaces => _workspaces;
+  List<Board> _workspaceBoards = [];
+  List<Board> get workspaceBoards => _workspaceBoards;
 
   WorkspaceProvider({required TrelloService trelloService}) : _trelloService = trelloService;
 
@@ -50,5 +53,11 @@ class WorkspaceProvider with ChangeNotifier {
       _workspaces.removeWhere((ws) => ws.id == workspaceId);
       notifyListeners();
     }
+  }
+
+  /// **Récupérer les boards d'un workspace**
+  Future<void> fetchBoardsByWorkspace(String workspaceId) async {
+    _workspaceBoards = await _trelloService.getBoardsByWorkspace(workspaceId);
+    notifyListeners();
   }
 }
