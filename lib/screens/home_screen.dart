@@ -1,100 +1,74 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/board.dart';
-import '../services/trello_service.dart';
+import '../providers/workspace_provider.dart';
+import '../models/workspace.dart';
+import 'boards_screen.dart';
+import 'manage_workspaces_screen.dart';
 
-/// The home screen of the application, displaying a list of Trello boards.
-///
-/// This screen fetches the list of boards from the Trello API using the [TrelloService]
-/// and displays them in a list. It also handles loading, errors, and empty states.
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final trelloService = Provider.of<TrelloService>(context);
-void showAddBoardDialog(BuildContext context, TrelloService trelloService) {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController descController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Créer un Board'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(labelText: 'Nom du board'),
-            ),
-            TextField(
-              controller: descController,
-              decoration: InputDecoration(labelText: 'Description'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Annuler'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              String name = nameController.text.trim();
-              String desc = descController.text.trim();
-
-              if (name.isNotEmpty) {
-                await trelloService.createBoard(name, desc);
-                Navigator.of(context).pop(); // Ferme la pop-up
-                (context as Element).reassemble(); // Rafraîchir la liste
-              }
-            },
-            child: Text('Créer'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-    
+    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trello Boards'),
-         actions: [
-        IconButton(
-         icon: Icon(Icons.add),
+        title: const Text('Mes Workspaces'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Gérer les Workspaces',
             onPressed: () {
-              showAddBoardDialog(context,trelloService); // Affiche la boîte de dialogue
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ManageWorkspacesScreen()),
+              );
             },
           ),
-  ],
+        ],
       ),
-      body: FutureBuilder<List<Board>>(
-        future: trelloService.getBoards(),
+      body: FutureBuilder(
+        future: workspaceProvider.fetchWorkspaces(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No boards found'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Board board = snapshot.data![index];
-                return ListTile(
-                  title: Text(board.name),
-                  subtitle: Text(board.desc),
-                  onTap: () {
-                  },
-                );
-              },
-            );
+            return Center(child: Text('Erreur: ${snapshot.error}'));
           }
+
+          return Consumer<WorkspaceProvider>(
+            builder: (context, provider, child) {
+              if (provider.workspaces.isEmpty) {
+                return const Center(child: Text('Aucun workspace trouvé.'));
+              }
+
+              return ListView.builder(
+                itemCount: provider.workspaces.length,
+                itemBuilder: (context, index) {
+                  final Workspace workspace = provider.workspaces[index];
+
+                  return ListTile(
+                    title: Text(workspace.displayName),
+                    subtitle: Text(workspace.desc ?? 'Aucune description'),
+                    trailing: const Icon(Icons.arrow_forward),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BoardsScreen(
+                            workspaceId: workspace.id,
+                            workspaceName: workspace.displayName,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
         },
       ),
     );
