@@ -3,15 +3,18 @@ import 'package:http/http.dart' as http;
 import '../models/board.dart';
 
 /// Service for interacting with the Trello API.
+
 class TrelloService {
   final String apiKey;
   final String token;
   final String baseUrl = 'https://api.trello.com/1';
 
+  /// Base URL for Trello API
+  final String baseUrl = "https://api.trello.com/1";
+
   /// Creates an instance of [TrelloService].
   TrelloService({required this.apiKey, required this.token});
 
-  /// **Récupère tous les Boards de l'utilisateur**
   Future<List<Board>> getBoards() async {
     final url = Uri.parse('$baseUrl/members/me/boards?key=$apiKey&token=$token');
     final response = await http.get(url);
@@ -111,5 +114,23 @@ class TrelloService {
       throw Exception('Erreur: impossible de charger les boards du workspace $workspaceId');
     }
   }
+  
 
+  /// Creates a new board on Trello.
+  Future<Board> createBoard(String boardName, String boardDesc) async {
+    final url = Uri.parse('$baseUrl/boards/?key=$apiKey&token=$token');
+
+    final response = await http.post(
+      url,
+      body: {'name': boardName, 'desc': boardDesc }, // Paramètre du board
+      
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return Board.fromJson(jsonResponse); // Retourne le board créé
+    } else {
+      throw Exception('❌ Failed to create board: ${response.statusCode}');
+    }
+  }
 }
