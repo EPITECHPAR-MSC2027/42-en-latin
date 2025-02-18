@@ -18,5 +18,5 @@ jobs:
       - name: Mirror to Epitech repository
         uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url: //Adress git drectory du EPITECH
+          target_repo_url: ${{ secrets.TARGET_URL }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
