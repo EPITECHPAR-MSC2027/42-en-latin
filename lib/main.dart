@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'config/secrets.dart';
 import 'services/trello_service.dart';
 import 'providers/workspace_provider.dart';
+
 import 'screens/home_screen.dart';
 
 void main() {

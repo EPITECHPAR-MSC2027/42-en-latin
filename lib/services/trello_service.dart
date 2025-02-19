@@ -9,8 +9,6 @@ class TrelloService {
   final String token;
   final String baseUrl = 'https://api.trello.com/1';
 
-  /// Base URL for Trello API
-  final String baseUrl = "https://api.trello.com/1";
 
   /// Creates an instance of [TrelloService].
   TrelloService({required this.apiKey, required this.token});
@@ -117,18 +115,18 @@ class TrelloService {
   
 
   /// Creates a new board on Trello.
-  Future<Board> createBoard(String boardName, String boardDesc) async {
+  Future<Map<String, dynamic>?>createBoard(String boardId, String boardName, String boardDesc) async {
     final url = Uri.parse('$baseUrl/boards/?key=$apiKey&token=$token');
 
     final response = await http.post(
       url,
-      body: {'name': boardName, 'desc': boardDesc }, // Paramètre du board
+      body: {'id': boardId , 'name': boardName, 'desc': boardDesc }, // Paramètre du board
       
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      return Board.fromJson(jsonResponse); // Retourne le board créé
+      return jsonDecode(jsonResponse); // Retourne le board créé
     } else {
       throw Exception('❌ Failed to create board: ${response.statusCode}');
     }
