@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'config/secrets.dart';
 import 'services/trello_service.dart';
 import 'providers/workspace_provider.dart';
+import 'providers/list_provider.dart';
+import 'providers/card_provider.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -17,6 +19,12 @@ void main() {
         Provider<TrelloService>.value(value: trelloService),
         ChangeNotifierProvider<WorkspaceProvider>(
           create: (_) => WorkspaceProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider<ListProvider>(
+          create: (_) => ListProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider<CardProvider>( 
+          create: (_) => CardProvider(trelloService: trelloService),
         ),
       ],
       child: const MyApp(),
