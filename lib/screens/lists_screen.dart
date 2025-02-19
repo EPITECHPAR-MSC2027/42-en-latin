@@ -75,4 +75,8 @@ class ListsScreen extends StatelessWidget {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6abd05245516fdafb6a8fcbd3c173cafe149a798

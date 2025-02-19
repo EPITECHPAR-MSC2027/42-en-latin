@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/board.dart';
+import '../models/list.dart';
 
 /// Service for interacting with the Trello API.
 
@@ -24,6 +25,10 @@ class TrelloService {
       throw Exception('Erreur: impossible de charger les boards');
     }
   }
+
+  //---------------------------------------------------------------------------//
+  //                                 WORKSPACES                                //
+  //---------------------------------------------------------------------------//
 
   /// **Créer un Workspace**
   Future<Map<String, dynamic>?> createWorkspace(String name, String displayName, String desc) async {
@@ -112,23 +117,44 @@ class TrelloService {
       throw Exception('Erreur: impossible de charger les boards du workspace $workspaceId');
     }
   }
-  
+
 
   /// Creates a new board on Trello.
-  Future<Map<String, dynamic>?>createBoard(String boardId, String boardName, String boardDesc) async {
+  Future<Board> createBoard(String boardName, String boardDesc) async {
     final url = Uri.parse('$baseUrl/boards/?key=$apiKey&token=$token');
 
     final response = await http.post(
       url,
-      body: {'id': boardId , 'name': boardName, 'desc': boardDesc }, // Paramètre du board
+      body: {'name': boardName, 'desc': boardDesc }, // Paramètre du board
       
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      return jsonDecode(jsonResponse); // Retourne le board créé
+      return Board.fromJson(jsonResponse); // Retourne le board créé
     } else {
-      throw Exception('❌ Failed to create board: ${response.statusCode}');
+      return null;
     }
+  }
+
+  /// **Mettre à jour une carte**
+  Future<bool> updateCard(String cardId, String newName, String newDesc) async {
+    final url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
+
+    final response = await http.put(url, body: {
+      'name': newName,
+      'desc': newDesc,
+    });
+
+    return response.statusCode == 200;
+  }
+
+  /// **Supprimer une carte**
+  Future<bool> deleteCard(String cardId) async {
+    final url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
+
+    final response = await http.delete(url);
+
+    return response.statusCode == 200;
   }
 }
