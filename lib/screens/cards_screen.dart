@@ -6,8 +6,9 @@ import '../models/card.dart';
 class CardsScreen extends StatelessWidget {
   final String listId;
   final String listName;
+  final String boardId; // 🔹 Ajout de boardId pour récupérer les membres
 
-  const CardsScreen({super.key, required this.listId, required this.listName});
+  const CardsScreen({super.key, required this.listId, required this.listName, required this.boardId});
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +35,19 @@ class CardsScreen extends StatelessWidget {
                   return ListTile(
                     title: Text(card.name),
                     subtitle: Text(card.desc),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => provider.removeCard(card.id),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.person_add, color: Colors.green),
+                          tooltip: 'Assigner un membre',
+                          onPressed: () => _assignMemberDialog(context, card.id, provider),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => provider.removeCard(card.id),
+                        ),
+                      ],
                     ),
                     onTap: () => _editCardDialog(context, card, provider),
                   );
@@ -102,6 +113,34 @@ class CardsScreen extends StatelessWidget {
             provider.editCard(card.id, newName, newDesc);
             Navigator.pop(context);
           }, child: const Text('Enregistrer')),
+        ],
+      ),
+    );
+  }
+
+  void _assignMemberDialog(BuildContext context, String cardId, CardProvider provider) async {
+    List<Map<String, dynamic>> members = await provider.fetchMembersByBoard(boardId);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Assigner un membre'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: members.map((member) {
+              return ListTile(
+                title: Text(member['fullName']),
+                subtitle: Text(member['username']),
+                onTap: () {
+                  provider.assignMemberToCard(cardId, member['id']);
+                  Navigator.pop(context);
+                },
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
         ],
       ),
     );

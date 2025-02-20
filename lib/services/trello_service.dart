@@ -230,4 +230,33 @@ class TrelloService {
 
     return response.statusCode == 200;
   }
+
+  //---------------------------------------------------------------------------//
+  //                                 MEMBERS                                   //
+  //---------------------------------------------------------------------------//
+
+  /// **Récupérer la liste des membres d'un Board**
+  Future<List<Map<String, dynamic>>> getMembersByBoard(String boardId) async {
+    final url = Uri.parse('$baseUrl/boards/$boardId/members?key=$apiKey&token=$token');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les membres du board $boardId');
+    }
+  }
+
+  /// **Assigner un membre à une Card**
+  Future<bool> assignMemberToCard(String cardId, String memberId) async {
+    final url = Uri.parse('$baseUrl/cards/$cardId/idMembers?key=$apiKey&token=$token');
+
+    final response = await http.post(url, body: {
+      'value': memberId,
+    });
+
+    return response.statusCode == 200;
+  }
+
 }

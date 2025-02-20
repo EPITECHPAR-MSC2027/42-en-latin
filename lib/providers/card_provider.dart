@@ -50,4 +50,18 @@ class CardProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// **Récupérer les membres d'un Board**
+  Future<List<Map<String, dynamic>>> fetchMembersByBoard(String boardId) async {
+    return await _trelloService.getMembersByBoard(boardId);
+  }
+
+  /// **Assigner un membre à une Card**
+  Future<void> assignMemberToCard(String cardId, String memberId) async {
+    bool success = await _trelloService.assignMemberToCard(cardId, memberId);
+    if (success) {
+      notifyListeners();
+    }
+  }
+
 }

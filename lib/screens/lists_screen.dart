@@ -9,7 +9,11 @@ class ListsScreen extends StatelessWidget {
   final String boardId;
   final String boardName;
 
-  const ListsScreen({super.key, required this.boardId, required this.boardName});
+  const ListsScreen({
+    super.key,
+    required this.boardId,
+    required this.boardName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +29,13 @@ class ListsScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ManageListsScreen(boardId: boardId, boardName: boardName)),
+                MaterialPageRoute(
+                  builder:
+                      (context) => ManageListsScreen(
+                        boardId: boardId,
+                        boardName: boardName,
+                      ),
+                ),
               );
             },
           ),
@@ -43,7 +53,9 @@ class ListsScreen extends StatelessWidget {
           return Consumer<ListProvider>(
             builder: (context, provider, child) {
               if (provider.lists.isEmpty) {
-                return const Center(child: Text('Aucune liste trouvée pour ce board.'));
+                return const Center(
+                  child: Text('Aucune liste trouvée pour ce board.'),
+                );
               }
 
               return ListView.builder(
@@ -55,14 +67,15 @@ class ListsScreen extends StatelessWidget {
                     title: Text(list.name),
                     trailing: const Icon(Icons.arrow_forward),
                     onTap: () {
-                      // 🔹 Ouvrir `CardsScreen` lorsqu’on clique sur une List
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CardsScreen(
-                            listId: list.id,
-                            listName: list.name,
-                          ),
+                          builder:
+                              (context) => CardsScreen(
+                                listId: list.id,
+                                listName: list.name,
+                                boardId: boardId,
+                              ),
                         ),
                       );
                     },
