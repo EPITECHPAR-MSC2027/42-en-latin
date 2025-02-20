@@ -49,6 +49,11 @@ class TrelloService {
     return null;
   }
 }
+
+
+
+
+
 /// **Supprimer un Board et tout son contenu (listes et cartes)**
 Future<bool> deleteBoard(String boardId) async {
   try {
@@ -134,6 +139,35 @@ Future<bool> deleteBoard(String boardId) async {
       return false;
     }
   }
+
+  Future<bool> updateBoard(String boardId, {String? newName, String? newDesc, String? newWorkspaceId}) async {
+  final url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
+
+
+  Map<String, dynamic> body = {};
+  if (newName != null) body['name'] = newName;
+  if (newDesc != null) body['desc'] = newDesc;
+  if (newWorkspaceId != null) body['idOrganization'] = newWorkspaceId; // ✅ Changer de workspace
+
+  final response = await http.put(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(body),
+  );
+
+  if (response.statusCode == 200) {
+    print('Board mis à jour avec succès');
+    return true;
+  } else {
+    print('Erreur mise à jour board: ${response.statusCode} - ${response.body}');
+    return false;
+  }
+}
+
+
+
+
+
 
   /// **Supprimer un Workspace**
   Future<bool> deleteWorkspace(String workspaceId) async {

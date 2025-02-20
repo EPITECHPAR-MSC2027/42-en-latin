@@ -27,7 +27,7 @@ class BoardsProvider with ChangeNotifier {
       if( success) {
         notifyListeners(); // Informe les listeners qu'un changement a eu lieu
       }
-      notifyListeners();
+    
     } catch (error) {
       throw Exception('Erreur lors de la suppression du board : $error');
     }
@@ -36,8 +36,11 @@ class BoardsProvider with ChangeNotifier {
   // **Modifier un board**
   Future<void> editBoard(String boardId, String newName, String newDesc) async {
     try {
-      // await _trelloService.updateBoard(boardId, newName, newDesc);
-      notifyListeners();
+      final success = await _trelloService.updateBoard( boardId );
+      if( success) {
+        notifyListeners(); // Informe les listeners qu'un changement a eu lieu
+      }
+      
     } catch (error) {
       throw Exception('Erreur lors de la modification du board : $error');
     }

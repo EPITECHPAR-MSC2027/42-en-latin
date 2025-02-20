@@ -1,7 +1,7 @@
 import 'package:fluter/models/board.dart';
+import 'package:fluter/models/workspace.dart';
+import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
-import '../services/trello_service.dart';
-import '../models/workspace.dart';
 
 class WorkspaceProvider with ChangeNotifier {
   final TrelloService _trelloService;
