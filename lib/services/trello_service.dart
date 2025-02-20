@@ -28,7 +28,7 @@ class TrelloService {
   }
 
 
-  Future<Map<String, dynamic>?> createBoard(String workspaceId, String name , String ? desc) async {
+  Future<Map<String, dynamic>?> createBoard(String workspaceId, String name , String  desc) async {
   final url = Uri.parse('$baseUrl/boards?key=$apiKey&token=$token');
 
   final response = await http.post(
@@ -36,8 +36,8 @@ class TrelloService {
     headers: {"Content-Type": "application/json"},
     body: jsonEncode({
       "name": name,
-      "description": desc,
-      "id": workspaceId, 
+      "desc": desc,
+     "idOrganization": workspaceId, 
     }),
     
   );
