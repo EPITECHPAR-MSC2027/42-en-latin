@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/board.dart';
@@ -26,6 +27,30 @@ class TrelloService {
     }
   }
 
+
+  Future<Map<String, dynamic>?> createBoard(String workspaceId, String name , String ? desc) async {
+  final url = Uri.parse('$baseUrl/boards?key=$apiKey&token=$token');
+
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "name": name,
+      "description": desc,
+      "id": workspaceId, 
+    }),
+    
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    print('Erreur création board: ${response.statusCode} - ${response.body}');
+    return null;
+  }
+}
+
+//Future<bool> deleteBoard()
   //---------------------------------------------------------------------------//
   //                                 WORKSPACES                                //
   //---------------------------------------------------------------------------//
@@ -119,19 +144,92 @@ class TrelloService {
   }
 
 
-  /// Creates a new board on Trello.
-  Future<Board> createBoard(String boardName, String boardDesc) async {
-    final url = Uri.parse('$baseUrl/boards/?key=$apiKey&token=$token');
+  //---------------------------------------------------------------------------//
+  //                                  LISTS                                    //
+  //---------------------------------------------------------------------------//
 
-    final response = await http.post(
-      url,
-      body: {'name': boardName, 'desc': boardDesc }, // Paramètre du board
-      
-    );
+  /// **Récupérer les listes d'un Board**
+  Future<List<Map<String, dynamic>>> getListsByBoard(String boardId) async {
+    final url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
+
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      return Board.fromJson(jsonResponse); // Retourne le board créé
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les listes du board $boardId');
+    }
+  }
+
+  /// **Créer une nouvelle liste dans un Board**
+  Future<ListModel?> createList(String boardId, String name) async {
+    final url = Uri.parse('$baseUrl/lists?key=$apiKey&token=$token');
+
+    final response = await http.post(url, body: {
+      'name': name,
+      'idBoard': boardId,
+    });
+
+    if (response.statusCode == 200) {
+      return ListModel.fromJson(json.decode(response.body));
+    } else {
+      return null;
+    }
+  }
+
+  /// **Mettre à jour le nom d'une List**
+  Future<bool> updateList(String listId, String newName) async {
+    final url = Uri.parse('$baseUrl/lists/$listId?key=$apiKey&token=$token');
+
+    final response = await http.put(url, body: {
+      'name': newName,
+    });
+
+    return response.statusCode == 200;
+  }
+
+  /// **Supprimer une List**
+  Future<bool> deleteList(String listId) async {
+    final url = Uri.parse('$baseUrl/lists/$listId/closed?key=$apiKey&token=$token');
+
+    final response = await http.put(url, body: {
+      'value': 'true',
+    });
+
+    return response.statusCode == 200;
+  }
+
+
+  //---------------------------------------------------------------------------//
+  //                                  CARDS                                    //
+  //---------------------------------------------------------------------------//
+
+
+    /// **Récupérer les cartes d'une liste**
+  Future<List<Map<String, dynamic>>> getCardsByList(String listId) async {
+    final url = Uri.parse('$baseUrl/lists/$listId/cards?key=$apiKey&token=$token');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les cartes de la liste $listId');
+    }
+  }
+
+  /// **Créer une nouvelle carte**
+  Future<Map<String, dynamic>?> createCard(String listId, String name, String desc) async {
+    final url = Uri.parse('$baseUrl/cards?key=$apiKey&token=$token');
+
+    final response = await http.post(url, body: {
+      'name': name,
+      'desc': desc,
+      'idList': listId,
+    });
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
     } else {
       return null;
     }

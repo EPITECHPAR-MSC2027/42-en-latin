@@ -26,10 +26,11 @@ class Board {
   /// [json]: A map representing the JSON data.
   /// Returns a new [Board] instance.
   factory Board.fromJson(Map<String, dynamic> json) {
+    print(json);
     return Board(
       id: json['id'],
       name: json['name'],
-      desc: json['description']  ,  // Utilise 'description' ici aussi
+      desc: json['desc'] ?? 'Pas de description'  ,  // Utilise 'description' ici aussi
     );
   }
 

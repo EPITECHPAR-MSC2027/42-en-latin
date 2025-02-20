@@ -1,9 +1,12 @@
+import 'package:fluter/config/secrets.dart';
+import 'package:fluter/providers/broad_providers.dart';
+import 'package:fluter/providers/card_provider.dart';
+import 'package:fluter/providers/list_provider.dart';
+import 'package:fluter/providers/workspace_provider.dart';
+import 'package:fluter/screens/home_screen.dart';
+import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'config/secrets.dart';
-import 'services/trello_service.dart';
-import 'providers/workspace_provider.dart';
-import 'screens/home_screen.dart';
 
 void main() {
   final trelloService = TrelloService(
@@ -17,6 +20,8 @@ void main() {
         Provider<TrelloService>.value(value: trelloService),
         ChangeNotifierProvider<WorkspaceProvider>(
           create: (_) => WorkspaceProvider(trelloService: trelloService),
+        ),ChangeNotifierProvider<BoardsProvider>(
+          create: (_) =>  BoardsProvider(trelloService: trelloService),
         ),
         ChangeNotifierProvider<ListProvider>(
           create: (_) => ListProvider(trelloService: trelloService),
