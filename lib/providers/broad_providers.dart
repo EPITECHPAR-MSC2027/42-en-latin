@@ -23,7 +23,10 @@ class BoardsProvider with ChangeNotifier {
   // **Supprimer un board**
   Future<void> removeBoard(String boardId) async {
     try {
-      // await _trelloService.deleteBoard(boardId);
+      final success = await _trelloService.deleteBoard(boardId);
+      if( success) {
+        notifyListeners(); // Informe les listeners qu'un changement a eu lieu
+      }
       notifyListeners();
     } catch (error) {
       throw Exception('Erreur lors de la suppression du board : $error');

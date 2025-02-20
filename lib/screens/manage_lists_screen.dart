@@ -1,7 +1,7 @@
+import 'package:fluter/models/list.dart';
+import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/list_provider.dart';
-import '../models/list.dart';
 
 class ManageListsScreen extends StatelessWidget {
   final String boardId;

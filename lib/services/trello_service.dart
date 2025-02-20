@@ -1,8 +1,8 @@
 
 import 'dart:convert';
+import 'package:fluter/models/board.dart';
+import 'package:fluter/models/list.dart';
 import 'package:http/http.dart' as http;
-import '../models/board.dart';
-import '../models/list.dart';
 
 /// Service for interacting with the Trello API.
 
@@ -49,8 +49,43 @@ class TrelloService {
     return null;
   }
 }
+/// **Supprimer un Board et tout son contenu (listes et cartes)**
+Future<bool> deleteBoard(String boardId) async {
+  try {
+    // 1. Récupérer toutes les listes du board
+    final lists = await getListsByBoard(boardId);
 
-//Future<bool> deleteBoard()
+    for (var list in lists) {
+      final listId = list['id'];
+
+      // 2. Récupérer toutes les cartes de la liste
+      final cards = await getCardsByList(listId);
+
+      // 3. Supprimer chaque carte
+      for (var card in cards) {
+        await deleteCard(card['id']);
+      }
+
+      // 4. Archiver la liste
+      await deleteList(listId);
+    }
+
+    // 5. Supprimer le board
+    final url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
+    final response = await http.delete(url);
+
+    if (response.statusCode == 200) {
+      print('Board supprimé avec succès');
+      return true;
+    } else {
+      print('Erreur suppression board: ${response.statusCode} - ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    print('Erreur lors de la suppression du board: $e');
+    return false;
+  }
+}
   //---------------------------------------------------------------------------//
   //                                 WORKSPACES                                //
   //---------------------------------------------------------------------------//
