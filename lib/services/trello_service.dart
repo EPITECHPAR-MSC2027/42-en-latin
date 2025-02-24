@@ -7,20 +7,20 @@ import 'package:http/http.dart' as http;
 /// Service for interacting with the Trello API.
 
 class TrelloService {
-  final String apiKey;
-  final String token;
-  final String baseUrl = 'https://api.trello.com/1';
 
 
   /// Creates an instance of [TrelloService].
   TrelloService({required this.apiKey, required this.token});
+  final String apiKey;
+  final String token;
+  final String baseUrl = 'https://api.trello.com/1';
 
   Future<List<Board>> getBoards() async {
-    final url = Uri.parse('$baseUrl/members/me/boards?key=$apiKey&token=$token');
-    final response = await http.get(url);
+    final Uri url = Uri.parse('$baseUrl/members/me/boards?key=$apiKey&token=$token');
+    final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> boardsJson = json.decode(response.body);
+      final List<dynamic> boardsJson = json.decode(response.body);
       return boardsJson.map((json) => Board.fromJson(json)).toList();
     } else {
       throw Exception('Erreur: impossible de charger les boards');
@@ -29,15 +29,15 @@ class TrelloService {
 
 
   Future<Map<String, dynamic>?> createBoard(String workspaceId, String name , String  desc) async {
-  final url = Uri.parse('$baseUrl/boards?key=$apiKey&token=$token');
+  final Uri url = Uri.parse('$baseUrl/boards?key=$apiKey&token=$token');
 
-  final response = await http.post(
+  final http.Response response = await http.post(
     url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "name": name,
-      "desc": desc,
-     "idOrganization": workspaceId, 
+    headers: <String, String>{'Content-Type': 'application/json'},
+    body: jsonEncode(<String, String>{
+      'name': name,
+      'desc': desc,
+     'idOrganization': workspaceId, 
     }),
     
   );
@@ -58,16 +58,16 @@ class TrelloService {
 Future<bool> deleteBoard(String boardId) async {
   try {
     // 1. Récupérer toutes les listes du board
-    final lists = await getListsByBoard(boardId);
+    final List<Map<String, dynamic>> lists = await getListsByBoard(boardId);
 
-    for (var list in lists) {
+    for (Map<String, dynamic> list in lists) {
       final listId = list['id'];
 
       // 2. Récupérer toutes les cartes de la liste
-      final cards = await getCardsByList(listId);
+      final List<Map<String, dynamic>> cards = await getCardsByList(listId);
 
       // 3. Supprimer chaque carte
-      for (var card in cards) {
+      for (Map<String, dynamic> card in cards) {
         await deleteCard(card['id']);
       }
 
@@ -76,8 +76,8 @@ Future<bool> deleteBoard(String boardId) async {
     }
 
     // 5. Supprimer le board
-    final url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
-    final response = await http.delete(url);
+    final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
+    final http.Response response = await http.delete(url);
 
     if (response.statusCode == 200) {
       print('Board supprimé avec succès');
@@ -91,67 +91,19 @@ Future<bool> deleteBoard(String boardId) async {
     return false;
   }
 }
-  //---------------------------------------------------------------------------//
-  //                                 WORKSPACES                                //
-  //---------------------------------------------------------------------------//
-
-  /// **Créer un Workspace**
-  Future<Map<String, dynamic>?> createWorkspace(String name, String displayName, String desc) async {
-    final url = Uri.parse('$baseUrl/organizations?key=$apiKey&token=$token');
-
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "displayName": displayName,
-        "name": name,
-        "desc": desc,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('Workspace créé: ${response.body}');
-      return jsonDecode(response.body);
-    } else {
-      print('Erreur création workspace: ${response.statusCode} - ${response.body}');
-      return null;
-    }
-  }
-
-  /// **Mettre à jour un Workspace**
-  Future<bool> updateWorkspace(String workspaceId, String newDisplayName, String newDesc) async {
-    final url = Uri.parse('$baseUrl/organizations/$workspaceId?key=$apiKey&token=$token');
-
-    final response = await http.put(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "displayName": newDisplayName,
-        "desc": newDesc,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('Workspace mis à jour avec succès');
-      return true;
-    } else {
-      print('Erreur mise à jour workspace: ${response.statusCode} - ${response.body}');
-      return false;
-    }
-  }
 
   Future<bool> updateBoard(String boardId, {String? newName, String? newDesc, String? newWorkspaceId}) async {
-  final url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
+  final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
 
 
-  Map<String, dynamic> body = {};
+  final Map<String, dynamic> body = {};
   if (newName != null) body['name'] = newName;
   if (newDesc != null) body['desc'] = newDesc;
   if (newWorkspaceId != null) body['idOrganization'] = newWorkspaceId; // ✅ Changer de workspace
 
-  final response = await http.put(
+  final http.Response response = await http.put(
     url,
-    headers: {"Content-Type": "application/json"},
+    headers: <String, String>{'Content-Type': 'application/json'},
     body: jsonEncode(body),
   );
 
@@ -168,12 +120,66 @@ Future<bool> deleteBoard(String boardId) async {
 
 
 
+  //---------------------------------------------------------------------------//
+  //                                 WORKSPACES                                //
+  //---------------------------------------------------------------------------//
+
+  /// **Créer un Workspace**
+  Future<Map<String, dynamic>?> createWorkspace(String name, String displayName, String desc) async {
+    final Uri url = Uri.parse('$baseUrl/organizations?key=$apiKey&token=$token');
+
+    final http.Response response = await http.post(
+      url,
+      headers: <String, String>{'Content-Type': 'application/json'},
+      body: jsonEncode(<String, String>{
+        'displayName': displayName,
+        'name': name,
+        'desc': desc,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Workspace créé: ${response.body}');
+      return jsonDecode(response.body);
+    } else {
+      print('Erreur création workspace: ${response.statusCode} - ${response.body}');
+      return null;
+    }
+  }
+
+  /// **Mettre à jour un Workspace**
+  Future<bool> updateWorkspace(String workspaceId, String newDisplayName, String newDesc) async {
+    final Uri url = Uri.parse('$baseUrl/organizations/$workspaceId?key=$apiKey&token=$token');
+
+    final http.Response response = await http.put(
+      url,
+      headers: <String, String>{'Content-Type': 'application/json'},
+      body: jsonEncode(<String, String>{
+        'displayName': newDisplayName,
+        'desc': newDesc,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Workspace mis à jour avec succès');
+      return true;
+    } else {
+      print('Erreur mise à jour workspace: ${response.statusCode} - ${response.body}');
+      return false;
+    }
+  }
+
+
+
+
+
+
 
   /// **Supprimer un Workspace**
   Future<bool> deleteWorkspace(String workspaceId) async {
-    final url = Uri.parse('$baseUrl/organizations/$workspaceId?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/organizations/$workspaceId?key=$apiKey&token=$token');
 
-    final response = await http.delete(url);
+    final http.Response response = await http.delete(url);
 
     if (response.statusCode == 200) {
       print('Workspace supprimé avec succès');
@@ -186,26 +192,26 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Récupérer la liste des Workspaces**
   Future<List<Map<String, dynamic>>> getWorkspaces() async {
-    final url = Uri.parse('$baseUrl/members/me/organizations?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/members/me/organizations?key=$apiKey&token=$token');
 
-    final response = await http.get(url);
+    final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else {
       print('Erreur récupération workspaces: ${response.statusCode} - ${response.body}');
-      return [];
+      return <Map<String, dynamic>>[];
     }
   }
 
   /// **Récupérer les boards d'un workspace spécifique**
   Future<List<Board>> getBoardsByWorkspace(String workspaceId) async {
-    final url = Uri.parse('$baseUrl/organizations/$workspaceId/boards?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/organizations/$workspaceId/boards?key=$apiKey&token=$token');
 
-    final response = await http.get(url);
+    final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> boardsJson = json.decode(response.body);
+      final List<dynamic> boardsJson = json.decode(response.body);
       return boardsJson.map((json) => Board.fromJson(json)).toList();
     } else {
       throw Exception('Erreur: impossible de charger les boards du workspace $workspaceId');
@@ -219,9 +225,9 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Récupérer les listes d'un Board**
   Future<List<Map<String, dynamic>>> getListsByBoard(String boardId) async {
-    final url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
 
-    final response = await http.get(url);
+    final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -232,12 +238,12 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Créer une nouvelle liste dans un Board**
   Future<ListModel?> createList(String boardId, String name) async {
-    final url = Uri.parse('$baseUrl/lists?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/lists?key=$apiKey&token=$token');
 
-    final response = await http.post(url, body: {
+    final http.Response response = await http.post(url, body: <String, String>{
       'name': name,
       'idBoard': boardId,
-    });
+    },);
 
     if (response.statusCode == 200) {
       return ListModel.fromJson(json.decode(response.body));
@@ -248,22 +254,22 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Mettre à jour le nom d'une List**
   Future<bool> updateList(String listId, String newName) async {
-    final url = Uri.parse('$baseUrl/lists/$listId?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/lists/$listId?key=$apiKey&token=$token');
 
-    final response = await http.put(url, body: {
+    final http.Response response = await http.put(url, body: <String, String>{
       'name': newName,
-    });
+    },);
 
     return response.statusCode == 200;
   }
 
   /// **Supprimer une List**
   Future<bool> deleteList(String listId) async {
-    final url = Uri.parse('$baseUrl/lists/$listId/closed?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/lists/$listId/closed?key=$apiKey&token=$token');
 
-    final response = await http.put(url, body: {
+    final http.Response response = await http.put(url, body: <String, String>{
       'value': 'true',
-    });
+    },);
 
     return response.statusCode == 200;
   }
@@ -276,9 +282,9 @@ Future<bool> deleteBoard(String boardId) async {
 
     /// **Récupérer les cartes d'une liste**
   Future<List<Map<String, dynamic>>> getCardsByList(String listId) async {
-    final url = Uri.parse('$baseUrl/lists/$listId/cards?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/lists/$listId/cards?key=$apiKey&token=$token');
 
-    final response = await http.get(url);
+    final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -289,13 +295,13 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Créer une nouvelle carte**
   Future<Map<String, dynamic>?> createCard(String listId, String name, String desc) async {
-    final url = Uri.parse('$baseUrl/cards?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/cards?key=$apiKey&token=$token');
 
-    final response = await http.post(url, body: {
+    final http.Response response = await http.post(url, body: <String, String>{
       'name': name,
       'desc': desc,
       'idList': listId,
-    });
+    },);
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -306,21 +312,21 @@ Future<bool> deleteBoard(String boardId) async {
 
   /// **Mettre à jour une carte**
   Future<bool> updateCard(String cardId, String newName, String newDesc) async {
-    final url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
 
-    final response = await http.put(url, body: {
+    final http.Response response = await http.put(url, body: <String, String>{
       'name': newName,
       'desc': newDesc,
-    });
+    },);
 
     return response.statusCode == 200;
   }
 
   /// **Supprimer une carte**
   Future<bool> deleteCard(String cardId) async {
-    final url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
+    final Uri url = Uri.parse('$baseUrl/cards/$cardId?key=$apiKey&token=$token');
 
-    final response = await http.delete(url);
+    final http.Response response = await http.delete(url);
 
     return response.statusCode == 200;
   }

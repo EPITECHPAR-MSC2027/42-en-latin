@@ -1,31 +1,31 @@
+import 'package:fluter/models/list.dart';
+import 'package:fluter/providers/list_provider.dart';
+import 'package:fluter/screens/cards_screen.dart';
+import 'package:fluter/screens/manage_lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/list_provider.dart';
-import '../models/list.dart';
-import '../screens/manage_lists_screen.dart';
-import '../screens/cards_screen.dart';
 
 class ListsScreen extends StatelessWidget {
+
+  const ListsScreen({super.key, required this.boardId, required this.boardName});
   final String boardId;
   final String boardName;
 
-  const ListsScreen({super.key, required this.boardId, required this.boardName});
-
   @override
   Widget build(BuildContext context) {
-    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    final ListProvider listProvider = Provider.of<ListProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Listes de $boardName'),
-        actions: [
+        actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Gérer les Listes',
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ManageListsScreen(boardId: boardId, boardName: boardName)),
+                MaterialPageRoute(builder: (BuildContext context) => ManageListsScreen(boardId: boardId, boardName: boardName)),
               );
             },
           ),
@@ -33,7 +33,7 @@ class ListsScreen extends StatelessWidget {
       ),
       body: FutureBuilder(
         future: listProvider.fetchListsByBoard(boardId),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -41,14 +41,14 @@ class ListsScreen extends StatelessWidget {
           }
 
           return Consumer<ListProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, ListProvider provider, Widget? child) {
               if (provider.lists.isEmpty) {
                 return const Center(child: Text('Aucune liste trouvée pour ce board.'));
               }
 
               return ListView.builder(
                 itemCount: provider.lists.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final ListModel list = provider.lists[index];
 
                   return ListTile(
@@ -59,7 +59,7 @@ class ListsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CardsScreen(
+                          builder: (BuildContext context) => CardsScreen(
                             listId: list.id,
                             listName: list.name,
                           ),

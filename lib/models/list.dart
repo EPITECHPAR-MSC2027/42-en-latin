@@ -1,6 +1,4 @@
 class ListModel {
-  final String id;
-  final String name;
 
   ListModel({
     required this.id,
@@ -14,4 +12,6 @@ class ListModel {
       name: json['name'],
     );
   }
+  final String id;
+  final String name;
 }

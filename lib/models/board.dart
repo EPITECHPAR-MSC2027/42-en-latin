@@ -2,15 +2,7 @@
 /// 
 /// A board contains an [id], a [name], and a [desc] (description).
 /// This class is used to model the data fetched from the Trello API.
-class Board {
-  /// The unique identifier of the board.
-  final String id;
-
-  /// The name of the board.
-  final String name;
-
-  /// The description of the board.
-  final String desc;  // desc est maintenant optionnel (String?)
+class Board {  // desc est maintenant optionnel (String?)
 
   /// Creates a new instance of [Board].
   ///
@@ -33,6 +25,14 @@ class Board {
       desc: json['desc'] ?? 'Pas de description'  ,  // Utilise 'description' ici aussi
     );
   }
+  /// The unique identifier of the board.
+  final String id;
+
+  /// The name of the board.
+  final String name;
+
+  /// The description of the board.
+  final String desc;
 
   /// Convert the Board instance to a JSON map.
   Map<String, dynamic> toJson() {

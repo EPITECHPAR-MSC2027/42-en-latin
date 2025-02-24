@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ManageBoardsScreen extends StatelessWidget {
+
+  const ManageBoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
   final String workspaceId;
   final String workspaceName;
 
-  const ManageBoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
-
   @override
   Widget build(BuildContext context) {
-    final boardsProvider = Provider.of<BoardsProvider>(context, listen: false);
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final BoardsProvider boardsProvider = Provider.of<BoardsProvider>(context, listen: false);
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: Text('Boards de $workspaceName')),
       body: FutureBuilder(
         future: workspaceProvider.fetchBoardsByWorkspace(workspaceId), // Récupère les boards
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -27,14 +27,14 @@ class ManageBoardsScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
               if (provider.workspaceBoards.isEmpty) {
                 return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
               }
 
               return ListView.builder(
                 itemCount: provider.workspaceBoards.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final Board board = provider.workspaceBoards[index];
 
                   return ListTile(
@@ -65,26 +65,27 @@ class ManageBoardsScreen extends StatelessWidget {
   }
 
   void _addBoardDialog(BuildContext context, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
-    String name = '', desc = '';
+    String name = '';
+    String desc = '';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Créer un Board'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             TextField(
               decoration: const InputDecoration(labelText: 'Nom du board'),
-              onChanged: (val) => name = val,
+              onChanged: (String val) => name = val,
             ),
             TextField(
               decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => desc = val,
+              onChanged: (String val) => desc = val,
             ),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () async {
@@ -105,24 +106,24 @@ class ManageBoardsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Modifier Board'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             TextField(
               controller: TextEditingController(text: newName),
               decoration: const InputDecoration(labelText: 'Nom du board'),
-              onChanged: (val) => newName = val,
+              onChanged: (String val) => newName = val,
             ),
             TextField(
               controller: TextEditingController(text: newDesc),
               decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => newDesc = val,
+              onChanged: (String val) => newDesc = val,
             ),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () async {

@@ -6,18 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BoardsScreen extends StatelessWidget {
+
+  const BoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
   final String workspaceId;
   final String workspaceName;
 
-  const BoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
-
   @override
   Widget build(BuildContext context) {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: Text('Boards de $workspaceName'),
-        actions: [
+        actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Gérer les Board',
@@ -25,7 +25,7 @@ class BoardsScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                      builder: (context) => ManageBoardsScreen(
+                      builder: (BuildContext context) => ManageBoardsScreen(
                        workspaceId: workspaceId,
                        workspaceName: workspaceName,
                 ),
@@ -40,7 +40,7 @@ class BoardsScreen extends StatelessWidget {
       ),
       body: FutureBuilder(
         future: workspaceProvider.fetchBoardsByWorkspace(workspaceId),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -48,14 +48,14 @@ class BoardsScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
               if (provider.workspaceBoards.isEmpty) {
                 return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
               }
 
               return ListView.builder(
                 itemCount: provider.workspaceBoards.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final Board board = provider.workspaceBoards[index];
                   return ListTile(
                     title: Text(board.name),
@@ -65,7 +65,7 @@ class BoardsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ListsScreen(
+                          builder: (BuildContext context) => ListsScreen(
                             boardId: board.id,
                             boardName: board.name,
                           ),

@@ -2,14 +2,14 @@ import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 
 class BoardsProvider with ChangeNotifier {
-  final TrelloService _trelloService;
 
   BoardsProvider({required TrelloService trelloService}) : _trelloService = trelloService;
+  final TrelloService _trelloService;
 
   // **Créer un board dans un workspace**
   Future<void> addBoard(String workspaceId, String boardName, String boardDesc) async {
     try {
-      final newBoardJson = await _trelloService.createBoard(workspaceId, boardName, boardDesc);
+      final Map<String, dynamic>? newBoardJson = await _trelloService.createBoard(workspaceId, boardName, boardDesc);
       
       if (newBoardJson != null) {
         notifyListeners(); // Informe les listeners qu'un changement a eu lieu
@@ -23,7 +23,7 @@ class BoardsProvider with ChangeNotifier {
   // **Supprimer un board**
   Future<void> removeBoard(String boardId) async {
     try {
-      final success = await _trelloService.deleteBoard(boardId);
+      final bool success = await _trelloService.deleteBoard(boardId);
       if( success) {
         notifyListeners(); // Informe les listeners qu'un changement a eu lieu
       }
@@ -36,7 +36,7 @@ class BoardsProvider with ChangeNotifier {
   // **Modifier un board**
   Future<void> editBoard(String boardId, String newName, String newDesc) async {
     try {
-      final success = await _trelloService.updateBoard( boardId );
+      final bool success = await _trelloService.updateBoard( boardId );
       if( success) {
         notifyListeners(); // Informe les listeners qu'un changement a eu lieu
       }
