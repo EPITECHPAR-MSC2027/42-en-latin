@@ -99,42 +99,43 @@ class ManageBoardsScreen extends StatelessWidget {
       ),
     );
   }
+void _editBoardDialog(BuildContext context, Board board, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
+  TextEditingController nameController = TextEditingController(text: board.name);
+  TextEditingController descController = TextEditingController(text: board.desc ?? '');
 
-  void _editBoardDialog(BuildContext context, Board board, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
-    String newName = board.name;
-    String newDesc = board.desc ?? '';
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier Board'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom du board'),
-              onChanged: (String val) => newName = val,
-            ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (String val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () async {
-              await boardsProvider.editBoard(board.id, newName, newDesc); // Modifie le board
-              await workspaceProvider.fetchBoardsByWorkspace(workspaceId); // Rafraîchit la liste
-              Navigator.pop(context);
-            },
-            child: const Text('Enregistrer'),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text('Modifier Board'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Nom du board'),
+          ),
+          TextField(
+            controller: descController,
+            decoration: const InputDecoration(labelText: 'Description'),
           ),
         ],
       ),
-    );
-  }
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await boardsProvider.editBoard(board.id, nameController.text, descController.text);
+            await workspaceProvider.fetchBoardsByWorkspace(workspaceId); // Rafraîchir les boards du workspace
+            // ignore: use_build_context_synchronously
+            Navigator.pop(context);
+          },
+          child: const Text('Enregistrer'),
+        ),
+      ],
+    ),
+  );
+}
 }

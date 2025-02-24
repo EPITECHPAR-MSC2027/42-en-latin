@@ -92,20 +92,18 @@ Future<bool> deleteBoard(String boardId) async {
   }
 }
 
-  Future<bool> updateBoard(String boardId, {String? newName, String? newDesc, String? newWorkspaceId}) async {
+  Future<bool> updateBoard(String boardId,String newName, String newDesc) async {
   final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
 
 
-  final Map<String, dynamic> body = {};
-  if (newName != null) body['name'] = newName;
-  if (newDesc != null) body['desc'] = newDesc;
-  if (newWorkspaceId != null) body['idOrganization'] = newWorkspaceId; // ✅ Changer de workspace
-
-  final http.Response response = await http.put(
-    url,
-    headers: <String, String>{'Content-Type': 'application/json'},
-    body: jsonEncode(body),
-  );
+final http.Response response = await http.put(
+      url,
+      headers: <String, String>{'Content-Type': 'application/json'},
+      body: jsonEncode(<String, String>{
+        'Name': newName,
+        'desc': newDesc,
+      }),
+    );
 
   if (response.statusCode == 200) {
     print('Board mis à jour avec succès');

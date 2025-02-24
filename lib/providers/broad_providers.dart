@@ -33,16 +33,21 @@ class BoardsProvider with ChangeNotifier {
     }
   }
 
-  // **Modifier un board**
+   // **Modifier un board**
   Future<void> editBoard(String boardId, String newName, String newDesc) async {
     try {
-      final bool success = await _trelloService.updateBoard( boardId );
-      if( success) {
-        notifyListeners(); // Informe les listeners qu'un changement a eu lieu
-      }
+      final bool success = await _trelloService.updateBoard(boardId, newName, newDesc);
       
+      if (success) {
+        notifyListeners(); // Informe les widgets que les données ont changé
+      } else {
+        print('La mise à jour du board a échoué');
+      }
     } catch (error) {
+      print('Erreur lors de la modification du board : $error');
       throw Exception('Erreur lors de la modification du board : $error');
     }
   }
 }
+  
+
