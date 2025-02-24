@@ -1,7 +1,4 @@
 class Workspace {
-  final String id;
-  final String displayName;
-  final String? desc;
 
   Workspace({
     required this.id,
@@ -17,10 +14,13 @@ class Workspace {
       desc: json['desc'],
     );
   }
+  final String id;
+  final String displayName;
+  final String? desc;
 
   /// Convertir un objet `Workspace` en JSON
   Map<String, dynamic> toJson() {
-    return {
+    return{
       'id': id,
       'displayName': displayName,
       'desc': desc,

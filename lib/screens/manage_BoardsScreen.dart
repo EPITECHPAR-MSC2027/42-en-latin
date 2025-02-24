@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ManageBoardsScreen extends StatelessWidget {
+
+  const ManageBoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
   final String workspaceId;
   final String workspaceName;
 
-  const ManageBoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
-
   @override
   Widget build(BuildContext context) {
-    final boardsProvider = Provider.of<BoardsProvider>(context, listen: false);
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final BoardsProvider boardsProvider = Provider.of<BoardsProvider>(context, listen: false);
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: Text('Boards de $workspaceName')),
       body: FutureBuilder(
         future: workspaceProvider.fetchBoardsByWorkspace(workspaceId), // Récupère les boards
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -27,14 +27,14 @@ class ManageBoardsScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
               if (provider.workspaceBoards.isEmpty) {
                 return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
               }
 
               return ListView.builder(
                 itemCount: provider.workspaceBoards.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final Board board = provider.workspaceBoards[index];
 
                   return ListTile(
@@ -65,26 +65,27 @@ class ManageBoardsScreen extends StatelessWidget {
   }
 
   void _addBoardDialog(BuildContext context, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
-    String name = '', desc = '';
+    String name = '';
+    String desc = '';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Créer un Board'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             TextField(
               decoration: const InputDecoration(labelText: 'Nom du board'),
-              onChanged: (val) => name = val,
+              onChanged: (String val) => name = val,
             ),
             TextField(
               decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => desc = val,
+              onChanged: (String val) => desc = val,
             ),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () async {
@@ -98,42 +99,43 @@ class ManageBoardsScreen extends StatelessWidget {
       ),
     );
   }
+void _editBoardDialog(BuildContext context, Board board, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
+  TextEditingController nameController = TextEditingController(text: board.name);
+  TextEditingController descController = TextEditingController(text: board.desc ?? '');
 
-  void _editBoardDialog(BuildContext context, Board board, BoardsProvider boardsProvider, WorkspaceProvider workspaceProvider) {
-    String newName = board.name;
-    String newDesc = board.desc ?? '';
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Modifier Board'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom du board'),
-              onChanged: (val) => newName = val,
-            ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () async {
-              await boardsProvider.editBoard(board.id, newName, newDesc); // Modifie le board
-              await workspaceProvider.fetchBoardsByWorkspace(workspaceId); // Rafraîchit la liste
-              Navigator.pop(context);
-            },
-            child: const Text('Enregistrer'),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text('Modifier Board'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Nom du board'),
+          ),
+          TextField(
+            controller: descController,
+            decoration: const InputDecoration(labelText: 'Description'),
           ),
         ],
       ),
-    );
-  }
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await boardsProvider.editBoard(board.id, nameController.text, descController.text);
+            await workspaceProvider.fetchBoardsByWorkspace(workspaceId); // Rafraîchir les boards du workspace
+            // ignore: use_build_context_synchronously
+            Navigator.pop(context);
+          },
+          child: const Text('Enregistrer'),
+        ),
+      ],
+    ),
+  );
+}
 }
