@@ -100,7 +100,7 @@ final http.Response response = await http.put(
       url,
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(<String, String>{
-        'Name': newName,
+        'name': newName,
         'desc': newDesc,
       }),
     );
