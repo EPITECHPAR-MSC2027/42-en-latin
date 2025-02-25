@@ -1,23 +1,23 @@
+import 'package:fluter/models/list.dart';
+import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/list_provider.dart';
-import '../models/list.dart';
 
 class ManageListsScreen extends StatelessWidget {
+
+  const ManageListsScreen({super.key, required this.boardId, required this.boardName});
   final String boardId;
   final String boardName;
 
-  const ManageListsScreen({super.key, required this.boardId, required this.boardName});
-
   @override
   Widget build(BuildContext context) {
-    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    final ListProvider listProvider = Provider.of<ListProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: Text('Gérer les listes de $boardName')),
       body: FutureBuilder(
         future: listProvider.fetchListsByBoard(boardId),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -25,17 +25,17 @@ class ManageListsScreen extends StatelessWidget {
           }
 
           return Consumer<ListProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, ListProvider provider, Widget? child) {
               return ListView.builder(
                 itemCount: provider.lists.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final ListModel list = provider.lists[index];
 
                   return ListTile(
                     title: Text(list.name),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: [
+                      children: <Widget>[
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
                           onPressed: () => _editListDialog(context, list, provider),
@@ -65,13 +65,13 @@ class ManageListsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Créer une Liste'),
         content: TextField(
           decoration: const InputDecoration(labelText: 'Nom'),
-          onChanged: (val) => name = val,
+          onChanged: (String val) => name = val,
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {
@@ -90,14 +90,14 @@ class ManageListsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Modifier la Liste'),
         content: TextField(
           controller: TextEditingController(text: newName),
           decoration: const InputDecoration(labelText: 'Nom'),
-          onChanged: (val) => newName = val,
+          onChanged: (String val) => newName = val,
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {

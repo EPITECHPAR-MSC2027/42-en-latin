@@ -1,23 +1,23 @@
+import 'package:fluter/models/card.dart';
+import 'package:fluter/providers/card_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/card_provider.dart';
-import '../models/card.dart';
 
 class CardsScreen extends StatelessWidget {
+
+  const CardsScreen({super.key, required this.listId, required this.listName});
   final String listId;
   final String listName;
 
-  const CardsScreen({super.key, required this.listId, required this.listName});
-
   @override
   Widget build(BuildContext context) {
-    final cardProvider = Provider.of<CardProvider>(context, listen: false);
+    final CardProvider cardProvider = Provider.of<CardProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: Text('Cartes de $listName')),
       body: FutureBuilder(
         future: cardProvider.fetchCardsByList(listId),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -25,10 +25,10 @@ class CardsScreen extends StatelessWidget {
           }
 
           return Consumer<CardProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, CardProvider provider, Widget? child) {
               return ListView.builder(
                 itemCount: provider.cards.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final CardModel card = provider.cards[index];
 
                   return ListTile(
@@ -54,20 +54,21 @@ class CardsScreen extends StatelessWidget {
   }
 
   void _addCardDialog(BuildContext context, CardProvider provider) {
-    String name = '', desc = '';
+    String name = '';
+    String desc = '';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Créer une Carte'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (val) => name = val),
-            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (val) => desc = val),
+          children: <Widget>[
+            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (String val) => name = val),
+            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (String val) => desc = val),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {
@@ -87,21 +88,21 @@ class CardsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Modifier la Carte'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: TextEditingController(text: newName), onChanged: (val) => newName = val),
-            TextField(controller: TextEditingController(text: newDesc), onChanged: (val) => newDesc = val),
+          children: <Widget>[
+            TextField(controller: TextEditingController(text: newName), onChanged: (String val) => newName = val),
+            TextField(controller: TextEditingController(text: newDesc), onChanged: (String val) => newDesc = val),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(onPressed: () {
             provider.editCard(card.id, newName, newDesc);
             Navigator.pop(context);
-          }, child: const Text('Enregistrer')),
+          }, child: const Text('Enregistrer'),),
         ],
       ),
     );

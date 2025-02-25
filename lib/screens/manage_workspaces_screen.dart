@@ -1,20 +1,21 @@
+import 'package:fluter/models/workspace.dart';
+import 'package:fluter/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/workspace_provider.dart';
-import '../models/workspace.dart';
 
 class ManageWorkspacesScreen extends StatelessWidget {
   const ManageWorkspacesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+  Widget build(BuildContext context) {  
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mes Workspaces')),
       body: FutureBuilder(
+      
         future: workspaceProvider.fetchWorkspaces(),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -22,10 +23,10 @@ class ManageWorkspacesScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
               return ListView.builder(
                 itemCount: provider.workspaces.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final Workspace workspace = provider.workspaces[index];
 
                   return ListTile(
@@ -33,10 +34,10 @@ class ManageWorkspacesScreen extends StatelessWidget {
                     subtitle: Text(workspace.desc ?? 'Aucune description'),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => provider.removeWorkspace(workspace.id),
+                      onPressed: () async => provider.removeWorkspace(workspace.id),
                     ),
-                    onTap: () {
-                      _editWorkspaceDialog(context, workspace, provider);
+                    onTap: () async {
+                      await _editWorkspaceDialog(context, workspace, provider);
                     },
                   );
                 },
@@ -47,27 +48,29 @@ class ManageWorkspacesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => _addWorkspaceDialog(context, workspaceProvider),
+        onPressed: () async => _addWorkspaceDialog(context, workspaceProvider),
       ),
     );
   }
 
-  void _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) {
-    String name = '', displayName = '', desc = '';
+  Future<void> _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) async {
+    String name = '';
+    String displayName = '';
+    String desc = '';
 
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Créer un Workspace'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (val) => name = val),
-            TextField(decoration: const InputDecoration(labelText: 'Nom affiché'), onChanged: (val) => displayName = val),
-            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (val) => desc = val),
+          children: <Widget>[
+            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (String val) => name = val),
+            TextField(decoration: const InputDecoration(labelText: 'Nom affiché'), onChanged: (String val) => displayName = val),
+            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (String val) => desc = val),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {
@@ -81,34 +84,35 @@ class ManageWorkspacesScreen extends StatelessWidget {
     );
   }
 
-  void _editWorkspaceDialog(BuildContext context, Workspace workspace, WorkspaceProvider provider) {
+  Future<void> _editWorkspaceDialog(BuildContext context, Workspace workspace, WorkspaceProvider provider) async {
     String newDisplayName = workspace.displayName;
     String newDesc = workspace.desc ?? '';
 
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Modifier Workspace'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             TextField(
               controller: TextEditingController(text: newDisplayName),
               decoration: const InputDecoration(labelText: 'Nom affiché'),
-              onChanged: (val) => newDisplayName = val,
+              onChanged: (String val) => newDisplayName = val,
             ),
             TextField(
               controller: TextEditingController(text: newDesc),
               decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => newDesc = val,
+              onChanged: (String val) => newDesc = val,
             ),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
-            onPressed: () {
-              provider.editWorkspace(workspace.id, newDisplayName, newDesc);
+            onPressed: () async {
+              await provider.editWorkspace(workspace.id, newDisplayName, newDesc);
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
             },
             child: const Text('Enregistrer'),
