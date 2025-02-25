@@ -1,20 +1,20 @@
+import 'package:fluter/models/list.dart';
+import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
-import '../services/trello_service.dart';
-import '../models/list.dart';
 
 class ListProvider with ChangeNotifier {
-  final TrelloService _trelloService;
-  List<ListModel> _lists = [];
-
-  List<ListModel> get lists => _lists;
 
   ListProvider({required TrelloService trelloService}) : _trelloService = trelloService;
+  final TrelloService _trelloService;
+  List<ListModel> _lists = <ListModel>[];
+
+  List<ListModel> get lists => _lists;
 
   /// **Récupérer les listes d'un board**
   Future<void> fetchListsByBoard(String boardId) async {
     try {
-      List<Map<String, dynamic>> jsonList = await _trelloService.getListsByBoard(boardId);
-      _lists = jsonList.map((json) => ListModel.fromJson(json)).toList();
+      final List<Map<String, dynamic>> jsonList = await _trelloService.getListsByBoard(boardId);
+      _lists = jsonList.map(ListModel.fromJson).toList();
       notifyListeners();
     } catch (e) {
       print('Erreur lors de la récupération des listes: $e');
@@ -23,7 +23,7 @@ class ListProvider with ChangeNotifier {
 
   /// **Créer une nouvelle List**
   Future<void> addList(String boardId, String name) async {
-    final newList = await _trelloService.createList(boardId, name);
+    final ListModel? newList = await _trelloService.createList(boardId, name);
     if (newList != null) {
       _lists.add(newList);
       notifyListeners();
@@ -32,9 +32,9 @@ class ListProvider with ChangeNotifier {
 
   /// **Mettre à jour une List**
   Future<void> editList(String listId, String newName) async {
-    bool success = await _trelloService.updateList(listId, newName);
+    final bool success = await _trelloService.updateList(listId, newName);
     if (success) {
-      int index = _lists.indexWhere((list) => list.id == listId);
+      final int index = _lists.indexWhere((ListModel list) => list.id == listId);
       if (index != -1) {
         _lists[index] = ListModel(id: listId, name: newName);
         notifyListeners();
@@ -44,9 +44,9 @@ class ListProvider with ChangeNotifier {
 
   /// **Supprimer une List**
   Future<void> removeList(String listId) async {
-    bool success = await _trelloService.deleteList(listId);
+    final bool success = await _trelloService.deleteList(listId);
     if (success) {
-      _lists.removeWhere((list) => list.id == listId);
+      _lists.removeWhere((ListModel list) => list.id == listId);
       notifyListeners();
     }
   }

@@ -8,14 +8,14 @@ class ManageWorkspacesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {  
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mes Workspaces')),
       body: FutureBuilder(
       
         future: workspaceProvider.fetchWorkspaces(),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -23,10 +23,10 @@ class ManageWorkspacesScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (context, provider, child) {
+            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
               return ListView.builder(
                 itemCount: provider.workspaces.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   final Workspace workspace = provider.workspaces[index];
 
                   return ListTile(
@@ -64,13 +64,13 @@ class ManageWorkspacesScreen extends StatelessWidget {
         title: const Text('Créer un Workspace'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (val) => name = val),
-            TextField(decoration: const InputDecoration(labelText: 'Nom affiché'), onChanged: (val) => displayName = val),
-            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (val) => desc = val),
+          children: <Widget>[
+            TextField(decoration: const InputDecoration(labelText: 'Nom'), onChanged: (String val) => name = val),
+            TextField(decoration: const InputDecoration(labelText: 'Nom affiché'), onChanged: (String val) => displayName = val),
+            TextField(decoration: const InputDecoration(labelText: 'Description'), onChanged: (String val) => desc = val),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () {
@@ -94,7 +94,7 @@ class ManageWorkspacesScreen extends StatelessWidget {
         title: const Text('Modifier Workspace'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             TextField(
               controller: TextEditingController(text: newDisplayName),
               decoration: const InputDecoration(labelText: 'Nom affiché'),
@@ -107,7 +107,7 @@ class ManageWorkspacesScreen extends StatelessWidget {
             ),
           ],
         ),
-        actions: [
+        actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () async {

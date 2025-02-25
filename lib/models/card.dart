@@ -1,7 +1,4 @@
 class CardModel {
-  final String id;
-  final String name;
-  final String desc;
 
   CardModel({
     required this.id,
@@ -17,4 +14,7 @@ class CardModel {
       desc: json['desc'] ?? '',
     );
   }
+  final String id;
+  final String name;
+  final String desc;
 }
