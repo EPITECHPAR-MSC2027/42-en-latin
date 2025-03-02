@@ -1,7 +1,10 @@
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
+import 'package:fluter/models/board.dart';
 
 class BoardsProvider with ChangeNotifier {
+  List<Board> _boards = [];
+  List<Board> get boards => _boards;
 
   BoardsProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
@@ -46,6 +49,17 @@ class BoardsProvider with ChangeNotifier {
     } catch (error) {
       print('Erreur lors de la modification du board : $error');
       throw Exception('Erreur lors de la modification du board : $error');
+    }
+  }
+
+  // Ajouter une méthode pour récupérer les boards
+  Future<void> fetchBoards() async {
+    try {
+      final List<Board> fetchedBoards = await _trelloService.getBoards();
+      _boards = fetchedBoards;
+      notifyListeners();
+    } catch (error) {
+      throw Exception('Erreur lors de la récupération des boards : $error');
     }
   }
 }

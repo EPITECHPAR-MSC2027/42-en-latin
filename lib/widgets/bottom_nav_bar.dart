@@ -10,13 +10,13 @@ class BottomNavBar extends StatelessWidget {
       onTap: (index) {
         switch (index) {
           case 0:
-            // Déjà sur la page d'accueil
+            Navigator.pushReplacementNamed(context, '/');
             break;
           case 1:
-            Navigator.pushNamed(context, '/workspace');
+            Navigator.pushReplacementNamed(context, '/workspace');
             break;
           case 2:
-            Navigator.pushNamed(context, '/profile');
+            Navigator.pushReplacementNamed(context, '/profile');
             break;
         }
       },

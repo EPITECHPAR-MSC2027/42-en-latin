@@ -5,8 +5,8 @@ import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class WorkspaceScreen extends StatelessWidget {
+  const WorkspaceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,31 +22,31 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (BuildContext context) => const ManageWorkspacesScreen()),
+                MaterialPageRoute(builder: (context) => const ManageWorkspacesScreen()),
               );
             },
           ),
         ],
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<List<Workspace>>(
         future: workspaceProvider.fetchWorkspaces(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Workspace>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Erreur: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Aucun workspace trouvé.'));
           }
 
           return Consumer<WorkspaceProvider>(
             builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-              if (provider.workspaces.isEmpty) {
-                return const Center(child: Text('Aucun workspace trouvé.'));
-              }
+              final List<Workspace> workspaces = provider.workspaces;
 
               return ListView.builder(
-                itemCount: provider.workspaces.length,
+                itemCount: workspaces.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final Workspace workspace = provider.workspaces[index];
+                  final Workspace workspace = workspaces[index];
 
                   return ListTile(
                     title: Text(workspace.displayName),
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => BoardsScreen(
+                          builder: (context) => BoardsScreen(
                             workspaceId: workspace.id,
                             workspaceName: workspace.displayName,
                           ),

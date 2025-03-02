@@ -10,31 +10,32 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.blue[50],
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Welcome back!',
-                style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'Welcome back!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Ready to work?',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.grey,
+                const SizedBox(height: 8),
+                const Text(
+                  'Ready to work?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              const BoardCarousel(),
-              const Spacer(),
-            ],
+                const SizedBox(height: 40),
+                const BoardCarousel(),
+              ],
+            ),
           ),
         ),
       ),

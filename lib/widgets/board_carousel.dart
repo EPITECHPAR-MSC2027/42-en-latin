@@ -8,20 +8,20 @@ class BoardCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BoardProvider>(
-      builder: (context, boardProvider, child) {
-        // Récupérer les boards et les trier par date de dernière modification
-        final recentBoards = boardProvider.boards
-          ..sort((a, b) => b.lastModified.compareTo(a.lastModified));
-        
-        // Prendre seulement les 3 derniers
-        final latestBoards = recentBoards.take(3).toList();
-
-        if (latestBoards.isEmpty) {
+    return Consumer<BoardsProvider>(
+      builder: (context, boardsProvider, child) {
+        if (boardsProvider.boards.isEmpty) {
           return const Center(
             child: Text('Aucun board récent'),
           );
         }
+
+        // Trier les boards par date de dernière modification
+        final recentBoards = List.from(boardsProvider.boards)
+          ..sort((a, b) => b.lastModified.compareTo(a.lastModified));
+        
+        // Prendre seulement les 3 derniers
+        final latestBoards = recentBoards.take(3).toList();
 
         return SizedBox(
           height: 160,
