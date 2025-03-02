@@ -1,75 +1,45 @@
-import 'package:fluter/models/workspace.dart';
-import 'package:fluter/providers/workspace_provider.dart';
-import 'package:fluter/screens/boards_screen.dart';
-import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import '../widgets/board_carousel.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mes Workspaces'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Gérer les Workspaces',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (BuildContext context) => const ManageWorkspacesScreen()),
-              );
-            },
+      backgroundColor: Colors.blue[50],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'Welcome back!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Ready to work?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                const BoardCarousel(),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
-      body: FutureBuilder(
-        future: workspaceProvider.fetchWorkspaces(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
-
-          return Consumer<WorkspaceProvider>(
-            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-              if (provider.workspaces.isEmpty) {
-                return const Center(child: Text('Aucun workspace trouvé.'));
-              }
-
-              return ListView.builder(
-                itemCount: provider.workspaces.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Workspace workspace = provider.workspaces[index];
-
-                  return ListTile(
-                    title: Text(workspace.displayName),
-                    subtitle: Text(workspace.desc ?? 'Aucune description'),
-                    trailing: const Icon(Icons.arrow_forward),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => BoardsScreen(
-                            workspaceId: workspace.id,
-                            workspaceName: workspace.displayName,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
