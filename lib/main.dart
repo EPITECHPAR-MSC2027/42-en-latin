@@ -1,5 +1,5 @@
 import 'package:fluter/config/secrets.dart';
-import 'package:fluter/providers/broad_providers.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
