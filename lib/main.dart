@@ -6,6 +6,7 @@ import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 
