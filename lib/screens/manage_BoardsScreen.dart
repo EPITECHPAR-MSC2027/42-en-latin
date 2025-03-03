@@ -1,5 +1,5 @@
 import 'package:fluter/models/board.dart';
-import 'package:fluter/providers/broad_providers.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
