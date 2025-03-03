@@ -3,111 +3,174 @@ import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ManageListsScreen extends StatelessWidget {
+/// **Écran de gestion des listes d'un board**
+class ManageListsScreen extends StatefulWidget {
+  /// **Constructeur de ManageListsScreen**
+  const ManageListsScreen({
+    required this.boardId, required this.boardName, super.key,
+  });
 
-  const ManageListsScreen({super.key, required this.boardId, required this.boardName});
+  /// **ID du board**
   final String boardId;
+
+  /// **Nom du board**
   final String boardName;
 
   @override
+  ManageListsScreenState createState() => ManageListsScreenState();
+}
+
+/// **État de ManageListsScreen**
+class ManageListsScreenState extends State<ManageListsScreen> {
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(() async => _loadLists());
+  }
+
+  /// **Charge les listes du board**
+  Future<void> _loadLists() async {
+    try {
+      await Provider.of<ListProvider>(
+        context,
+        listen: false,
+      ).fetchListsByBoard(widget.boardId);
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ListProvider listProvider = Provider.of<ListProvider>(context, listen: false);
-
     return Scaffold(
-      appBar: AppBar(title: Text('Gérer les listes de $boardName')),
-      body: FutureBuilder(
-        future: listProvider.fetchListsByBoard(boardId),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
+      appBar: AppBar(title: Text('Gérer les listes de ${widget.boardName}')),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage != null
+              ? Center(child: Text('Erreur: $_errorMessage'))
+              : Consumer<ListProvider>(
+                builder: (
+                  BuildContext context,
+                  ListProvider provider,
+                  Widget? child,
+                ) {
+                  if (provider.lists.isEmpty) {
+                    return const Center(child: Text('Aucune liste trouvée.'));
+                  }
 
-          return Consumer<ListProvider>(
-            builder: (BuildContext context, ListProvider provider, Widget? child) {
-              return ListView.builder(
-                itemCount: provider.lists.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final ListModel list = provider.lists[index];
+                  return ListView.builder(
+                    itemCount: provider.lists.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final ListModel list = provider.lists[index];
 
-                  return ListTile(
-                    title: Text(list.name),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _editListDialog(context, list, provider),
+                      return ListTile(
+                        title: Text(list.name),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed:
+                                  () async =>
+                                      _editListDialog(context, list, provider),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                await provider.removeList(list.id);
+                              },
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => provider.removeList(list.id),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          );
-        },
-      ),
+              ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => _addListDialog(context, listProvider),
+        onPressed:
+            () async => _addListDialog(
+              context,
+              Provider.of<ListProvider>(context, listen: false),
+            ),
       ),
     );
   }
 
-  void _addListDialog(BuildContext context, ListProvider provider) {
+  /// **Affiche le dialogue pour créer une liste**
+  Future<void> _addListDialog(
+    BuildContext context,
+    ListProvider provider,
+  ) async {
     String name = '';
 
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer une Liste'),
-        content: TextField(
-          decoration: const InputDecoration(labelText: 'Nom'),
-          onChanged: (String val) => name = val,
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () {
-              provider.addList(boardId, name);
-              Navigator.pop(context);
-            },
-            child: const Text('Créer'),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Créer une Liste'),
+            content: TextField(
+              decoration: const InputDecoration(labelText: 'Nom'),
+              onChanged: (String val) => name = val,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.addList(widget.boardId, name);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                child: const Text('Créer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
-  void _editListDialog(BuildContext context, ListModel list, ListProvider provider) {
+  /// **Affiche le dialogue pour modifier une liste**
+  Future<void> _editListDialog(
+    BuildContext context,
+    ListModel list,
+    ListProvider provider,
+  ) async {
     String newName = list.name;
 
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier la Liste'),
-        content: TextField(
-          controller: TextEditingController(text: newName),
-          decoration: const InputDecoration(labelText: 'Nom'),
-          onChanged: (String val) => newName = val,
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () {
-              provider.editList(list.id, newName);
-              Navigator.pop(context);
-            },
-            child: const Text('Enregistrer'),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Modifier la Liste'),
+            content: TextField(
+              controller: TextEditingController(text: newName),
+              decoration: const InputDecoration(labelText: 'Nom'),
+              onChanged: (String val) => newName = val,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.editList(list.id, newName);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                child: const Text('Enregistrer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
