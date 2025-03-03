@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fluter/models/board.dart';
 import 'package:fluter/models/list.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluter/utils/templates.dart'; // Import des templates
 
 /// Service for interacting with the Trello API.
 
@@ -14,6 +15,13 @@ class TrelloService {
   final String apiKey;
   final String token;
   final String baseUrl = 'https://api.trello.com/1';
+
+
+
+ //---------------------------------------------------------------------------//
+  //                                Boards                              //
+  //---------------------------------------------------------------------------//
+
 
   Future<List<Board>> getBoards() async {
     final Uri url = Uri.parse('$baseUrl/members/me/boards?key=$apiKey&token=$token');
@@ -28,18 +36,29 @@ class TrelloService {
   }
 
 
-  Future<Map<String, dynamic>?> createBoard(String workspaceId, String name , String  desc) async {
+ Future<Map<String, dynamic>?> createBoard(
+  String workspaceId, 
+  String name, 
+  String desc, 
+  {String? templateId} // Template optionnel
+) async {
   final Uri url = Uri.parse('$baseUrl/boards?key=$apiKey&token=$token');
+
+  // Construction du body JSON
+  final Map<String, String> body = {
+    'name': name,
+    'desc': desc,
+    'idOrganization': workspaceId,
+  };
+
+  if (templateId != null) {
+    body['idBoardSource'] = templateId; // Ajout du template si sélectionné
+  }
 
   final http.Response response = await http.post(
     url,
     headers: <String, String>{'Content-Type': 'application/json'},
-    body: jsonEncode(<String, String>{
-      'name': name,
-      'desc': desc,
-     'idOrganization': workspaceId, 
-    }),
-    
+    body: jsonEncode(body),
   );
 
   if (response.statusCode == 200) {
@@ -51,7 +70,48 @@ class TrelloService {
 }
 
 
+Future<Map<String, dynamic>?> createBoardWithTemplate(
+  String workspaceId, 
+  String name, 
+  String desc, 
+  String templateId
+) async {
+  // 1️⃣ Créer un board vide
+  final board = await createBoard(workspaceId, name, desc);
+  if (board == null || !board.containsKey('id')) return null;
 
+  String boardId = board['id'];
+
+  // 2️⃣ Supprimer toutes les listes existantes avant d'ajouter le template
+  await deleteAllLists(boardId);
+
+  // 3️⃣ Vérifier si le template existe
+  final Map<String, List<String>>? template = templateCards[templateId];
+  if (template == null) {
+    print('Template non trouvé');
+    return null;
+  }
+
+  // 4️⃣ Ajouter les listes et cartes du template
+  for (var entry in template.entries) {
+    String listName = entry.key;
+    List<String> cards = entry.value;
+
+    // Créer la liste
+    final list = await createList(boardId, listName);
+    if (list == null) continue;
+
+    String listId = list.id;
+
+    // Ajouter les cartes
+    for (String cardName in cards) {
+      await createCard(listId, cardName, ''); // Description vide
+    }
+  }
+
+  print('✅ Board créé avec le template $templateId');
+  return board;
+}
 
 
 /// **Supprimer un Board et tout son contenu (listes et cartes)**
@@ -113,6 +173,30 @@ final http.Response response = await http.put(
     return false;
   }
 }
+
+Future<List<Map<String, String>>> getBoardTemplates() async {
+  final Uri url = Uri.parse('$baseUrl/boardTemplates?key=$apiKey&token=$token');
+
+  final http.Response response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.body);
+    
+    // Convertir les valeurs dynamiques en String pour correspondre à List<Map<String, String>>
+    List<Map<String, String>> templates = data.map((template) {
+      return {
+        'id': template['id'].toString(),  
+        'name': template['name'].toString(),
+      };
+    }).toList();
+
+    return templates;
+  } else {
+    print('Erreur récupération templates: ${response.statusCode} - ${response.body}');
+    return [];
+  }
+}
+
 
 
 
@@ -272,6 +356,22 @@ final http.Response response = await http.put(
     return response.statusCode == 200;
   }
 
+Future<void> deleteAllLists(String boardId) async {
+  final Uri url = Uri.parse('$baseUrl/boards/$boardId/lists?key=$apiKey&token=$token');
+  final http.Response response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    List<dynamic> lists = jsonDecode(response.body);
+
+    for (var list in lists) {
+      final Uri deleteUrl = Uri.parse('$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token');
+      await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
+      print('❌ Liste supprimée : ${list["name"]}');
+    }
+  } else {
+    print('❌ Erreur lors de la récupération des listes : ${response.statusCode}');
+  }
+}
 
   //---------------------------------------------------------------------------//
   //                                  CARDS                                    //
