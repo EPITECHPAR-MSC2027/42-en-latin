@@ -38,7 +38,7 @@ class Workspace {
   ///
   /// Retourne une Map contenant les données JSON.
   Map<String, dynamic> toJson() {
-    return {
+    return <String, dynamic>{
       'id': id,
       'displayName': displayName,
       'desc': desc,

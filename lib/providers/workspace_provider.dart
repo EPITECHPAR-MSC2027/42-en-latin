@@ -3,14 +3,18 @@ import 'package:fluter/models/workspace.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 
+/// **Classe permettant de gérer les workspaces**
 class WorkspaceProvider with ChangeNotifier {
 
+  /// **Constructeur de Workspace**
   WorkspaceProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
 
   List<Workspace> _workspaces = <Workspace>[];
+  /// **Liste des workspaces**
   List<Workspace> get workspaces => _workspaces;
   List<Board> _workspaceBoards = <Board>[];
+  /// **Liste des boards d'un workspace**
   List<Board> get workspaceBoards => _workspaceBoards;
 
   /// **Récupérer la liste des workspaces**
