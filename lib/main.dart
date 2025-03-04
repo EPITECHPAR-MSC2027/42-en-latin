@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const HomeScreen(),
+        //'/': (context) => const WorkspaceScreen(),
         '/workspace': (context) => const WorkspaceScreen(),
         '/profile': (context) => const ProfileScreen(),
       },
