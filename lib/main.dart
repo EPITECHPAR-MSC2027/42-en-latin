@@ -8,6 +8,7 @@ import 'package:fluter/screens/workspace_screen.dart';
 import 'package:fluter/screens/profile_screen.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +40,9 @@ void main() {
   );
 }
 
+/// The main application widget.
 class MyApp extends StatelessWidget {
+  /// The main application widget.
   const MyApp({super.key});
 
   @override
@@ -51,6 +54,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const HomeScreen(),
+        //'/': (context) => const WorkspaceScreen(),
         '/workspace': (context) => const WorkspaceScreen(),
         '/profile': (context) => const ProfileScreen(),
       },

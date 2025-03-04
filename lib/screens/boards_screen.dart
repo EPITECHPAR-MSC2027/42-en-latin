@@ -5,18 +5,37 @@ import 'package:fluter/screens/manage_BoardsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BoardsScreen extends StatelessWidget {
 
-  const BoardsScreen({super.key, required this.workspaceId, required this.workspaceName});
+
+/// Écran affichant les boards d'un workspace spécifique.
+///
+/// Cet écran récupère les boards d'un workspace en utilisant `WorkspaceProvider`.
+/// L'utilisateur peut voir la liste des boards et en sélectionner un pour afficher ses listes.
+///
+/// [workspaceId] : Identifiant unique du workspace.
+/// [workspaceName] : Nom du workspace affiché dans l'interface.
+class BoardsScreen extends StatelessWidget {
+  /// Constructeur du `BoardsScreen`
+  const BoardsScreen({
+    required this.workspaceId,
+    required this.workspaceName,
+    super.key,
+  });
+  /// Identifiant du workspace.
   final String workspaceId;
+  /// Nom du workspace.
   final String workspaceName;
 
   @override
   Widget build(BuildContext context) {
-    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(
+      context,
+      listen: false,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: Text('Boards de $workspaceName'),
+      appBar: AppBar(
+        title: Text('Boards de $workspaceName'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -25,18 +44,16 @@ class BoardsScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                      builder: (BuildContext context) => ManageBoardsScreen(
-                       workspaceId: workspaceId,
-                       workspaceName: workspaceName,
+                  builder:
+                      (BuildContext context) => ManageBoardsScreen(
+                        workspaceId: workspaceId,
+                        workspaceName: workspaceName,
+                      ),
                 ),
-              ),
               );
             },
           ),
         ],
-      
-      
-      
       ),
       body: FutureBuilder(
         future: workspaceProvider.fetchBoardsByWorkspace(workspaceId),
@@ -48,9 +65,15 @@ class BoardsScreen extends StatelessWidget {
           }
 
           return Consumer<WorkspaceProvider>(
-            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
+            builder: (
+              BuildContext context,
+              WorkspaceProvider provider,
+              Widget? child,
+            ) {
               if (provider.workspaceBoards.isEmpty) {
-                return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
+                return const Center(
+                  child: Text('Aucun board trouvé pour ce workspace.'),
+                );
               }
 
               return ListView.builder(
@@ -65,10 +88,11 @@ class BoardsScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => ListsScreen(
-                            boardId: board.id,
-                            boardName: board.name,
-                          ),
+                          builder:
+                              (BuildContext context) => ListsScreen(
+                                boardId: board.id,
+                                boardName: board.name,
+                              ),
                         ),
                       );
                     },
