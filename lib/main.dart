@@ -1,11 +1,14 @@
 import 'package:fluter/config/secrets.dart';
-import 'package:fluter/providers/broad_providers.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
+import 'package:fluter/screens/workspace_screen.dart';
+import 'package:fluter/screens/profile_screen.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 
@@ -21,8 +24,9 @@ void main() {
         Provider<TrelloService>.value(value: trelloService),
         ChangeNotifierProvider<WorkspaceProvider>(
           create: (_) => WorkspaceProvider(trelloService: trelloService),
-        ),ChangeNotifierProvider<BoardsProvider>(
-          create: (_) =>  BoardsProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider<BoardsProvider>(
+          create: (_) => BoardsProvider(trelloService: trelloService),
         ),
         ChangeNotifierProvider<ListProvider>(
           create: (_) => ListProvider(trelloService: trelloService),
@@ -48,7 +52,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeScreen(),
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/workspace': (context) => const WorkspaceScreen(),
+        '/profile': (context) => const ProfileScreen(),
+      },
     );
   }
 }

@@ -1,9 +1,11 @@
-import 'package:fluter/models/workspace.dart';
-import 'package:fluter/providers/workspace_provider.dart';
-import 'package:fluter/screens/boards_screen.dart';
-import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/workspace_provider.dart';
+import '../models/workspace.dart';
+import '../screens/boards_screen.dart';
+import '../screens/manage_workspaces_screen.dart';
+import '../widgets/board_carousel.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
@@ -25,12 +27,11 @@ class HomeScreenState extends State<HomeScreen> {
     Future<void>.microtask(() async => _loadWorkspaces());
   }
 
+  /// **Charge les workspaces**
   Future<void> _loadWorkspaces() async {
     try {
-      await Provider.of<WorkspaceProvider>(
-        context,
-        listen: false,
-      ).fetchWorkspaces();
+      await Provider.of<WorkspaceProvider>(context, listen: false)
+          .fetchWorkspaces();
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -41,6 +42,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue[50],
       appBar: AppBar(
         title: const Text('Mes Workspaces'),
         actions: <Widget>[
@@ -51,55 +53,84 @@ class HomeScreenState extends State<HomeScreen> {
               await Navigator.push(
                 context,
                 MaterialPageRoute<void>(
-                  builder:
-                      (BuildContext context) => const ManageWorkspacesScreen(),
+                  builder: (BuildContext context) => const ManageWorkspacesScreen(),
                 ),
               );
             },
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage != null
-              ? Center(child: Text('Erreur: $_errorMessage'))
-              : Consumer<WorkspaceProvider>(
-                builder: (
-                  BuildContext context,
-                  WorkspaceProvider provider,
-                  Widget? child,
-                ) {
-                  if (provider.workspaces.isEmpty) {
-                    return const Center(child: Text('Aucun workspace trouvé.'));
-                  }
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'Welcome back!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Ready to work?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                const BoardCarousel(),
 
-                  return ListView.builder(
-                    itemCount: provider.workspaces.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Workspace workspace = provider.workspaces[index];
+                const SizedBox(height: 20),
 
-                      return ListTile(
-                        title: Text(workspace.displayName),
-                        subtitle: Text(workspace.desc ?? 'Aucune description'),
-                        trailing: const Icon(Icons.arrow_forward),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder:
-                                  (BuildContext context) => BoardsScreen(
-                                    workspaceId: workspace.id,
-                                    workspaceName: workspace.displayName,
-                                  ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
+                        ? Center(child: Text('Erreur: $_errorMessage'))
+                        : Consumer<WorkspaceProvider>(
+                            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
+                              if (provider.workspaces.isEmpty) {
+                                return const Center(child: Text('Aucun workspace trouvé.'));
+                              }
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: provider.workspaces.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final Workspace workspace = provider.workspaces[index];
+
+                                  return ListTile(
+                                    title: Text(workspace.displayName),
+                                    subtitle: Text(workspace.desc ?? 'Aucune description'),
+                                    trailing: const Icon(Icons.arrow_forward),
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (BuildContext context) => BoardsScreen(
+                                            workspaceId: workspace.id,
+                                            workspaceName: workspace.displayName,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
