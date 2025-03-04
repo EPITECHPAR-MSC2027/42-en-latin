@@ -1,12 +1,16 @@
 import 'package:fluter/services/trello_service.dart';
 import 'package:fluter/utils/templates.dart'; // ✅ Import des templates en dur
 import 'package:flutter/material.dart';
+import 'package:fluter/models/board.dart';
 
 /// **Classe BoardsProvider**
 class BoardsProvider with ChangeNotifier {
   /// Constructeur
   BoardsProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
+
+  List<Board> _boards = [];
+  List<Board> get boards => _boards;
 
   /// Liste des templates récupérés
   List<Map<String, String>> _templates = templateCards.keys.map((String key) {
@@ -68,20 +72,29 @@ class BoardsProvider with ChangeNotifier {
   }
 
   Future<void> fetchTemplates() async {
-  try {
-    final List<Map<String, dynamic>> fetchedTemplates = await _trelloService.getBoardTemplates();
+    try {
+      final List<Map<String, dynamic>> fetchedTemplates = await _trelloService.getBoardTemplates();
 
-    _templates = fetchedTemplates.map((template) {
-      return {
-        'id': template['id'].toString(),
-        'name': template['name'].toString(),
-      };
-    }).toList();
+      _templates = fetchedTemplates.map((template) {
+        return {
+          'id': template['id'].toString(),
+          'name': template['name'].toString(),
+        };
+      }).toList();
 
-    notifyListeners(); // Mise à jour de l'interface
-  } catch (error) {
-    print('Erreur lors du chargement des templates: $error');
+      notifyListeners();
+    } catch (error) {
+      print('Erreur lors du chargement des templates: $error');
+    }
   }
-}
 
+  /// Charger tous les boards
+  Future<void> fetchBoards() async {
+    try {
+      _boards = await _trelloService.getBoards();
+      notifyListeners();
+    } catch (error) {
+      print('Erreur lors du chargement des boards: $error');
+    }
+  }
 }
