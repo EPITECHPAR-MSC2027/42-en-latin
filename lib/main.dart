@@ -36,7 +36,9 @@ void main() {
   );
 }
 
+/// The main application widget.
 class MyApp extends StatelessWidget {
+  /// The main application widget.
   const MyApp({super.key});
 
   @override
