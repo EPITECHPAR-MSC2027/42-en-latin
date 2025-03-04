@@ -4,8 +4,7 @@ import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-
+import '../widgets/bottom_nav_bar.dart';
 
 /// Écran affichant les boards d'un workspace spécifique.
 ///
@@ -35,7 +34,11 @@ class BoardsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Boards de $workspaceName'),
+        title: Text(workspaceName),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -103,6 +106,7 @@ class BoardsScreen extends StatelessWidget {
           );
         },
       ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }

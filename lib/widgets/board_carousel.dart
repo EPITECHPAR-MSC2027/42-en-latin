@@ -4,7 +4,12 @@ import '../providers/board_provider.dart';
 import '../models/board.dart';
 
 class BoardCarousel extends StatelessWidget {
-  const BoardCarousel({super.key});
+  final bool sortByLastOpened;
+  
+  const BoardCarousel({
+    super.key,
+    this.sortByLastOpened = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +21,11 @@ class BoardCarousel extends StatelessWidget {
           );
         }
 
-        // Trier les boards par date de dernière modification
+        // Trier les boards selon le critère choisi
         final recentBoards = List.from(boardsProvider.boards)
-          ..sort((a, b) => b.lastModified.compareTo(a.lastModified));
+          ..sort((a, b) => sortByLastOpened
+              ? b.lastOpened.compareTo(a.lastOpened)
+              : b.lastModified.compareTo(a.lastModified));
         
         // Prendre seulement les 3 derniers
         final latestBoards = recentBoards.take(3).toList();

@@ -4,6 +4,7 @@ import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 class WorkspaceScreen extends StatelessWidget {
   const WorkspaceScreen({super.key});
@@ -15,6 +16,7 @@ class WorkspaceScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Workspaces'),
+        automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -70,6 +72,7 @@ class WorkspaceScreen extends StatelessWidget {
           );
         },
       ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
