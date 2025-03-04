@@ -36,7 +36,7 @@ class Board {  // desc est maintenant optionnel (String?)
 
   /// Convert the Board instance to a JSON map.
   Map<String, dynamic> toJson() {
-    return {
+    return <String, dynamic>{
       'id': id,
       'name': name,
       'description': desc  ,  // On envoie 'desc' comme 'description'

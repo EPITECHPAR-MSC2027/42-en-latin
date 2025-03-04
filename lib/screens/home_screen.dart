@@ -1,14 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/workspace_provider.dart';
+import '../models/workspace.dart';
+import '../screens/boards_screen.dart';
+import '../screens/manage_workspaces_screen.dart';
 import '../widgets/board_carousel.dart';
 import '../widgets/bottom_nav_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+/// **Écran d'accueil**
+class HomeScreen extends StatefulWidget {
+  /// **Constructeur de HomeScreen**
   const HomeScreen({super.key});
+
+  @override
+  HomeScreenState createState() => HomeScreenState();
+}
+
+/// **État de HomeScreen**
+class HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(() async => _loadWorkspaces());
+  }
+
+  /// **Charge les workspaces**
+  Future<void> _loadWorkspaces() async {
+    try {
+      await Provider.of<WorkspaceProvider>(context, listen: false)
+          .fetchWorkspaces();
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[50],
+      appBar: AppBar(
+        title: const Text('Mes Workspaces'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Gérer les Workspaces',
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) => const ManageWorkspacesScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -34,6 +85,46 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 const BoardCarousel(),
+
+                const SizedBox(height: 20),
+
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
+                        ? Center(child: Text('Erreur: $_errorMessage'))
+                        : Consumer<WorkspaceProvider>(
+                            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
+                              if (provider.workspaces.isEmpty) {
+                                return const Center(child: Text('Aucun workspace trouvé.'));
+                              }
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: provider.workspaces.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final Workspace workspace = provider.workspaces[index];
+
+                                  return ListTile(
+                                    title: Text(workspace.displayName),
+                                    subtitle: Text(workspace.desc ?? 'Aucune description'),
+                                    trailing: const Icon(Icons.arrow_forward),
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (BuildContext context) => BoardsScreen(
+                                            workspaceId: workspace.id,
+                                            workspaceName: workspace.displayName,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
               ],
             ),
           ),
