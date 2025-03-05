@@ -17,6 +17,8 @@ class WorkspaceProvider with ChangeNotifier {
   /// **Liste des boards d'un workspace**
   List<Board> get workspaceBoards => _workspaceBoards;
 
+  get boards => null;
+
   /// **Récupérer la liste des workspaces**
   Future<List<Workspace>> fetchWorkspaces() async {
     try {
@@ -66,8 +68,9 @@ class WorkspaceProvider with ChangeNotifier {
   }
 
   /// **Récupérer les boards d'un workspace**
-  Future<void> fetchBoardsByWorkspace(String workspaceId) async {
+  Future<List<Board>> fetchBoardsByWorkspace(String workspaceId) async {
     _workspaceBoards = await _trelloService.getBoardsByWorkspace(workspaceId);
     notifyListeners();
+    return _workspaceBoards;
   }
 }
