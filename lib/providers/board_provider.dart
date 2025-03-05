@@ -1,7 +1,7 @@
+import 'package:fluter/models/board.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:fluter/utils/templates.dart'; // ✅ Import des templates en dur
 import 'package:flutter/material.dart';
-import 'package:fluter/models/board.dart';
 
 /// **Classe BoardsProvider**
 class BoardsProvider with ChangeNotifier {
@@ -25,7 +25,7 @@ class BoardsProvider with ChangeNotifier {
   String workspaceId, 
   String boardName, 
   String boardDesc, 
-  {String? templateId}
+  {String? templateId,}
 ) async {
   try {
     if (templateId != null && templateCards.containsKey(templateId)) {
@@ -62,11 +62,9 @@ class BoardsProvider with ChangeNotifier {
       
       if (success) {
         notifyListeners(); // Informe les widgets que les données ont changé
-      } else {
-        print('La mise à jour du board a échoué');
-      }
+      } 
     } catch (error) {
-      print('Erreur lors de la modification du board : $error');
+     
       throw Exception('Erreur lors de la modification du board : $error');
     }
   }
@@ -84,7 +82,8 @@ class BoardsProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (error) {
-      print('Erreur lors du chargement des templates: $error');
+      throw Exception('Erreur lors du chargement des templates : $error');
+    
     }
   }
 
@@ -94,7 +93,7 @@ class BoardsProvider with ChangeNotifier {
       _boards = await _trelloService.getBoards();
       notifyListeners();
     } catch (error) {
-      print('Erreur lors du chargement des boards: $error');
+      throw Exception('Erreur lors de la récupération des boards : $error');
     }
   }
 }

@@ -1,11 +1,11 @@
+import 'package:fluter/models/workspace.dart';
+import 'package:fluter/providers/workspace_provider.dart';
+import 'package:fluter/screens/boards_screen.dart';
+import 'package:fluter/screens/manage_workspaces_screen.dart';
+import 'package:fluter/widgets/board_carousel.dart';
+import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/workspace_provider.dart';
-import '../models/workspace.dart';
-import '../screens/boards_screen.dart';
-import '../screens/manage_workspaces_screen.dart';
-import '../widgets/board_carousel.dart';
-import '../widgets/bottom_nav_bar.dart';
 
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
@@ -63,7 +63,7 @@ class HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
                 const SizedBox(height: 20),
@@ -88,9 +88,7 @@ class HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 20),
 
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _errorMessage != null
+                if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
                         ? Center(child: Text('Erreur: $_errorMessage'))
                         : Consumer<WorkspaceProvider>(
                             builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {

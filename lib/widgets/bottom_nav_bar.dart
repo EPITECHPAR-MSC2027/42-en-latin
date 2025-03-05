@@ -6,17 +6,16 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: 0,
-      onTap: (index) {
+      onTap: (index) async {
         switch (index) {
           case 0:
-            Navigator.pushReplacementNamed(context, '/');
+            await Navigator.pushReplacementNamed(context, '/');
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, '/workspace');
+            await Navigator.pushReplacementNamed(context, '/workspace');
             break;
           case 2:
-            Navigator.pushReplacementNamed(context, '/profile');
+            await Navigator.pushReplacementNamed(context, '/profile');
             break;
         }
       },
