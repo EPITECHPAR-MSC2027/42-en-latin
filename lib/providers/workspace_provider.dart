@@ -17,13 +17,13 @@ class WorkspaceProvider with ChangeNotifier {
   /// **Liste des boards d'un workspace**
   List<Board> get workspaceBoards => _workspaceBoards;
 
-  get boards => null;
+  void get boards {}
 
   /// **Récupérer la liste des workspaces**
   Future<List<Workspace>> fetchWorkspaces() async {
     try {
       final List<Map<String, dynamic>> jsonList = await _trelloService.getWorkspaces();
-      final workspaces = jsonList.map((json) => Workspace.fromJson(json)).toList();
+      final List<Workspace> workspaces = jsonList.map(Workspace.fromJson).toList();
       _workspaces = workspaces;
       notifyListeners();
       return workspaces;
