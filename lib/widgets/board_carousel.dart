@@ -1,7 +1,6 @@
+import 'package:fluter/providers/board_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/board_provider.dart';
-import '../models/board.dart';
 
 class BoardCarousel extends StatelessWidget {
   final bool sortByLastOpened;
@@ -39,8 +38,8 @@ class BoardCarousel extends StatelessWidget {
             itemBuilder: (context, index) {
               final board = latestBoards[index];
               return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
+                onTap: () async {
+                  await Navigator.pushNamed(
                     context,
                     '/board',
                     arguments: board.id,

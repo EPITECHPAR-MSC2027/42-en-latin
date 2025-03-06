@@ -69,16 +69,13 @@ class TrelloService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else {
-        print(
-          '❌ Erreur création board: ${response.statusCode} - ${response.body}',
-        );
-        return null;
-      }
+      } 
+      
     } catch (e) {
-      print('❌ Exception lors de la création du board: $e');
-      return null;
+      throw Exception('Erreur lors de la création du board : $e');
     }
+      return null;
+    
   }
 
   /// **Créer un board en appliquant un template**
@@ -92,7 +89,7 @@ class TrelloService {
     final board = await createBoard(workspaceId, name, desc);
     if (board == null || !board.containsKey('id')) return null;
 
-    String boardId = board['id'];
+    final String boardId = board['id'];
 
     // 2️⃣ Supprimer toutes les listes existantes avant d'ajouter le template
     await deleteAllLists(boardId);
@@ -100,67 +97,40 @@ class TrelloService {
     // 3️⃣ Vérifier si le template existe
     final Map<String, List<String>>? template = templateCards[templateId];
     if (template == null) {
-      print('❌ Template non trouvé');
       return null;
     }
 
     // 4️⃣ Ajouter les listes et cartes du template
-    for (var entry in template.entries) {
-      String listName = entry.key;
-      List<String> cards = entry.value;
+    for (final entry in template.entries) {
+      final String listName = entry.key;
+      final List<String> cards = entry.value;
 
       // Créer la liste
       final list = await createList(boardId, listName);
       if (list == null) continue;
 
-      String listId = list.id;
+      final String listId = list.id;
 
       // Ajouter les cartes
-      for (String cardName in cards) {
+      for (final String cardName in cards) {
         await createCard(listId, cardName, ''); // Description vide
       }
     }
 
-    print('✅ Board créé avec le template $templateId');
     return board;
   }
 
   /// **Supprimer un Board et tout son contenu (listes et cartes)**
   Future<bool> deleteBoard(String boardId) async {
-    try {
-      // 1. Récupérer toutes les listes du board
-      final List<Map<String, dynamic>> lists = await getListsByBoard(boardId);
+  try {
+    final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
+    final http.Response response = await http.delete(url);
 
-      for (final Map<String, dynamic> list in lists) {
-        final dynamic listId = list['id'];
-
-        // 2. Récupérer toutes les cartes de la liste
-        final List<Map<String, dynamic>> cards = await getCardsByList(listId);
-
-        // 3. Supprimer chaque carte
-        for (final Map<String, dynamic> card in cards) {
-          await deleteCard(card['id']);
-        }
-
-        // 4. Archiver la liste
-        await deleteList(listId);
-      }
-
-      // 5. Supprimer le board
-      final Uri url = Uri.parse(
-        '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
-      );
-      final http.Response response = await http.delete(url);
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
+    return response.statusCode == 200;
+  } catch (e) {
+    return false;
   }
+}
 
   /// **Mettre à jour un Board**
   Future<bool> updateBoard(
@@ -193,10 +163,10 @@ class TrelloService {
     final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
+      final List<dynamic> data = jsonDecode(response.body);
 
       // Convertir les valeurs dynamiques en String pour correspondre à List<Map<String, String>>
-      List<Map<String, String>> templates =
+      final List<Map<String, String>> templates =
           data.map((template) {
             return {
               'id': template['id'].toString(),
@@ -206,9 +176,6 @@ class TrelloService {
 
       return templates;
     } else {
-      print(
-        'Erreur récupération templates: ${response.statusCode} - ${response.body}',
-      );
       return [];
     }
   }
@@ -390,20 +357,16 @@ class TrelloService {
     final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> lists = jsonDecode(response.body);
+      final List<dynamic> lists = jsonDecode(response.body);
 
-      for (var list in lists) {
+      for (final list in lists) {
         final Uri deleteUrl = Uri.parse(
           '$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token',
         );
         await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
-        print('❌ Liste supprimée : ${list["name"]}');
+     
       }
-    } else {
-      print(
-        '❌ Erreur lors de la récupération des listes : ${response.statusCode}',
-      );
-    }
+    } 
   }
 
   //---------------------------------------------------------------------------//

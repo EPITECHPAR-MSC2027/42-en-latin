@@ -1,4 +1,3 @@
-import 'package:fluter/models/workspace.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/screens/manage_workspaces_screen.dart';
@@ -6,13 +5,40 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bottom_nav_bar.dart';
 
-class WorkspaceScreen extends StatelessWidget {
+class WorkspaceScreen extends StatefulWidget {
   const WorkspaceScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+  State<WorkspaceScreen> createState() => _WorkspaceScreenState();
+}
 
+class _WorkspaceScreenState extends State<WorkspaceScreen> {
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeWorkspaces();
+  }
+
+  void _initializeWorkspaces() {
+    Future.microtask(() async => _loadWorkspaces());
+  }
+
+  /// **Charge les workspaces**
+  Future<void> _loadWorkspaces() async {
+    try {
+      await Provider.of<WorkspaceProvider>(context, listen: false).fetchWorkspaces();
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Workspaces'),
@@ -21,29 +47,27 @@ class WorkspaceScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Gérer les Workspaces',
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const ManageWorkspacesScreen()),
               );
+              // Après le retour de la gestion des workspaces, nous rechargeons les données
+              setState(_initializeWorkspaces);
             },
           ),
         ],
       ),
-      body: FutureBuilder<List<Workspace>>(
-        future: workspaceProvider.fetchWorkspaces(),
-        builder: (BuildContext context, AsyncSnapshot<List<Workspace>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Aucun workspace trouvé.'));
-          }
-
-          return Consumer<WorkspaceProvider>(
-            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-              final List<Workspace> workspaces = provider.workspaces;
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(child: Text('Erreur: $_errorMessage'))
+              : Consumer<WorkspaceProvider>(
+                  builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
+                    final workspaces = provider.workspaces;
+                    if (workspaces.isEmpty) {
+                      return const Center(child: Text('Aucun workspace trouvé.'));
+                    }
 
               return ListView.builder(
                 itemCount: workspaces.length,
