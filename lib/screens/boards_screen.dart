@@ -6,7 +6,17 @@ import 'package:fluter/screens/manage_BoardsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BoardsScreen extends StatefulWidget {
+import '../widgets/bottom_nav_bar.dart';
+
+/// Écran affichant les boards d'un workspace spécifique.
+///
+/// Cet écran récupère les boards d'un workspace en utilisant `WorkspaceProvider`.
+/// L'utilisateur peut voir la liste des boards et en sélectionner un pour afficher ses listes.
+///
+/// [workspaceId] : Identifiant unique du workspace.
+/// [workspaceName] : Nom du workspace affiché dans l'interface.
+class BoardsScreen extends StatelessWidget {
+  /// Constructeur du `BoardsScreen`
   const BoardsScreen({
     required this.workspaceId,
     required this.workspaceName,
@@ -53,7 +63,11 @@ class _BoardsScreenState extends State<BoardsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Boards de ${widget.workspaceName}'),
+        title: Text(workspaceName),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -109,13 +123,17 @@ class _BoardsScreenState extends State<BoardsScreen> {
                                   boardName: board.name,
                                 ),
                               ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }

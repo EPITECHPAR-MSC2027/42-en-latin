@@ -6,33 +6,54 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      onTap: (index) async {
-        switch (index) {
-          case 0:
-            await Navigator.pushReplacementNamed(context, '/');
-            break;
-          case 1:
-            await Navigator.pushReplacementNamed(context, '/workspace');
-            break;
-          case 2:
-            await Navigator.pushReplacementNamed(context, '/profile');
-            break;
-        }
-      },
+      currentIndex: _getCurrentIndex(context),
+      onTap: (index) => _onItemTapped(context, index),
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Home',
+          label: 'Accueil',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
+          icon: Icon(Icons.work),
           label: 'Workspace',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
-          label: 'Profile',
+          label: 'Profil',
         ),
       ],
     );
+  }
+
+  int _getCurrentIndex(BuildContext context) {
+    final String currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
+    switch (currentRoute) {
+      case '/':
+        return 0;
+      case '/workspace':
+        return 1;
+      case '/profile':
+        return 2;
+      default:
+        return 0;
+    }
+  }
+
+  void _onItemTapped(BuildContext context, int index) {
+    String route;
+    switch (index) {
+      case 0:
+        route = '/';
+        break;
+      case 1:
+        route = '/workspace';
+        break;
+      case 2:
+        route = '/profile';
+        break;
+      default:
+        route = '/';
+    }
+    Navigator.pushReplacementNamed(context, route);
   }
 } 
