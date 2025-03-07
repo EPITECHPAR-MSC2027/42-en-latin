@@ -7,7 +7,7 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: _getCurrentIndex(context),
-      onTap: (index) => _onItemTapped(context, index),
+      onTap: (index) async => _onItemTapped(context, index),
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
@@ -39,7 +39,7 @@ class BottomNavBar extends StatelessWidget {
     }
   }
 
-  void _onItemTapped(BuildContext context, int index) {
+  Future<void> _onItemTapped(BuildContext context, int index) async {
     String route;
     switch (index) {
       case 0:
@@ -54,6 +54,6 @@ class BottomNavBar extends StatelessWidget {
       default:
         route = '/';
     }
-    Navigator.pushReplacementNamed(context, route);
+    await Navigator.pushReplacementNamed(context, route);
   }
 } 

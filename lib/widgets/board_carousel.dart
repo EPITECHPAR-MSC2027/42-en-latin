@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
-  final bool sortByLastOpened;
   
   const BoardCarousel({
     super.key,
     this.sortByLastOpened = false,
   });
+  final bool sortByLastOpened;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class BoardCarousel extends StatelessWidget {
         final recentBoards = List.from(boardsProvider.boards)
           ..sort((a, b) => sortByLastOpened
               ? b.lastOpened.compareTo(a.lastOpened)
-              : b.lastModified.compareTo(a.lastModified));
+              : b.lastModified.compareTo(a.lastModified),);
         
         // Prendre seulement les 3 derniers
         final latestBoards = recentBoards.take(3).toList();
