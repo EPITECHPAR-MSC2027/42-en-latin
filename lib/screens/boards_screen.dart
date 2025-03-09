@@ -1,12 +1,12 @@
 import 'dart:async';
+
 import 'package:fluter/models/board.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';
+import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../widgets/bottom_nav_bar.dart';
 
 /// Écran affichant les boards d'un workspace spécifique.
 ///
@@ -15,7 +15,7 @@ import '../widgets/bottom_nav_bar.dart';
 ///
 /// [workspaceId] : Identifiant unique du workspace.
 /// [workspaceName] : Nom du workspace affiché dans l'interface.
-class BoardsScreen extends StatelessWidget {
+class BoardsScreen extends StatefulWidget {
   /// Constructeur du `BoardsScreen`
   const BoardsScreen({
     required this.workspaceId,
@@ -60,80 +60,77 @@ class _BoardsScreenState extends State<BoardsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(workspaceName),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Gérer les Boards',
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => ManageBoardsScreen(
-                    workspaceId: widget.workspaceId,
-                    workspaceName: widget.workspaceName,
-                  ),
-                ),
-              );
-              // Après le retour de la gestion des boards, nous rechargeons les données
-              setState(_initializeBoards);
-            },
-          ),
-        ],
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(widget.workspaceName),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.pop(context),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(child: Text('Erreur: $_errorMessage'))
-              : FutureBuilder<List<Board>>(
-                  future: _fetchBoardsFuture,
-                  builder: (BuildContext context, AsyncSnapshot<List<Board>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Erreur: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
-                    }
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: 'Gérer les Boards',
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => ManageBoardsScreen(
+                  workspaceId: widget.workspaceId,
+                  workspaceName: widget.workspaceName,
+                ),
+              ),
+            );
+            // Correction ici :
+            setState(_initializeBoards);
+          },
+        ),
+      ],
+    ),
+    body: _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _errorMessage != null
+            ? Center(child: Text('Erreur: $_errorMessage'))
+            : FutureBuilder<List<Board>>(
+                future: _fetchBoardsFuture,
+                builder: (BuildContext context, AsyncSnapshot<List<Board>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
+                  }
 
-                    final List<Board> boards = snapshot.data!;
+                  final List<Board> boards = snapshot.data!;
 
-                    return ListView.builder(
-                      itemCount: boards.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final Board board = boards[index];
+                  return ListView.builder(
+                    itemCount: boards.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Board board = boards[index];
 
-                        return ListTile(
-                          title: Text(board.name),
-                          subtitle: Text(board.desc),
-                          trailing: const Icon(Icons.arrow_forward),
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => ListsScreen(
-                                  boardId: board.id,
-                                  boardName: board.name,
-                                ),
+                      return ListTile(
+                        title: Text(board.name),
+                        subtitle: Text(board.desc),
+                        trailing: const Icon(Icons.arrow_forward),
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => ListsScreen(
+                                boardId: board.id,
+                                boardName: board.name,
                               ),
-                        ),
+                            ),
+                          );
+                        }, // Correction ici
                       );
                     },
                   );
                 },
-              );
-            },
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavBar(),
-    );
-  }
+              ),
+    bottomNavigationBar: const BottomNavBar(),
+  );
+}
 }

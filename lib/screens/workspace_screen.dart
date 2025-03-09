@@ -1,9 +1,9 @@
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/screens/manage_workspaces_screen.dart';
+import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/bottom_nav_bar.dart';
 
 class WorkspaceScreen extends StatefulWidget {
   const WorkspaceScreen({super.key});
@@ -72,20 +72,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               return ListView.builder(
                 itemCount: workspaces.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final Workspace workspace = workspaces[index];
+                  final workspace = workspaces[index];
 
                   return ListTile(
                     title: Text(workspace.displayName),
                     subtitle: Text(workspace.desc ?? 'Aucune description'),
                     trailing: const Icon(Icons.arrow_forward),
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => BoardsScreen(
                             workspaceId: workspace.id,
                             workspaceName: workspace.displayName,
-                          ),
+                               ),
                         ),
                       );
                     },
@@ -93,10 +93,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 },
               );
             },
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavBar(),
-    );
+          ),
+          bottomNavigationBar: const BottomNavBar(),
+        );
   }
 }
