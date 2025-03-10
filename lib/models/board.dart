@@ -9,7 +9,13 @@ class Board {  // desc est maintenant optionnel (String?)
   /// [id]: The unique identifier of the board.
   /// [name]: The name of the board.
   /// [desc]: The description of the board (peut être null).
-  Board({required this.id, required this.name, required this.desc});  // desc n'est plus "required"
+  /// [lastOpened]: The last opened date of the board (can be null).
+  Board({
+    required this.id,
+    required this.name,
+    required this.desc,
+    DateTime? lastOpened,
+  }) : lastOpened = lastOpened ?? DateTime.now();
 
   /// Creates a [Board] instance from a JSON object.
   ///
@@ -18,11 +24,13 @@ class Board {  // desc est maintenant optionnel (String?)
   /// [json]: A map representing the JSON data.
   /// Returns a new [Board] instance.
   factory Board.fromJson(Map<String, dynamic> json) {
-    
     return Board(
       id: json['id'],
       name: json['name'],
-      desc: json['desc'] ?? 'Pas de description'  ,  // Utilise 'description' ici aussi
+      desc: json['desc'] ?? 'Pas de description',
+      lastOpened: json['lastOpened'] != null 
+          ? DateTime.parse(json['lastOpened'])
+          : null,
     );
   }
   /// The unique identifier of the board.
@@ -34,12 +42,16 @@ class Board {  // desc est maintenant optionnel (String?)
   /// The description of the board.
   final String desc;
 
+  /// The last opened date of the board.
+  final DateTime lastOpened;
+
   /// Convert the Board instance to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,
       'name': name,
-      'description': desc  ,  // On envoie 'desc' comme 'description'
+      'description': desc,
+      'lastOpened': lastOpened.toIso8601String(),
     };
   }
 }

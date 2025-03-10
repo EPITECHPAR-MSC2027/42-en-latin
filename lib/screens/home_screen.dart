@@ -1,4 +1,5 @@
 import 'package:fluter/models/workspace.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/screens/manage_workspaces_screen.dart';
@@ -24,14 +25,14 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.microtask(() async => _loadWorkspaces());
+    Future<void>.microtask(() async => _loadData());
   }
 
-  /// **Charge les workspaces**
-  Future<void> _loadWorkspaces() async {
+  /// **Charge les données nécessaires**
+  Future<void> _loadData() async {
     try {
-      await Provider.of<WorkspaceProvider>(context, listen: false)
-          .fetchWorkspaces();
+      // Charger les boards pour le carousel
+      await Provider.of<BoardsProvider>(context, listen: false).fetchBoards();
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -44,7 +45,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.blue[50],
       appBar: AppBar(
-        title: const Text('Mes Workspaces'),
+        title: const Text('Mes Boards'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -56,6 +57,8 @@ class HomeScreenState extends State<HomeScreen> {
                   builder: (BuildContext context) => const ManageWorkspacesScreen(),
                 ),
               );
+              // Recharger les boards après la gestion des workspaces
+              await _loadData();
             },
           ),
         ],
@@ -68,7 +71,7 @@ class HomeScreenState extends State<HomeScreen> {
               children: [
                 const SizedBox(height: 20),
                 const Text(
-                  'Welcome back!',
+                  'Bienvenue !',
                   style: TextStyle(
                     fontSize: 32,
                     color: Colors.blue,
@@ -77,52 +80,19 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Ready to work?',
+                  'Prêt à travailler ?',
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.grey,
                   ),
                 ),
                 const SizedBox(height: 40),
-                const BoardCarousel(),
-
-                const SizedBox(height: 20),
-
-                if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
-                        ? Center(child: Text('Erreur: $_errorMessage'))
-                        : Consumer<WorkspaceProvider>(
-                            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-                              if (provider.workspaces.isEmpty) {
-                                return const Center(child: Text('Aucun workspace trouvé.'));
-                              }
-
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: provider.workspaces.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final Workspace workspace = provider.workspaces[index];
-
-                                  return ListTile(
-                                    title: Text(workspace.displayName),
-                                    subtitle: Text(workspace.desc ?? 'Aucune description'),
-                                    trailing: const Icon(Icons.arrow_forward),
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute<void>(
-                                          builder: (BuildContext context) => BoardsScreen(
-                                            workspaceId: workspace.id,
-                                            workspaceName: workspace.displayName,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                if (_isLoading) 
+                  const Center(child: CircularProgressIndicator()) 
+                else if (_errorMessage != null)
+                  Center(child: Text('Erreur: $_errorMessage'))
+                else
+                  const BoardCarousel(),
               ],
             ),
           ),
