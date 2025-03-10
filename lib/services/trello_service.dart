@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fluter/models/board.dart';
 import 'package:fluter/models/list.dart';
+import 'package:fluter/models/notification.dart';
 import 'package:fluter/utils/templates.dart'; // Import des templates
 import 'package:http/http.dart' as http;
 
@@ -452,6 +453,56 @@ class TrelloService {
     );
 
     final http.Response response = await http.delete(url);
+
+    return response.statusCode == 200;
+  }
+
+  //---------------------------------------------------------------------------//
+  //                              NOTIFICATIONS                                 //
+  //---------------------------------------------------------------------------//
+
+  /// **Récupérer les notifications**
+  Future<List<TrelloNotification>> getNotifications() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/notifications?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> notificationsJson = json.decode(response.body);
+      return notificationsJson.map((json) => TrelloNotification.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur: impossible de charger les notifications');
+    }
+  }
+
+  /// **Marquer une notification comme lue**
+  Future<bool> markNotificationAsRead(String notificationId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/notifications/$notificationId?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'unread': false}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  /// **Marquer toutes les notifications comme lues**
+  Future<bool> markAllNotificationsAsRead() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/notifications?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'unread': false}),
+    );
 
     return response.statusCode == 200;
   }
