@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluter/models/board.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';
@@ -115,6 +116,9 @@ Widget build(BuildContext context) {
                         subtitle: Text(board.desc),
                         trailing: const Icon(Icons.arrow_forward),
                         onTap: () async {
+                          await Provider.of<BoardsProvider>(context, listen: false)
+                              .markBoardAsOpened(board.id);
+                          
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -124,7 +128,7 @@ Widget build(BuildContext context) {
                               ),
                             ),
                           );
-                        }, // Correction ici
+                        },
                       );
                     },
                   );

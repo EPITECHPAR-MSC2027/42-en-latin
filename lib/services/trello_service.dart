@@ -180,6 +180,27 @@ class TrelloService {
     }
   }
 
+  /// **Mettre à jour la date de dernière ouverture d'un board**
+  Future<bool> updateBoardLastOpened(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
+    );
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'lastOpened': DateTime.now().toIso8601String(),
+        }),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture : $e');
+    }
+  }
+
   //---------------------------------------------------------------------------//
   //                                 WORKSPACES                                //
   //---------------------------------------------------------------------------//
