@@ -464,17 +464,47 @@ class TrelloService {
   /// **Récupérer les notifications**
   Future<List<TrelloNotification>> getNotifications() async {
     final Uri url = Uri.parse(
-      '$baseUrl/members/me/notifications?key=$apiKey&token=$token',
+      '$baseUrl/members/me/notifications?key=$apiKey&token=$token&limit=50&read_filter=all&memberCreator=true&memberCreator_fields=fullName&board=true&board_fields=name&card=true&card_fields=name&list=true&list_fields=name',
     );
 
     final http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
       final List<dynamic> notificationsJson = json.decode(response.body);
-      return notificationsJson.map((json) => TrelloNotification.fromJson(json)).toList();
+      return notificationsJson.map((json) {
+        // Extraire les informations du board si présentes
+        String? boardId;
+        String? boardName;
+        if (json['data']?['board'] != null) {
+          boardId = json['data']['board']['id'];
+          boardName = json['data']['board']['name'];
+        }
+
+        return TrelloNotification(
+          id: json['id'],
+          type: json['type'],
+          message: json['data']?['text'] ?? _getDefaultMessage(json),
+          date: DateTime.parse(json['date']),
+          isRead: !json['unread'],
+          boardId: boardId,
+          boardName: boardName,
+        );
+      }).toList();
     } else {
       throw Exception('Erreur: impossible de charger les notifications');
     }
+  }
+
+  /// Obtient un message par défaut si le texte n'est pas disponible
+  String _getDefaultMessage(Map<String, dynamic> json) {
+    final memberName = json['memberCreator']?['fullName'] ?? 'Quelqu\'un';
+    final boardName = json['data']?['board']?['name'] ?? '';
+    final cardName = json['data']?['card']?['name'] ?? '';
+    final listName = json['data']?['list']?['name'] ?? '';
+
+    return '$memberName a effectué une action${boardName.isNotEmpty ? ' sur le board $boardName' : ''}'
+           '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
+           '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
   }
 
   /// **Marquer une notification comme lue**

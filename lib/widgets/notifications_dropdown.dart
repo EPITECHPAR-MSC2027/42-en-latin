@@ -102,18 +102,21 @@ class NotificationsDropdown extends StatelessWidget {
     );
   }
 
-  IconData _getNotificationIcon(NotificationType type) {
-    switch (type) {
-      case NotificationType.mention:
-        return Icons.alternate_email;
-      case NotificationType.boardShared:
-        return Icons.share;
-      case NotificationType.cardAssigned:
-        return Icons.assignment_ind;
-      case NotificationType.dueDate:
-        return Icons.access_time;
-      case NotificationType.other:
-        return Icons.notifications;
+  IconData _getNotificationIcon(String type) {
+    if (type.contains('mention')) {
+      return Icons.alternate_email;
+    } else if (type.contains('added') || type.contains('make')) {
+      return Icons.person_add;
+    } else if (type.contains('Card')) {
+      return Icons.assignment;
+    } else if (type.contains('due')) {
+      return Icons.access_time;
+    } else if (type.contains('comment')) {
+      return Icons.comment;
+    } else if (type.contains('attachment')) {
+      return Icons.attach_file;
+    } else {
+      return Icons.notifications;
     }
   }
 

@@ -11,27 +11,11 @@ class TrelloNotification {
     this.boardName,
   });
 
-  /// Crée une [TrelloNotification] à partir d'un objet JSON
-  factory TrelloNotification.fromJson(Map<String, dynamic> json) {
-    return TrelloNotification(
-      id: json['id'],
-      type: NotificationType.values.firstWhere(
-        (type) => type.toString() == json['type'],
-        orElse: () => NotificationType.other,
-      ),
-      message: json['message'],
-      date: DateTime.parse(json['date']),
-      isRead: json['isRead'] ?? false,
-      boardId: json['boardId'],
-      boardName: json['boardName'],
-    );
-  }
-
   /// L'identifiant unique de la notification
   final String id;
 
-  /// Le type de notification
-  final NotificationType type;
+  /// Le type de notification (directement depuis l'API Trello)
+  final String type;
 
   /// Le message de la notification
   final String message;
@@ -52,7 +36,7 @@ class TrelloNotification {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'type': type.toString(),
+      'type': type,
       'message': message,
       'date': date.toIso8601String(),
       'isRead': isRead,
