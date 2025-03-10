@@ -2,23 +2,23 @@ import 'package:fluter/models/list.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 
+/// **Classe permettant de gérer les listes**
 class ListProvider with ChangeNotifier {
 
+
+  /// **Constructeur de List**
   ListProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
   List<ListModel> _lists = <ListModel>[];
 
+  /// **Liste des listes**
   List<ListModel> get lists => _lists;
 
   /// **Récupérer les listes d'un board**
   Future<void> fetchListsByBoard(String boardId) async {
-    try {
-      final List<Map<String, dynamic>> jsonList = await _trelloService.getListsByBoard(boardId);
-      _lists = jsonList.map(ListModel.fromJson).toList();
-      notifyListeners();
-    } catch (e) {
-      print('Erreur lors de la récupération des listes: $e');
-    }
+    final List<Map<String, dynamic>> jsonList = await _trelloService.getListsByBoard(boardId);
+    _lists = jsonList.map(ListModel.fromJson).toList();
+    notifyListeners();
   }
 
   /// **Créer une nouvelle List**

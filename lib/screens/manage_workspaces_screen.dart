@@ -3,56 +3,81 @@ import 'package:fluter/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ManageWorkspacesScreen extends StatelessWidget {
+/// **Écran de gestion des workspaces**
+class ManageWorkspacesScreen extends StatefulWidget {
+  /// **Constructeur de ManageWorkspacesScreen**
   const ManageWorkspacesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {  
-    final WorkspaceProvider workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+  ManageWorkspacesScreenState createState() => ManageWorkspacesScreenState();
+}
 
+/// **État de ManageWorkspacesScreen**
+class ManageWorkspacesScreenState extends State<ManageWorkspacesScreen> {
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(() async => _loadWorkspaces());
+  }
+
+  /// **Charge les workspaces**
+  Future<void> _loadWorkspaces() async {
+    try {
+      await Provider.of<WorkspaceProvider>(context, listen: false).fetchWorkspaces();
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Mes Workspaces')),
-      body: FutureBuilder(
-      
-        future: workspaceProvider.fetchWorkspaces(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(child: Text('Erreur: $_errorMessage'))
+              : Consumer<WorkspaceProvider>(
+                  builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
+                    if (provider.workspaces.isEmpty) {
+                      return const Center(child: Text('Aucun workspace trouvé.'));
+                    }
 
-          return Consumer<WorkspaceProvider>(
-            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-              return ListView.builder(
-                itemCount: provider.workspaces.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Workspace workspace = provider.workspaces[index];
+                    return ListView.builder(
+                      itemCount: provider.workspaces.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final Workspace workspace = provider.workspaces[index];
 
-                  return ListTile(
-                    title: Text(workspace.displayName),
-                    subtitle: Text(workspace.desc ?? 'Aucune description'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async => provider.removeWorkspace(workspace.id),
-                    ),
-                    onTap: () async {
-                      await _editWorkspaceDialog(context, workspace, provider);
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                        return ListTile(
+                          title: Text(workspace.displayName),
+                          subtitle: Text(workspace.desc ?? 'Aucune description'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              await provider.removeWorkspace(workspace.id);
+                            },
+                          ),
+                          onTap: () async {
+                            await _editWorkspaceDialog(context, workspace, provider);
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () async => _addWorkspaceDialog(context, workspaceProvider),
+        onPressed: () async => _addWorkspaceDialog(context, Provider.of<WorkspaceProvider>(context, listen: false)),
       ),
     );
   }
 
+  /// **Affiche le dialogue pour créer un workspace**
   Future<void> _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) async {
     String name = '';
     String displayName = '';
@@ -73,8 +98,9 @@ class ManageWorkspacesScreen extends StatelessWidget {
         actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
-            onPressed: () {
-              provider.addWorkspace(name, displayName, desc);
+            onPressed: () async {
+              await provider.addWorkspace(name, displayName, desc);
+              if (!context.mounted) return;
               Navigator.pop(context);
             },
             child: const Text('Créer'),
@@ -84,6 +110,7 @@ class ManageWorkspacesScreen extends StatelessWidget {
     );
   }
 
+  /// **Affiche le dialogue pour modifier un workspace**
   Future<void> _editWorkspaceDialog(BuildContext context, Workspace workspace, WorkspaceProvider provider) async {
     String newDisplayName = workspace.displayName;
     String newDesc = workspace.desc ?? '';
@@ -112,7 +139,7 @@ class ManageWorkspacesScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               await provider.editWorkspace(workspace.id, newDisplayName, newDesc);
-              // ignore: use_build_context_synchronously
+              if (!context.mounted) return;
               Navigator.pop(context);
             },
             child: const Text('Enregistrer'),

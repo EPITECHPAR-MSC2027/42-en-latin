@@ -3,21 +3,33 @@ import 'package:fluter/models/workspace.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 
+/// **Classe permettant de gérer les workspaces**
 class WorkspaceProvider with ChangeNotifier {
 
+  /// **Constructeur de Workspace**
   WorkspaceProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
 
   List<Workspace> _workspaces = <Workspace>[];
+  /// **Liste des workspaces**
   List<Workspace> get workspaces => _workspaces;
   List<Board> _workspaceBoards = <Board>[];
+  /// **Liste des boards d'un workspace**
   List<Board> get workspaceBoards => _workspaceBoards;
 
+  void get boards {}
+
   /// **Récupérer la liste des workspaces**
-  Future<void> fetchWorkspaces() async {
-    final List<Map<String, dynamic>> jsonList = await _trelloService.getWorkspaces();
-    _workspaces = jsonList.map(Workspace.fromJson).toList();
-    notifyListeners();
+  Future<List<Workspace>> fetchWorkspaces() async {
+    try {
+      final List<Map<String, dynamic>> jsonList = await _trelloService.getWorkspaces();
+      final List<Workspace> workspaces = jsonList.map(Workspace.fromJson).toList();
+      _workspaces = workspaces;
+      notifyListeners();
+      return workspaces;
+    } catch (error) {
+      throw Exception('Erreur lors de la récupération des workspaces : $error');
+    }
   }
 
   /// **Créer un workspace**
@@ -56,8 +68,9 @@ class WorkspaceProvider with ChangeNotifier {
   }
 
   /// **Récupérer les boards d'un workspace**
-  Future<void> fetchBoardsByWorkspace(String workspaceId) async {
+  Future<List<Board>> fetchBoardsByWorkspace(String workspaceId) async {
     _workspaceBoards = await _trelloService.getBoardsByWorkspace(workspaceId);
     notifyListeners();
+    return _workspaceBoards;
   }
 }

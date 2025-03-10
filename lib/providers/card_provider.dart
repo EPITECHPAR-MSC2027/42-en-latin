@@ -2,24 +2,25 @@ import 'package:fluter/models/card.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 
+/// **Classe permettant de gérer les cartes**
 class CardProvider with ChangeNotifier {
 
+  /// **Constructeur de Card**
   CardProvider({required TrelloService trelloService}) : _trelloService = trelloService;
   final TrelloService _trelloService;
   List<CardModel> _cards = <CardModel>[];
 
+  /// **Liste des cartes**
   List<CardModel> get cards => _cards;
 
   /// **Récupérer les cartes d'une liste**
   Future<void> fetchCardsByList(String listId) async {
-    try {
-      final List<Map<String, dynamic>> jsonList = await _trelloService.getCardsByList(listId);
-      _cards = jsonList.map(CardModel.fromJson).toList();
-      notifyListeners();
-    } catch (e) {
-      print('Erreur lors de la récupération des cartes: $e');
-    }
+    final List<Map<String, dynamic>> jsonList = await _trelloService.getCardsByList(listId);
+    _cards = jsonList.map(CardModel.fromJson).toList();
+    notifyListeners();
   }
+
+
 
   /// **Créer une nouvelle carte**
   Future<void> addCard(String listId, String name, String desc) async {
