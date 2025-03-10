@@ -1,10 +1,10 @@
-import 'package:fluter/models/workspace.dart';
 import 'package:fluter/providers/board_provider.dart';
-import 'package:fluter/providers/workspace_provider.dart';
-import 'package:fluter/screens/boards_screen.dart';
+import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
+import 'package:fluter/widgets/notifications_dropdown.dart';
+import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +25,12 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.microtask(() async => _loadData());
+    Future<void>.microtask(() async {
+      await _loadData();
+      // Charger les notifications au démarrage
+      // ignore: use_build_context_synchronously
+      await Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
+    });
   }
 
   /// **Charge les données nécessaires**
@@ -47,6 +52,7 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Mes Boards'),
         actions: <Widget>[
+          const NotificationsDropdown(),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Gérer les Workspaces',
@@ -68,6 +74,7 @@ class HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
                 const Text(
@@ -92,7 +99,14 @@ class HomeScreenState extends State<HomeScreen> {
                 else if (_errorMessage != null)
                   Center(child: Text('Erreur: $_errorMessage'))
                 else
-                  const BoardCarousel(),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BoardCarousel(),
+                      SizedBox(height: 32),
+                      RecentNotificationsList(),
+                    ],
+                  ),
               ],
             ),
           ),
