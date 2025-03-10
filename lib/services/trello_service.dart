@@ -497,7 +497,7 @@ class TrelloService {
 
   /// Obtient un message par défaut si le texte n'est pas disponible
   String _getDefaultMessage(Map<String, dynamic> json) {
-    final memberName = json['memberCreator']?['fullName'] ?? 'Quelqu\'un';
+    final memberName = json['memberCreator']?['fullName'] ?? "Quelqu'un";
     final boardName = json['data']?['board']?['name'] ?? '';
     final cardName = json['data']?['card']?['name'] ?? '';
     final listName = json['data']?['list']?['name'] ?? '';

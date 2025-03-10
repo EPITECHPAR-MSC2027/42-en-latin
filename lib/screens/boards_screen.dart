@@ -120,6 +120,7 @@ Widget build(BuildContext context) {
                               .markBoardAsOpened(board.id);
                           
                           await Navigator.push(
+                            // ignore: use_build_context_synchronously
                             context,
                             MaterialPageRoute(
                               builder: (BuildContext context) => ListsScreen(

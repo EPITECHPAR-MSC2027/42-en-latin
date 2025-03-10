@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:fluter/models/notification.dart';
 import 'package:fluter/services/trello_service.dart';
+import 'package:flutter/material.dart';
 
 class NotificationProvider with ChangeNotifier {
   NotificationProvider({required TrelloService trelloService}) 
@@ -69,7 +69,7 @@ class NotificationProvider with ChangeNotifier {
           isRead: true,
           boardId: notification.boardId,
           boardName: notification.boardName,
-        )).toList();
+        ),).toList();
         notifyListeners();
       }
     } catch (error) {

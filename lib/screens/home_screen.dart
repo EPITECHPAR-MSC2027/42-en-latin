@@ -28,6 +28,7 @@ class HomeScreenState extends State<HomeScreen> {
     Future<void>.microtask(() async {
       await _loadData();
       // Charger les notifications au démarrage
+      // ignore: use_build_context_synchronously
       await Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
     });
   }
@@ -98,9 +99,9 @@ class HomeScreenState extends State<HomeScreen> {
                 else if (_errorMessage != null)
                   Center(child: Text('Erreur: $_errorMessage'))
                 else
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       BoardCarousel(),
                       SizedBox(height: 32),
                       RecentNotificationsList(),

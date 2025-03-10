@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:fluter/models/notification.dart';
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class RecentNotificationsList extends StatelessWidget {
@@ -112,7 +111,7 @@ class RecentNotificationsList extends StatelessWidget {
     } else if (difference.inMinutes > 0) {
       return 'Il y a ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''}';
     } else {
-      return 'À l\'instant';
+      return "À l'instant";
     }
   }
-} 
+}
