@@ -3,6 +3,7 @@ import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
 import 'package:fluter/screens/profile_screen.dart';
@@ -37,6 +38,9 @@ void main() {
         ),
         ChangeNotifierProvider<NotificationProvider>(
           create: (_) => NotificationProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+          create: (context) => UserProvider(trelloService: trelloService),
         ),
       ],
       child: const MyApp(),

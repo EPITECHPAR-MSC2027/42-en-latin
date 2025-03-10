@@ -536,4 +536,23 @@ class TrelloService {
 
     return response.statusCode == 200;
   }
+
+  //---------------------------------------------------------------------------//
+  //                                  USER INFO                                  //
+  //---------------------------------------------------------------------------//
+
+  /// **Récupérer les informations de l'utilisateur**
+  Future<Map<String, dynamic>> getUserInfo() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me?key=$apiKey&token=$token&fields=all',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Erreur: impossible de charger les informations utilisateur');
+    }
+  }
 }
