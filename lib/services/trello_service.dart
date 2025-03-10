@@ -197,7 +197,7 @@ class TrelloService {
 
       return response.statusCode == 200;
     } catch (e) {
-      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture : $e');
+      throw Exception("Erreur lors de la mise à jour de la date d'ouverture : $e");
     }
   }
 

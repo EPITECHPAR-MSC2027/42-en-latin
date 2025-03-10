@@ -45,7 +45,7 @@ class BoardsProvider with ChangeNotifier {
         await _trelloService.updateBoardLastOpened(boardId);
       }
     } catch (error) {
-      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture du board : $error');
+      throw Exception("Erreur lors de la mise à jour de la date d'ouverture du board : $error");
     }
   }
 

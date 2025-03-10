@@ -27,7 +27,7 @@ class BoardCarousel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'Boards récents',
                 style: TextStyle(
