@@ -2,6 +2,8 @@ import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/widgets/favorites_carousel.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,10 +16,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les informations utilisateur au démarrage
-    Future.microtask(
-      () => context.read<UserProvider>().loadUserInfo(),
-    );
+    // Charger les informations utilisateur et les favoris au démarrage
+    Future.microtask(() {
+      context.read<UserProvider>().loadUserInfo();
+      context.read<FavoritesProvider>().loadFavorites();
+    });
   }
 
   @override
@@ -100,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                // Ici, vous pouvez ajouter d'autres sections pour plus d'informations
+                const FavoritesCarousel(),
               ],
             ),
           );
