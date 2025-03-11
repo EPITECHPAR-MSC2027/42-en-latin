@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fluter/models/board.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';
@@ -168,6 +169,7 @@ Widget _buildTableView(List<Board> boards) {
             (index) {
               final Board board = boards[index];
 
+
               return Column(
                 children: [
                   ListTile(
@@ -183,6 +185,8 @@ Widget _buildTableView(List<Board> boards) {
                             boardName: board.name,
                           ),
                         ),
+
+                   
                       );
                     },
                   ),
