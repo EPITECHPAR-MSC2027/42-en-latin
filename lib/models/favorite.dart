@@ -5,10 +5,6 @@ class Favorite {
     required this.url,
   });
 
-  final String id;
-  final String name;
-  final String url;
-
   factory Favorite.fromJson(Map<String, dynamic> json) {
     return Favorite(
       id: json['id'],
@@ -16,4 +12,8 @@ class Favorite {
       url: json['url'],
     );
   }
+
+  final String id;
+  final String name;
+  final String url;
 } 

@@ -13,10 +13,10 @@ class FavoritesProvider extends ChangeNotifier {
   Future<void> loadFavorites() async {
     try {
       final favoritesData = await trelloService.getFavorites();
-      _favorites = favoritesData.map((json) => Favorite.fromJson(json)).toList();
+      _favorites = favoritesData.map(Favorite.fromJson).toList();
       notifyListeners();
     } catch (e) {
       debugPrint('Erreur lors du chargement des favoris: $e');
     }
   }
-} 
+}

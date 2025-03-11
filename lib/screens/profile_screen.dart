@@ -1,9 +1,9 @@
+import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
+import 'package:fluter/widgets/favorites_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/favorites_provider.dart';
-import 'package:fluter/widgets/favorites_carousel.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,9 +17,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     // Charger les informations utilisateur et les favoris au démarrage
-    Future.microtask(() {
-      context.read<UserProvider>().loadUserInfo();
-      context.read<FavoritesProvider>().loadFavorites();
+    Future.microtask(() async {
+      // ignore: use_build_context_synchronously
+      await context.read<UserProvider>().loadUserInfo();
+      // ignore: use_build_context_synchronously
+      await context.read<FavoritesProvider>().loadFavorites();
     });
   }
 
@@ -53,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       end: Alignment.bottomRight,
                       colors: [
                         Theme.of(context).primaryColor,
+                        // ignore: deprecated_member_use
                         Theme.of(context).primaryColor.withOpacity(0.8),
                       ],
                     ),
@@ -92,6 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     user.bio!,
                                     style: TextStyle(
                                       fontSize: 14,
+                                      // ignore: deprecated_member_use
                                       color: Colors.white.withOpacity(0.9),
                                     ),
                                   ),

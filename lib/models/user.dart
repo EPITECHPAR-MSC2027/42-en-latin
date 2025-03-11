@@ -8,13 +8,6 @@ class TrelloUser {
     this.bio,
   });
 
-  final String id;
-  final String fullName;
-  final String username;
-  final String email;
-  final String avatarUrl;
-  final String? bio;
-
   factory TrelloUser.fromJson(Map<String, dynamic> json) {
     return TrelloUser(
       id: json['id'],
@@ -26,6 +19,13 @@ class TrelloUser {
     );
   }
 
+  final String id;
+  final String fullName;
+  final String username;
+  final String email;
+  final String avatarUrl;
+  final String? bio;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -36,4 +36,4 @@ class TrelloUser {
       'bio': bio,
     };
   }
-} 
+}

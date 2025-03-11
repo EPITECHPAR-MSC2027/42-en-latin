@@ -19,7 +19,6 @@ class FavoritesCarousel extends StatelessWidget {
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 1, // Pour un affichage carré
           ),
           itemCount: favorites.length,
           itemBuilder: (context, index) {
@@ -40,4 +39,4 @@ class FavoritesCarousel extends StatelessWidget {
       },
     );
   }
-} 
+}
