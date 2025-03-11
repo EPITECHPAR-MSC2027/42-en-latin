@@ -559,7 +559,7 @@ class TrelloService {
   /// **Récupérer les favoris**
   Future<List<Map<String, dynamic>>> getFavorites() async {
     final Uri url = Uri.parse(
-      '$baseUrl/members/me/favorites?key=$apiKey&token=$token',
+      '$baseUrl/members/me/boards?key=$apiKey&token=$token&filter=starred',
     );
 
     final http.Response response = await http.get(url);

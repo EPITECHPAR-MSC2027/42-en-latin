@@ -2,18 +2,24 @@ class Favorite {
   Favorite({
     required this.id,
     required this.name,
-    required this.url,
+    required this.prefs,
+    this.shortUrl,
+    this.backgroundColor,
   });
 
   factory Favorite.fromJson(Map<String, dynamic> json) {
     return Favorite(
       id: json['id'],
       name: json['name'],
-      url: json['url'],
+      prefs: json['prefs'] ?? {},
+      shortUrl: json['shortUrl'],
+      backgroundColor: json['prefs']?['backgroundColor'],
     );
   }
 
   final String id;
   final String name;
-  final String url;
+  final Map<String, dynamic> prefs;
+  final String? shortUrl;
+  final String? backgroundColor;
 } 
