@@ -27,7 +27,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   late Future<List<Board>> _fetchBoardsFuture;
-  bool _isTableView = true; // Gère l'affichage entre Table et Board
+  final bool _isTableView = true; // Gère l'affichage entre Table et Board
 
   @override
   void initState() {
@@ -148,40 +148,58 @@ class _BoardsScreenState extends State<BoardsScreen> {
 
   
 
-  /// **Affichage du mode Table**
-  Widget _buildTableView(List<Board> boards) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+Widget _buildTableView(List<Board> boards) {
+  return Padding(
+    padding: const EdgeInsets.all(20),
+    child: Align(
+      alignment: Alignment.topCenter, // Évite d'étirer le conteneur sur toute la hauteur
       child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.9, // Limite la largeur si besoin
+        ),
         decoration: BoxDecoration(
           color: Colors.blue[100],
           borderRadius: BorderRadius.circular(10),
         ),
-        child: ListView.builder(
-          itemCount: boards.length,
-          itemBuilder: (BuildContext context, int index) {
-            final Board board = boards[index];
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Ajuste la hauteur selon le contenu
+          children: List.generate(
+            boards.length,
+            (index) {
+              final Board board = boards[index];
 
-            return ListTile(
-              title: Text(board.name),
-              subtitle: Text(board.desc),
-              trailing: const Icon(Icons.arrow_forward),
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => ListsScreen(
-                      boardId: board.id,
-                      boardName: board.name,
-                    ),
+              return Column(
+                children: [
+                  ListTile(
+                    title: Text(board.name),
+                    subtitle: Text(board.desc),
+                    trailing: const Icon(Icons.arrow_forward),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => ListsScreen(
+                            boardId: board.id,
+                            boardName: board.name,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            );
-          },
+                  if (index < boards.length - 1) // Empêche un divider après le dernier élément
+                    const Divider(
+                      color: Color(0xFFD97C83),
+                      thickness: 1,
+                      height: 10, // Espacement vertical
+                    ),
+                ],
+              );
+            },
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
 }
