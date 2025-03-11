@@ -20,11 +20,22 @@ dependencies:
 
 dev_dependencies:
   blackfoot_flutter_lint: ^2.0.0
+  flutter_launcher_icons: ^0.14.3
   flutter_test:
     sdk: flutter
   json_serializable: ^6.9.4
   
- 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  windows: 
+    generate: true
+    image_path: "documentation/app icon.jpg"
+  web:
+    generate: true
+    image_path: "documentation/app icon.jpg"
+  image_path: "documentation/app icon.jpg"
+
 
 flutter:
 
