@@ -1,5 +1,5 @@
-import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/board_provider.dart';
+import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -75,6 +75,7 @@ class FavoritesCarousel extends StatelessWidget {
                               
                               // ignore: use_build_context_synchronously
                               await Navigator.push(
+                                // ignore: use_build_context_synchronously
                                 context,
                                 MaterialPageRoute(
                                   builder: (BuildContext context) => ListsScreen(
@@ -91,6 +92,7 @@ class FavoritesCarousel extends StatelessWidget {
                                 children: [
                                   Icon(
                                     Icons.star,
+                                    // ignore: deprecated_member_use
                                     color: Colors.white.withOpacity(0.9),
                                     size: 32,
                                   ),
@@ -141,6 +143,7 @@ class FavoritesCarousel extends StatelessWidget {
                                 
                                 // ignore: use_build_context_synchronously
                                 await Navigator.push(
+                                  // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) => ListsScreen(
@@ -157,6 +160,7 @@ class FavoritesCarousel extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.star,
+                                      // ignore: deprecated_member_use
                                       color: Colors.white.withOpacity(0.9),
                                       size: 32,
                                     ),
