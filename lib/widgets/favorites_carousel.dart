@@ -1,4 +1,6 @@
 import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/providers/board_provider.dart';
+import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -61,8 +63,22 @@ class FavoritesCarousel extends StatelessWidget {
                       elevation: 4,
                       color: _getBackgroundColor(favorite.backgroundColor),
                       child: InkWell(
-                        onTap: () {
-                          // Navigation vers le board (à implémenter)
+                        onTap: () async {
+                          // Marquer le board comme ouvert avant la navigation
+                          await Provider.of<BoardsProvider>(context, listen: false)
+                              .markBoardAsOpened(favorite.id);
+                          
+                          // Naviguer vers le ListsScreen avec l'ID et le nom du board
+                          // ignore: use_build_context_synchronously
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => ListsScreen(
+                                boardId: favorite.id,
+                                boardName: favorite.name,
+                              ),
+                            ),
+                          );
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(12),
