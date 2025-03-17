@@ -83,7 +83,7 @@ class ListsScreenState extends State<ListsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 16), // ✅ Marge sous la navbar
+                            const SizedBox(height: 16),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -121,8 +121,8 @@ class ListsScreenState extends State<ListsScreen> {
 
   /// **Construit un container dynamique pour chaque liste**
   Widget _buildListContainer(ListModel list, {required double width}) {
-    final cardProvider = Provider.of<CardProvider>(context, listen: false);
-    final List<CardModel> cards = cardProvider.getCardsByList(list.id);
+    final cardProvider = Provider.of<CardProvider>(context);
+    final List<CardModel> cards = cardProvider.fetchCardsByList(list.id);
 
     return SizedBox(
       width: width,
@@ -142,13 +142,24 @@ class ListsScreenState extends State<ListsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              list.name,
-              style: GoogleFonts.itim(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  list.name,
+                  style: GoogleFonts.itim(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add, color: Colors.black),
+                  onPressed: () async {
+                    await _addCardDialog(context, list.id, cardProvider);
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 3),
             Column(
@@ -163,41 +174,148 @@ class ListsScreenState extends State<ListsScreen> {
     );
   }
 
+  /// **Affiche un popup pour ajouter une carte**
+  Future<void> _addCardDialog(BuildContext context, String listId, CardProvider provider) async {
+  String name = '';
+  String desc = '';
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text('Créer une Carte'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            decoration: const InputDecoration(labelText: 'Nom'),
+            onChanged: (String val) => name = val,
+          ),
+          TextField(
+            decoration: const InputDecoration(labelText: 'Description'),
+            onChanged: (String val) => desc = val,
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+        TextButton(
+          onPressed: () async {
+            await provider.addCard(listId, name, desc);
+            if (!context.mounted) return;
+            Navigator.pop(context);
+
+            // ✅ Rafraîchir après ajout
+            await provider.fetchCardsByBoard(listId);
+          },
+          child: const Text('Créer'),
+        ),
+      ],
+    ),
+  );
+}
+
   /// **Construit un widget pour une carte**
   Widget _buildCard(CardModel card) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(20),
-              blurRadius: 3,
-              offset: const Offset(1, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              card.name,
-              style: GoogleFonts.itim(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            if (card.desc.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                card.desc,
-                style: GoogleFonts.itim(fontSize: 12, color: Colors.black87),
+    return GestureDetector(
+      onTap: () async {
+        await _editCardDialog(context, card, Provider.of<CardProvider>(context, listen: false));
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(20),
+                blurRadius: 3,
+                offset: const Offset(1, 1),
               ),
             ],
-          ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      card.name,
+                      style: GoogleFonts.itim(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                    if (card.desc.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        card.desc,
+                        style: GoogleFonts.itim(fontSize: 12, color: Colors.black87),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () async {
+                  final cardProvider = Provider.of<CardProvider>(context, listen: false);
+                  await cardProvider.removeCard(card.id);
+
+                  // ✅ Rafraîchir la liste des cartes après suppression
+                  await cardProvider.fetchCardsByBoard(card.listId);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  /// **Affiche un popup pour modifier une carte**
+  Future<void> _editCardDialog(BuildContext context, CardModel card, CardProvider provider) async {
+    String newName = card.name;
+    String newDesc = card.desc;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Modifier la Carte'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              controller: TextEditingController(text: newName),
+              decoration: const InputDecoration(labelText: 'Nom'),
+              onChanged: (String val) => newName = val,
+            ),
+            TextField(
+              controller: TextEditingController(text: newDesc),
+              decoration: const InputDecoration(labelText: 'Description'),
+              onChanged: (String val) => newDesc = val,
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () async {
+              await provider.editCard(card.id, newName, newDesc);
+              if (!context.mounted) return;
+              Navigator.pop(context);
+
+              // ✅ Rafraîchir les cartes après la modification
+              await provider.fetchCardsByBoard(card.listId);
+            },
+            child: const Text('Enregistrer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
 }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 /// **Provider pour gérer les cartes**
 class CardProvider with ChangeNotifier {
-  final TrelloService _trelloService;
-  List<CardModel> _cards = [];
 
   CardProvider({required TrelloService trelloService}) : _trelloService = trelloService;
+  final TrelloService _trelloService;
+  List<CardModel> _cards = [];
 
   /// **Liste des cartes**
   List<CardModel> get cards => _cards;
@@ -20,7 +20,7 @@ class CardProvider with ChangeNotifier {
   }
 
   /// **Récupérer les cartes d'une liste spécifique**
-  List<CardModel> getCardsByList(String listId) {
+  List<CardModel> fetchCardsByList(String listId) {
     return _cards.where((card) => card.listId == listId).toList();
   }
 

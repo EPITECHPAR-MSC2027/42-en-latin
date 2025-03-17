@@ -30,7 +30,7 @@ class CardsScreenState extends State<CardsScreen> {
 
   Future<void> _loadCards() async {
     try {
-      await Provider.of<CardProvider>(context, listen: false).fetchCardsByList(widget.listId);
+      Provider.of<CardProvider>(context, listen: false).fetchCardsByList(widget.listId);
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
