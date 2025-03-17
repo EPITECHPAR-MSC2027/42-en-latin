@@ -555,4 +555,19 @@ class TrelloService {
       throw Exception('Erreur: impossible de charger les informations utilisateur');
     }
   }
+
+  /// **Récupérer les favoris**
+  Future<List<Map<String, dynamic>>> getFavorites() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/boards?key=$apiKey&token=$token&filter=starred',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les favoris');
+    }
+  }
 }
