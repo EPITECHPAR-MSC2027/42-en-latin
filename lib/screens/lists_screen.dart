@@ -78,12 +78,18 @@ class ListsScreenState extends State<ListsScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: SingleChildScrollView(
-                        child: Row(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, true)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, false)),
+                            const SizedBox(height: 16), // ✅ Marge sous la navbar
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, true)),
+                                const SizedBox(width: 16),
+                                Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, false)),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -95,7 +101,7 @@ class ListsScreenState extends State<ListsScreen> {
 
   /// **Crée une colonne pour répartir les listes**
   Widget _buildColumn(List<ListModel> lists, double screenWidth, double widthPercentage, bool isLeftColumn) {
-    List<ListModel> filteredLists = [];
+    final List<ListModel> filteredLists = [];
     for (int i = isLeftColumn ? 0 : 1; i < lists.length; i += 2) {
       filteredLists.add(lists[i]);
     }
