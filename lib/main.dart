@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
+import 'package:fluter/providers/activity_provider.dart';
 
 void main() {
   final TrelloService trelloService = TrelloService(
@@ -45,6 +46,11 @@ void main() {
         ),
         ChangeNotifierProvider<FavoritesProvider>(
           create: (context) => FavoritesProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ActivityProvider(
+            trelloService: trelloService,
+          ),
         ),
       ],
       child: const MyApp(),
