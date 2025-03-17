@@ -37,7 +37,7 @@ class CardProvider with ChangeNotifier {
     if (success) {
       final int index = _cards.indexWhere((CardModel card) => card.id == cardId);
       if (index != -1) {
-        _cards[index] = CardModel(id: cardId, name: newName, desc: newDesc);
+        _cards[index] = CardModel(id: cardId, name: newName, desc: newDesc, listId: _cards[index].listId);
         notifyListeners();
       }
     }

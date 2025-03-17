@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:fluter/models/list.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,9 @@ class ListsScreenState extends State<ListsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    const double listWidthPercentage = 0.48;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFEDE3),
       appBar: AppBar(
@@ -72,84 +76,103 @@ class ListsScreenState extends State<ListsScreen> {
                     }
 
                     return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // 2 colonnes
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.2, // Ajuste la hauteur des rectangles
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: SingleChildScrollView(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, true)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildColumn(provider.lists, screenWidth, listWidthPercentage, false)),
+                          ],
                         ),
-                        itemCount: provider.lists.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final ListModel list = provider.lists[index];
-
-                          return GestureDetector(
-                            onTap: () {
-                              // Ouvre l'écran des cartes
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD2E3F7),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(25),
-                                    blurRadius: 4,
-                                    offset: const Offset(2, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    list.name,
-                                    style: GoogleFonts.itim(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Card',
-                                          style: GoogleFonts.itim(
-                                            fontSize: 14,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Card',
-                                          style: GoogleFonts.itim(
-                                            fontSize: 14,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Card',
-                                          style: GoogleFonts.itim(
-                                            fontSize: 14,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
                       ),
                     );
                   },
                 ),
+    );
+  }
+
+  /// **Crée une colonne pour répartir les listes**
+  Widget _buildColumn(List<ListModel> lists, double screenWidth, double widthPercentage, bool isLeftColumn) {
+    List<ListModel> filteredLists = [];
+    for (int i = isLeftColumn ? 0 : 1; i < lists.length; i += 2) {
+      filteredLists.add(lists[i]);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: filteredLists.map((list) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _buildListContainer(list, width: screenWidth * widthPercentage),
+        );
+      }).toList(),
+    );
+  }
+
+  /// **Construit un container dynamique pour chaque liste**
+  Widget _buildListContainer(ListModel list, {required double width}) {
+    final int numberOfCards = Random().nextInt(4) + 1;
+
+    return SizedBox(
+      width: width,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD2E3F7),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(25),
+              blurRadius: 4,
+              offset: const Offset(2, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              list.name,
+              style: GoogleFonts.itim(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.generate(
+                numberOfCards,
+                (index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 3,
+                          offset: const Offset(1, 1),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'Placeholder',
+                      style: GoogleFonts.itim(fontSize: 14, color: Colors.black87),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
