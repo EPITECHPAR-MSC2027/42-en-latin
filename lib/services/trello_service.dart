@@ -412,6 +412,23 @@ class TrelloService {
     }
   }
 
+  /// **Récupérer les cartes d'un board**
+  Future<List<Map<String, dynamic>>> getCardsByBoard(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId/cards?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception(
+        'Erreur: impossible de charger les cartes du board $boardId',
+      );
+    }
+  }
+
   /// **Créer une nouvelle carte**
   Future<Map<String, dynamic>?> createCard(
     String listId,

@@ -1,5 +1,6 @@
-import 'dart:math';
+import 'package:fluter/models/card.dart';
 import 'package:fluter/models/list.dart';
+import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,10 +34,11 @@ class ListsScreenState extends State<ListsScreen> {
 
   Future<void> _loadLists() async {
     try {
-      await Provider.of<ListProvider>(
-        context,
-        listen: false,
-      ).fetchListsByBoard(widget.boardId);
+      final listProvider = Provider.of<ListProvider>(context, listen: false);
+      final cardProvider = Provider.of<CardProvider>(context, listen: false);
+
+      await listProvider.fetchListsByBoard(widget.boardId);
+      await cardProvider.fetchCardsByBoard(widget.boardId);
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -119,7 +121,8 @@ class ListsScreenState extends State<ListsScreen> {
 
   /// **Construit un container dynamique pour chaque liste**
   Widget _buildListContainer(ListModel list, {required double width}) {
-    final int numberOfCards = Random().nextInt(4) + 1;
+    final cardProvider = Provider.of<CardProvider>(context, listen: false);
+    final List<CardModel> cards = cardProvider.getCardsByList(list.id);
 
     return SizedBox(
       width: width,
@@ -150,32 +153,48 @@ class ListsScreenState extends State<ListsScreen> {
             const SizedBox(height: 3),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(
-                numberOfCards,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(20),
-                          blurRadius: 3,
-                          offset: const Offset(1, 1),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      'Placeholder',
-                      style: GoogleFonts.itim(fontSize: 14, color: Colors.black87),
-                    ),
-                  ),
-                ),
-              ),
+              children: cards.isEmpty
+                  ? [const Text('Aucune carte', style: TextStyle(color: Colors.black54))]
+                  : cards.map(_buildCard).toList(),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// **Construit un widget pour une carte**
+  Widget _buildCard(CardModel card) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(20),
+              blurRadius: 3,
+              offset: const Offset(1, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              card.name,
+              style: GoogleFonts.itim(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            if (card.desc.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                card.desc,
+                style: GoogleFonts.itim(fontSize: 12, color: Colors.black87),
+              ),
+            ],
           ],
         ),
       ),
