@@ -123,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 10),
                       Consumer<ActivityProvider>(
                         builder: (context, activityProvider, child) {
-                          final activities = activityProvider.activities;
+                          final activities = activityProvider.recentActivities; // Utilise les 5 plus récentes
                           if (activities.isEmpty) {
                             return const Text('Aucune activité récente.');
                           }
