@@ -1,4 +1,5 @@
 import 'package:fluter/config/secrets.dart';
+import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
@@ -14,7 +15,6 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/activity_provider.dart';
 
 void main() {
   final TrelloService trelloService = TrelloService(

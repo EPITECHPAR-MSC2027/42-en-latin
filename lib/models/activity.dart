@@ -1,9 +1,4 @@
 class Activity {
-  final String id;
-  final String type;
-  final DateTime timestamp;
-  final String? text;
-  final Map<String, dynamic>? data;
 
   Activity({
     required this.id,
@@ -22,6 +17,11 @@ class Activity {
       data: json['data'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final String type;
+  final DateTime timestamp;
+  final String? text;
+  final Map<String, dynamic>? data;
 
   String get displayText {
     // If there's a text property, use it

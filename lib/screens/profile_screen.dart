@@ -1,6 +1,6 @@
+import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
-import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/favorites_carousel.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +19,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     // Charger les informations utilisateur, les favoris et les activités récentes au démarrage
     Future.microtask(() async {
+      // ignore: use_build_context_synchronously
       await context.read<UserProvider>().loadUserInfo();
+      // ignore: use_build_context_synchronously
       await context.read<FavoritesProvider>().loadFavorites();
+      // ignore: use_build_context_synchronously
       await context.read<ActivityProvider>().loadRecentActivities();
     });
   }
