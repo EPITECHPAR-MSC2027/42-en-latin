@@ -135,11 +135,11 @@ class ListsScreenState extends State<ListsScreen> {
             style: GoogleFonts.itim(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: const Color(0xFFD97E8D),
             ),
           ),
           const SizedBox(width: 8), // Espacement entre le texte et l'icône
-          const Icon(Icons.add, color: Colors.black),
+          const Icon(Icons.add, color: Color(0xFFD97E8D)),
         ],
       ),
     );
