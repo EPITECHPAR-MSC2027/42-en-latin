@@ -1,6 +1,7 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
@@ -19,20 +20,19 @@ class BoardCarousel extends StatelessWidget {
 
         if (recentBoards.isEmpty) {
           return const Center(
-            child: Text('Aucun board récent'),
+            child: Text('No recent boards'),
           );
         }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Boards récents',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                'Latest boards',
+                style: GoogleFonts.itim(
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -72,16 +72,17 @@ class BoardCarousel extends StatelessWidget {
                           children: [
                             Text(
                               board.name,
-                              style: const TextStyle(
+                              style: GoogleFonts.itim(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color:  const Color(0xFF314A43),
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Dernière ouverture: ${_formatDate(board.lastOpened)}',
+                              'Last opened : ${_formatDate(board.lastOpened)}',
                               style: const TextStyle(
-                                color: Colors.grey,
+                              color:  Color(0xFF314A43),
                               ),
                             ),
                           ],

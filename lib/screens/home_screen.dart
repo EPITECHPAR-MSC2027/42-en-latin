@@ -6,6 +6,7 @@ import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/notifications_dropdown.dart';
 import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 /// **Écran d'accueil**
@@ -48,9 +49,9 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: const Color(0xFFFFEDE3),
       appBar: AppBar(
-        title: const Text('Mes Boards'),
+        title: const Text('Home Page'),
         actions: <Widget>[
           const NotificationsDropdown(),
           IconButton(
@@ -77,20 +78,20 @@ class HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'Bienvenue !',
-                  style: TextStyle(
-                    fontSize: 32,
-                    color: Colors.blue,
+                Text(
+                  'Welcome Back',
+                  style: GoogleFonts.itim(
+                    fontSize: 44,
+                    color: const Color(0xFFC27C88),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Prêt à travailler ?',
-                  style: TextStyle(
+                Text(
+                  'Ready to work ?',
+                  style: GoogleFonts.itim(
                     fontSize: 20,
-                    color: Colors.grey,
+                    color: const Color(0xFF314A43),
                   ),
                 ),
                 const SizedBox(height: 40),
