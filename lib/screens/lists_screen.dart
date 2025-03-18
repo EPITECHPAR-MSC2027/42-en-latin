@@ -98,8 +98,47 @@ class ListsScreenState extends State<ListsScreen> {
                     );
                   },
                 ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFC0CDA9), // Couleur du bouton
+        onPressed: () async {
+          await _addListDialog(context, Provider.of<ListProvider>(context, listen: false));
+        },
+        child: const Icon(Icons.add, color: Colors.black),
+      ),
     );
   }
+
+  /// **Affiche un popup pour ajouter une liste**
+  Future<void> _addListDialog(BuildContext context, ListProvider provider) async {
+    String name = '';
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Créer une Liste'),
+        content: TextField(
+          decoration: const InputDecoration(labelText: 'Nom de la liste'),
+          onChanged: (String val) => name = val,
+        ),
+        actions: <Widget>[
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () async {
+              if (name.isNotEmpty) {
+                await provider.addList(widget.boardId, name);
+                if (!context.mounted) return;
+                Navigator.pop(context);
+
+                await provider.fetchListsByBoard(widget.boardId);
+              }
+            },
+            child: const Text('Créer'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   /// **Crée une colonne pour répartir les listes**
   Widget _buildColumn(List<ListModel> lists, double screenWidth, double widthPercentage, bool isLeftColumn) {
@@ -204,7 +243,6 @@ class ListsScreenState extends State<ListsScreen> {
             if (!context.mounted) return;
             Navigator.pop(context);
 
-            // ✅ Rafraîchir après ajout
             await provider.fetchCardsByBoard(listId);
           },
           child: const Text('Créer'),
@@ -263,7 +301,6 @@ class ListsScreenState extends State<ListsScreen> {
                   final cardProvider = Provider.of<CardProvider>(context, listen: false);
                   await cardProvider.removeCard(card.id);
 
-                  // ✅ Rafraîchir la liste des cartes après suppression
                   await cardProvider.fetchCardsByBoard(card.listId);
                 },
               ),
@@ -306,7 +343,6 @@ class ListsScreenState extends State<ListsScreen> {
               if (!context.mounted) return;
               Navigator.pop(context);
 
-              // ✅ Rafraîchir les cartes après la modification
               await provider.fetchCardsByBoard(card.listId);
             },
             child: const Text('Enregistrer'),
@@ -315,7 +351,4 @@ class ListsScreenState extends State<ListsScreen> {
       ),
     );
   }
-
-
-
 }
