@@ -104,7 +104,7 @@ class HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       BoardCarousel(),
-                      SizedBox(height: 32),
+                      SizedBox(height: 45),
                       RecentNotificationsList(),
                     ],
                   ),

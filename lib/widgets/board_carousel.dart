@@ -33,12 +33,13 @@ class BoardCarousel extends StatelessWidget {
                 'Latest boards',
                 style: GoogleFonts.itim(
                   fontSize: 18,
+                  color:  const Color(0xFF314A43),
                 ),
               ),
             ),
             const SizedBox(height: 8),
             SizedBox(
-              height: 160,
+              height: 145,
               child: PageView.builder(
                 padEnds: false,
                 controller: PageController(viewportFraction: 0.85),
@@ -60,6 +61,7 @@ class BoardCarousel extends StatelessWidget {
                       );
                     },
                     child: Card(
+                      color: const Color(0xFFC0CCC9),
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       elevation: 4,
                       shape: RoundedRectangleBorder(
@@ -73,7 +75,7 @@ class BoardCarousel extends StatelessWidget {
                             Text(
                               board.name,
                               style: GoogleFonts.itim(
-                                fontSize: 18,
+                                fontSize: 21,
                                 fontWeight: FontWeight.bold,
                                 color:  const Color(0xFF314A43),
                               ),
@@ -81,7 +83,7 @@ class BoardCarousel extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               'Last opened : ${_formatDate(board.lastOpened)}',
-                              style: const TextStyle(
+                              style: GoogleFonts.itim(
                               color:  Color(0xFF314A43),
                               ),
                             ),
