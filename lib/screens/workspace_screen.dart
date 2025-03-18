@@ -127,7 +127,6 @@ Widget build(BuildContext context) {
         // Image placée en dehors de l'AppBar
         Positioned(
           left: -40,
-        
           top: 0, // Fait dépasser sous l'AppBar
           child: Image.asset(
             'documentation/pic.png',
