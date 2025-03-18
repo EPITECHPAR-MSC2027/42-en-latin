@@ -57,9 +57,10 @@ class ListsScreenState extends State<ListsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFEDE3),
       appBar: _buildAppBar(),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage != null
               ? Center(child: Text('Erreur: $_errorMessage'))
               : _buildBody(screenWidth, listWidthPercentage),
       floatingActionButton: _buildFloatingActionButton(),
@@ -122,7 +123,10 @@ class ListsScreenState extends State<ListsScreen> {
     return FloatingActionButton(
       backgroundColor: const Color(0xFFC0CDA9),
       onPressed: () async {
-        await _addListDialog(context, Provider.of<ListProvider>(context, listen: false));
+        await _addListDialog(
+          context,
+          Provider.of<ListProvider>(context, listen: false),
+        );
       },
       child: const Icon(Icons.add, color: Colors.black),
     );
@@ -131,7 +135,11 @@ class ListsScreenState extends State<ListsScreen> {
   // ============================================================
   //                         LISTS
   // ============================================================
-  Widget _buildColumn(bool isLeftColumn, double screenWidth, double widthPercentage) {
+  Widget _buildColumn(
+    bool isLeftColumn,
+    double screenWidth,
+    double widthPercentage,
+  ) {
     final provider = Provider.of<ListProvider>(context, listen: false);
     final List<ListModel> filteredLists = [];
     for (int i = isLeftColumn ? 0 : 1; i < provider.lists.length; i += 2) {
@@ -139,12 +147,16 @@ class ListsScreenState extends State<ListsScreen> {
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: filteredLists.map((list) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: _buildListContainer(list, width: screenWidth * widthPercentage),
-        );
-      }).toList(),
+      children:
+          filteredLists.map((list) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _buildListContainer(
+                list,
+                width: screenWidth * widthPercentage,
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -171,7 +183,7 @@ class ListsScreenState extends State<ListsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ------------------------------
-            // HEADER (LIST NAME + Add Card)
+            // HEADER (LIST NAME + ACTION BUTTONS)
             // ------------------------------
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,11 +196,36 @@ class ListsScreenState extends State<ListsScreen> {
                     color: Colors.black,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add, color: Colors.black),
-                  onPressed: () async {
-                    await _addCardDialog(context, list.id, cardProvider);
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add, color: Colors.black),
+                      onPressed: () async {
+                        await _addCardDialog(context, list.id, cardProvider);
+                      },
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                      onSelected: (String value) async {
+                        if (value == 'Modifier') {
+                          await _editListDialog(context, list);
+                        } else if (value == 'Supprimer') {
+                          await _deleteList(context, list);
+                        }
+                      },
+                      itemBuilder:
+                          (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: 'Modifier',
+                              child: Text('Modifier'),
+                            ),
+                            const PopupMenuItem(
+                              value: 'Supprimer',
+                              child: Text('Supprimer'),
+                            ),
+                          ],
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -198,9 +235,15 @@ class ListsScreenState extends State<ListsScreen> {
             // ------------------------------
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: cards.isEmpty
-                  ? [const Text('Aucune carte', style: TextStyle(color: Colors.black54))]
-                  : cards.map(_buildCard).toList(),
+              children:
+                  cards.isEmpty
+                      ? [
+                        const Text(
+                          'Aucune carte',
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ]
+                      : cards.map(_buildCard).toList(),
             ),
           ],
         ),
@@ -214,7 +257,11 @@ class ListsScreenState extends State<ListsScreen> {
   Widget _buildCard(CardModel card) {
     return GestureDetector(
       onTap: () async {
-        await _editCardDialog(context, card, Provider.of<CardProvider>(context, listen: false));
+        await _editCardDialog(
+          context,
+          card,
+          Provider.of<CardProvider>(context, listen: false),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 4),
@@ -241,13 +288,20 @@ class ListsScreenState extends State<ListsScreen> {
                   children: [
                     Text(
                       card.name,
-                      style: GoogleFonts.itim(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                      style: GoogleFonts.itim(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     if (card.desc.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         card.desc,
-                        style: GoogleFonts.itim(fontSize: 12, color: Colors.black87),
+                        style: GoogleFonts.itim(
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ],
@@ -256,7 +310,10 @@ class ListsScreenState extends State<ListsScreen> {
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
                 onPressed: () async {
-                  final cardProvider = Provider.of<CardProvider>(context, listen: false);
+                  final cardProvider = Provider.of<CardProvider>(
+                    context,
+                    listen: false,
+                  );
                   await cardProvider.removeCard(card.id);
                   await cardProvider.fetchCardsByBoard(card.listId);
                 },
@@ -269,8 +326,104 @@ class ListsScreenState extends State<ListsScreen> {
   }
 
   // ============================================================
-  //                    DIALOGS (ADD / EDIT)
+  //                    DIALOGS (CARD EDITION)
   // ============================================================
+
+  Future<void> _addCardDialog(
+    BuildContext context,
+    String listId,
+    CardProvider provider,
+  ) async {
+    String name = '';
+    String desc = '';
+
+    await showDialog(
+      context: context,
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Créer une Carte'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Nom'),
+                  onChanged: (String val) => name = val,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  onChanged: (String val) => desc = val,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.addCard(listId, name, desc);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                  await provider.fetchCardsByBoard(listId);
+                },
+                child: const Text('Créer'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _editCardDialog(
+    BuildContext context,
+    CardModel card,
+    CardProvider provider,
+  ) async {
+    String newName = card.name;
+    String newDesc = card.desc;
+
+    await showDialog(
+      context: context,
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Modifier la Carte'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  controller: TextEditingController(text: newName),
+                  decoration: const InputDecoration(labelText: 'Nom'),
+                  onChanged: (String val) => newName = val,
+                ),
+                TextField(
+                  controller: TextEditingController(text: newDesc),
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  onChanged: (String val) => newDesc = val,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.editCard(card.id, newName, newDesc);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                  await provider.fetchCardsByBoard(card.listId);
+                },
+                child: const Text('Enregistrer'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// ============================================================
+  ///                    DIALOGS (LIST EDITION)
+  /// ============================================================
   Future<void> _addListDialog(BuildContext context, ListProvider provider) async {
     String name = '';
 
@@ -288,9 +441,11 @@ class ListsScreenState extends State<ListsScreen> {
             onPressed: () async {
               if (name.isNotEmpty) {
                 await provider.addList(widget.boardId, name);
+                await provider.fetchListsByBoard(widget.boardId);
+                
+                setState(() {}); // ✅ Rafraîchir immédiatement l'UI
                 if (!context.mounted) return;
                 Navigator.pop(context);
-                await provider.fetchListsByBoard(widget.boardId);
               }
             },
             child: const Text('Créer'),
@@ -300,79 +455,46 @@ class ListsScreenState extends State<ListsScreen> {
     );
   }
 
-  Future<void> _addCardDialog(BuildContext context, String listId, CardProvider provider) async {
-    String name = '';
-    String desc = '';
+  Future<void> _editListDialog(BuildContext context, ListModel list) async {
+    String newName = list.name;
 
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer une Carte'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              decoration: const InputDecoration(labelText: 'Nom'),
-              onChanged: (String val) => name = val,
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (String val) => desc = val,
-            ),
-          ],
+        title: const Text('Modifier la Liste'),
+        content: TextField(
+          controller: TextEditingController(text: newName),
+          decoration: const InputDecoration(labelText: 'Nom de la liste'),
+          onChanged: (String val) => newName = val,
         ),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
-            onPressed: () async {
-              await provider.addCard(listId, name, desc);
-              if (!context.mounted) return;
-              Navigator.pop(context);
-              await provider.fetchCardsByBoard(listId);
-            },
-            child: const Text('Créer'),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
           ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _editCardDialog(BuildContext context, CardModel card, CardProvider provider) async {
-    String newName = card.name;
-    String newDesc = card.desc;
-
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier la Carte'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom'),
-              onChanged: (String val) => newName = val,
-            ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (String val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
           TextButton(
             onPressed: () async {
-              await provider.editCard(card.id, newName, newDesc);
+              final listProvider = Provider.of<ListProvider>(context, listen: false);
+              await listProvider.editList(list.id, newName);
+              await listProvider.fetchListsByBoard(widget.boardId);
+
+              setState(() {}); // ✅ Rafraîchir l'UI immédiatement
               if (!context.mounted) return;
               Navigator.pop(context);
-              await provider.fetchCardsByBoard(card.listId);
             },
             child: const Text('Enregistrer'),
           ),
         ],
       ),
     );
+  }
+
+
+  Future<void> _deleteList(BuildContext context, ListModel list) async {
+    final listProvider = Provider.of<ListProvider>(context, listen: false);
+    await listProvider.removeList(list.id);
+    await listProvider.fetchListsByBoard(widget.boardId);
+
+    setState(() {});
   }
 }
