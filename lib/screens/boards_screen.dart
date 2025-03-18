@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:fluter/models/board.dart';
-import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';

@@ -1,3 +1,4 @@
+import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -16,12 +17,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les informations utilisateur et les favoris au démarrage
+    // Charger les informations utilisateur, les favoris et les activités récentes au démarrage
     Future.microtask(() async {
       // ignore: use_build_context_synchronously
       await context.read<UserProvider>().loadUserInfo();
       // ignore: use_build_context_synchronously
       await context.read<FavoritesProvider>().loadFavorites();
+      // ignore: use_build_context_synchronously
+      await context.read<ActivityProvider>().loadRecentActivities();
     });
   }
 
@@ -108,6 +111,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const FavoritesCarousel(),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Activités récentes',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Consumer<ActivityProvider>(
+                        builder: (context, activityProvider, child) {
+                          final activities = activityProvider.recentActivities; // Utilise les 5 plus récentes
+                          if (activities.isEmpty) {
+                            return const Text('Aucune activité récente.');
+                          }
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: activities.length,
+                            itemBuilder: (context, index) {
+                              final activity = activities[index];
+                              return ListTile(
+                                leading: const Icon(Icons.history),
+                                title: Text(activity.displayText),
+                                subtitle: Text(
+                                  '${activity.timestamp.day}/${activity.timestamp.month}/${activity.timestamp.year} à ${activity.timestamp.hour}:${activity.timestamp.minute.toString().padLeft(2, '0')}',
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
