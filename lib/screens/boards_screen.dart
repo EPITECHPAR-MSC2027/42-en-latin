@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:fluter/models/board.dart';
-import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/screens/manage_BoardsScreen.dart';
@@ -70,7 +69,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
           child: Text(
             widget.workspaceName,
             style: GoogleFonts.itim(
-              fontSize: 30,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               color: const Color(0xFFC0CDA9),
             ),
@@ -79,7 +78,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
       ),
       body: Column(
         children: [
-          /// **Boutons de navigation entre Table et Board**
+         
           const Padding(
             padding: EdgeInsets.all(10),
             child: Row(

@@ -16,7 +16,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     // Charger les informations utilisateur au démarrage
     Future.microtask(
-      () => context.read<UserProvider>().loadUserInfo(),
+      // ignore: use_build_context_synchronously
+      () async => context.read<UserProvider>().loadUserInfo(),
     );
   }
 
@@ -50,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       end: Alignment.bottomRight,
                       colors: [
                         Theme.of(context).primaryColor,
+                        // ignore: deprecated_member_use
                         Theme.of(context).primaryColor.withOpacity(0.8),
                       ],
                     ),
@@ -89,6 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     user.bio!,
                                     style: TextStyle(
                                       fontSize: 14,
+                                      // ignore: deprecated_member_use
                                       color: Colors.white.withOpacity(0.9),
                                     ),
                                   ),
