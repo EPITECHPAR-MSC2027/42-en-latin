@@ -124,13 +124,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           if (activities.isEmpty) {
                             return const Text('Aucune activité récente.');
                           }
-                          return Column(
-                            children: activities.map((activity) {
-                              return Text(
-                                activity.type,
-                                style: const TextStyle(fontSize: 16),
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: activities.length,
+                            itemBuilder: (context, index) {
+                              final activity = activities[index];
+                              return ListTile(
+                                leading: const Icon(Icons.history),
+                                title: Text(activity.displayText),
+                                subtitle: Text(
+                                  '${activity.timestamp.day}/${activity.timestamp.month}/${activity.timestamp.year} à ${activity.timestamp.hour}:${activity.timestamp.minute.toString().padLeft(2, '0')}',
+                                ),
                               );
-                            }).toList(),
+                            },
                           );
                         },
                       ),
