@@ -32,8 +32,9 @@ class BoardCarousel extends StatelessWidget {
               child: Text(
                 'Latest boards',
                 style: GoogleFonts.itim(
-                  fontSize: 18,
+                  fontSize: 20,
                   color:  const Color(0xFF314A43),
+                  fontWeight: FontWeight.bold
                 ),
               ),
             ),
@@ -84,7 +85,7 @@ class BoardCarousel extends StatelessWidget {
                             Text(
                               'Last opened : ${_formatDate(board.lastOpened)}',
                               style: GoogleFonts.itim(
-                              color:  Color(0xFF314A43),
+                              color:  const Color(0xFF314A43),
                               ),
                             ),
                           ],
