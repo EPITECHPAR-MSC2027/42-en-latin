@@ -76,7 +76,7 @@ class ListsScreenState extends State<ListsScreen> {
       title: Padding(
         padding: const EdgeInsets.only(left: 10),
         child: Text(
-          '[${widget.boardName}]',
+          widget.boardName,
           style: GoogleFonts.itim(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class ListsScreenState extends State<ListsScreen> {
   //                FLOATING ACTION BUTTON
   // ============================================================
   FloatingActionButton _buildFloatingActionButton() {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       backgroundColor: const Color(0xFFC0CDA9),
       onPressed: () async {
         await _addListDialog(
@@ -128,9 +128,23 @@ class ListsScreenState extends State<ListsScreen> {
           Provider.of<ListProvider>(context, listen: false),
         );
       },
-      child: const Icon(Icons.add, color: Colors.black),
+      label: Row(
+        children: [
+          Text(
+            'Add',
+            style: GoogleFonts.itim(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(width: 8), // Espacement entre le texte et l'icône
+          const Icon(Icons.add, color: Colors.black),
+        ],
+      ),
     );
   }
+
 
   // ============================================================
   //                         LISTS
