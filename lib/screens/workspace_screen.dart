@@ -58,7 +58,7 @@ Widget build(BuildContext context) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Your WorkSpace',
+                    'Your WorkSpaces',
                     style: GoogleFonts.itim(
                       fontSize: 30, 
                       fontWeight: FontWeight.bold,
@@ -128,10 +128,10 @@ Widget build(BuildContext context) {
         Positioned(
           left: -40,
         
-          top: 0, // Fait dépasser sous l'AppBar
+          top: 3, // Fait dépasser sous l'AppBar
           child: Image.asset(
             'documentation/pic.png',
-            height: 120, // Agrandit l’image
+            height: 130, // Agrandit l’image
             fit: BoxFit.contain,
           ),
         ),
