@@ -202,12 +202,16 @@ class ListsScreenState extends State<ListsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  list.name,
-                  style: GoogleFonts.itim(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Flexible(
+                  child: Text(
+                    list.name,
+                    style: GoogleFonts.itim(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Row(
@@ -322,12 +326,9 @@ class ListsScreenState extends State<ListsScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
+                icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: () async {
-                  final cardProvider = Provider.of<CardProvider>(
-                    context,
-                    listen: false,
-                  );
+                  final cardProvider = Provider.of<CardProvider>(context, listen: false);
                   await cardProvider.removeCard(card.id);
                   await cardProvider.fetchCardsByBoard(card.listId);
                 },
