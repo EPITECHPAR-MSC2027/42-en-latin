@@ -52,6 +52,7 @@ class HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFFFFEDE3),
       appBar: AppBar(
         title: const Text('Home Page'),
+        backgroundColor: const Color(0xFFC0CCC9),
         actions: <Widget>[
           const NotificationsDropdown(),
           IconButton(

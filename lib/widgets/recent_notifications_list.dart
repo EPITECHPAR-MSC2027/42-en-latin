@@ -42,15 +42,15 @@ class RecentNotificationsList extends StatelessWidget {
                 return Card(
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 4),
-                  color: Colors.white,
+                  color:  const Color(0xFFC9D2E3),
                   child: ListTile(
                     leading: Icon(
                       _getNotificationIcon(notification.type),
-                      color: notification.isRead ? Colors.grey : const Color.fromARGB(255, 175, 213, 245),
+                      color: notification.isRead ? Colors.grey : const Color(0xFF737C7B),
                     ),
                     title: Text(
                       notification.message,
-                      style: TextStyle(
+                      style: GoogleFonts.itim(
                         color: notification.isRead ? Colors.grey : const Color.fromARGB(255, 74, 66, 111),
                       ),
                     ),
