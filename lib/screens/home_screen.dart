@@ -79,20 +79,24 @@ class HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                Text(
-                  'Welcome Back',
-                  style: GoogleFonts.itim(
-                    fontSize: 44,
-                    color: const Color(0xFFC27C88),
-                    fontWeight: FontWeight.bold,
+                Center(
+                  child: Text(
+                    'Welcome Back',
+                    style: GoogleFonts.itim(
+                      fontSize: 44,
+                      color: const Color(0xFFC27C88),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Ready to work ?',
-                  style: GoogleFonts.itim(
-                    fontSize: 20,
-                    color: const Color(0xFF314A43),
+                Center(
+                  child: Text(
+                    'Ready to work ?',
+                    style: GoogleFonts.itim(
+                      fontSize: 20,
+                      color: const Color(0xFF314A43),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
