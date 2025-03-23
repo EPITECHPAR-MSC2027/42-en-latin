@@ -1,6 +1,7 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
@@ -19,26 +20,27 @@ class BoardCarousel extends StatelessWidget {
 
         if (recentBoards.isEmpty) {
           return const Center(
-            child: Text('Aucun board récent'),
+            child: Text('No recent boards'),
           );
         }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Boards récents',
-                style: TextStyle(
+                'Latest boards',
+                style: GoogleFonts.itim(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  color:  const Color(0xFF314A43),
+                  fontWeight: FontWeight.bold
                 ),
               ),
             ),
             const SizedBox(height: 8),
             SizedBox(
-              height: 160,
+              height: 145,
               child: PageView.builder(
                 padEnds: false,
                 controller: PageController(viewportFraction: 0.85),
@@ -60,6 +62,7 @@ class BoardCarousel extends StatelessWidget {
                       );
                     },
                     child: Card(
+                      color: const Color(0xFFC0CCC9),
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       elevation: 4,
                       shape: RoundedRectangleBorder(
@@ -72,16 +75,17 @@ class BoardCarousel extends StatelessWidget {
                           children: [
                             Text(
                               board.name,
-                              style: const TextStyle(
-                                fontSize: 18,
+                              style: GoogleFonts.itim(
+                                fontSize: 21,
                                 fontWeight: FontWeight.bold,
+                                color:  const Color(0xFF314A43),
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Dernière ouverture: ${_formatDate(board.lastOpened)}',
-                              style: const TextStyle(
-                                color: Colors.grey,
+                              'Last opened : ${_formatDate(board.lastOpened)}',
+                              style: GoogleFonts.itim(
+                              color:  const Color(0xFF314A43),
                               ),
                             ),
                           ],
