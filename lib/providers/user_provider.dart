@@ -19,4 +19,4 @@ class UserProvider extends ChangeNotifier {
       debugPrint('Erreur lors du chargement des informations utilisateur: $e');
     }
   }
-}
+} 
