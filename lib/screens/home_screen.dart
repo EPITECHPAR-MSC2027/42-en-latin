@@ -1,5 +1,6 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/screens/manage_workspaces_screen.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/notifications_dropdown.dart';
