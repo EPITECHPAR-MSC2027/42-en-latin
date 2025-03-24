@@ -4,6 +4,7 @@ import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/favorites_carousel.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -31,8 +32,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFEDE3),
       appBar: AppBar(
-        title: const Text('Profil'),
+        title: const Text('Profile'),
+        backgroundColor: const Color(0xFFC0CCC9),
         automaticallyImplyLeading: false,
       ),
       body: Consumer<UserProvider>(
@@ -67,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         'Hi, ${user.fullName}',
-                        style: const TextStyle(
+                        style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -116,9 +119,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Activités récentes',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        'Recent Activity',
+                        style: GoogleFonts.itim(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF314A43)),
                       ),
                       const SizedBox(height: 10),
                       Consumer<ActivityProvider>(
