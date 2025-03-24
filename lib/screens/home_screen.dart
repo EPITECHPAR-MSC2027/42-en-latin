@@ -1,5 +1,6 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/screens/ManageWorkspacesScreen.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/notifications_dropdown.dart';
@@ -99,8 +100,8 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                if (_isLoading) 
-                  const Center(child: CircularProgressIndicator()) 
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
                 else if (_errorMessage != null)
                   Center(child: Text('Erreur: $_errorMessage'))
                 else
