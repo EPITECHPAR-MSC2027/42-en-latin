@@ -95,7 +95,6 @@ class ListsScreenState extends State<ListsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
             Row(
@@ -110,11 +109,33 @@ class ListsScreenState extends State<ListsScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 24), // Espacement avant le footer
+
+            Column(
+              children: [
+                Image.asset(
+                  'documentation/pic1.png',
+                  width: 160,
+                  height: 160,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 8), // Espacement entre l'image et le texte
+                Text(
+                  'End of the lists',
+                  style: GoogleFonts.itim(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
+
 
   // ============================================================
   //                FLOATING ACTION BUTTON
