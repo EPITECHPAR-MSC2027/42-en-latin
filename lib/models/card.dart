@@ -7,10 +7,12 @@ class CardModel {
   /// [id] : Identifiant unique de la carte.
   /// [name] : Nom de la carte.
   /// [desc] : Description de la carte.
+  /// [listId] : Identifiant de la liste à laquelle appartient la carte.
   CardModel({
     required this.id,
     required this.name,
     required this.desc,
+    required this.listId,
   });
 
   /// Convertir un JSON en `CardModel`.
@@ -22,6 +24,7 @@ class CardModel {
       id: json['id'],
       name: json['name'],
       desc: json['desc'] ?? '',
+      listId: json['idList'],
     );
   }
 
@@ -33,4 +36,7 @@ class CardModel {
 
   /// Description de la carte.
   final String desc;
+
+  /// Identifiant de la liste à laquelle appartient la carte.
+  final String listId;
 }
