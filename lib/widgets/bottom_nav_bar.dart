@@ -11,7 +11,7 @@ class BottomNavBar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Accueil',
+          label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.work),
@@ -19,7 +19,7 @@ class BottomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
-          label: 'Profil',
+          label: 'Profile',
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class FavoritesCarousel extends StatelessWidget {
@@ -9,8 +10,8 @@ class FavoritesCarousel extends StatelessWidget {
   const FavoritesCarousel({super.key});
 
   Color _getBackgroundColor(String? colorStr) {
-    if (colorStr == null) return Colors.blue;
-    return Color(int.parse('FF${colorStr.substring(1)}', radix: 16));
+    if (colorStr == null) return Color(0xFF889596);
+    return Color(0xFF889596);
   }
 
   @override
@@ -43,13 +44,14 @@ class FavoritesCarousel extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
-                  'Tableaux favoris',
-                  style: TextStyle(
-                    fontSize: 20,
+                  'Favorite Boards',
+                  style: GoogleFonts.itim(
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
+                    color: const Color(0xFF314A43),
                   ),
                 ),
               ),
