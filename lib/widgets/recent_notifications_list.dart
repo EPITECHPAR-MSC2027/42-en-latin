@@ -1,6 +1,7 @@
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class RecentNotificationsList extends StatelessWidget {
@@ -14,21 +15,21 @@ class RecentNotificationsList extends StatelessWidget {
 
         if (recentNotifications.isEmpty) {
           return const Center(
-            child: Text('Aucune notification récente'),
+            child: Text('No recent notification'),
           );
         }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                'Notifications récentes',
-                style: TextStyle(
+                'Latest notifications',
+                style: GoogleFonts.itim(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color:  const Color(0xFF314A43),
                 ),
               ),
             ),
@@ -41,15 +42,16 @@ class RecentNotificationsList extends StatelessWidget {
                 return Card(
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 4),
+                  color:  const Color(0xFFC9D2E3),
                   child: ListTile(
                     leading: Icon(
                       _getNotificationIcon(notification.type),
-                      color: notification.isRead ? Colors.grey : Colors.blue,
+                      color: notification.isRead ? Colors.grey : const Color(0xFF737C7B),
                     ),
                     title: Text(
                       notification.message,
-                      style: TextStyle(
-                        color: notification.isRead ? Colors.grey : Colors.black,
+                      style: GoogleFonts.itim(
+                        color: notification.isRead ? Colors.grey : const Color.fromARGB(255, 74, 66, 111),
                       ),
                     ),
                     subtitle: Text(
@@ -105,13 +107,13 @@ class RecentNotificationsList extends StatelessWidget {
     final difference = now.difference(date);
 
     if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays} jour${difference.inDays > 1 ? 's' : ''}';
+      return '${difference.inDays} jour${difference.inDays > 1 ? 's' : ''} ago';
     } else if (difference.inHours > 0) {
-      return 'Il y a ${difference.inHours} heure${difference.inHours > 1 ? 's' : ''}';
+      return '${difference.inHours} heure${difference.inHours > 1 ? 's' : ''} ago';
     } else if (difference.inMinutes > 0) {
-      return 'Il y a ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''}';
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
     } else {
-      return "À l'instant";
+      return 'Now';
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:fluter/config/secrets.dart';
+import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
+import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
@@ -41,6 +43,14 @@ void main() {
         ),
         ChangeNotifierProvider<UserProvider>(
           create: (context) => UserProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider<FavoritesProvider>(
+          create: (context) => FavoritesProvider(trelloService: trelloService),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ActivityProvider(
+            trelloService: trelloService,
+          ),
         ),
       ],
       child: const MyApp(),
