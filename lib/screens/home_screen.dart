@@ -1,10 +1,11 @@
-import 'package:fluter/models/workspace.dart';
-import 'package:fluter/providers/workspace_provider.dart';
-import 'package:fluter/screens/boards_screen.dart';
-import 'package:fluter/screens/manage_workspaces_screen.dart';
+import 'package:fluter/providers/board_provider.dart';
+import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
+import 'package:fluter/widgets/notifications_dropdown.dart';
+import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 /// **Écran d'accueil**
@@ -24,14 +25,19 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.microtask(() async => _loadWorkspaces());
+    Future<void>.microtask(() async {
+      await _loadData();
+      // Charger les notifications au démarrage
+      // ignore: use_build_context_synchronously
+      await Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
+    });
   }
 
-  /// **Charge les workspaces**
-  Future<void> _loadWorkspaces() async {
+  /// **Charge les données nécessaires**
+  Future<void> _loadData() async {
     try {
-      await Provider.of<WorkspaceProvider>(context, listen: false)
-          .fetchWorkspaces();
+      // Charger les boards pour le carousel
+      await Provider.of<BoardsProvider>(context, listen: false).fetchBoards();
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -42,10 +48,12 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: const Color(0xFFFFEDE3),
       appBar: AppBar(
-        title: const Text('Mes Workspaces'),
+        title: const Text('Home Page'),
+        backgroundColor: const Color(0xFFC0CCC9),
         actions: <Widget>[
+          const NotificationsDropdown(),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Gérer les Workspaces',
@@ -56,6 +64,8 @@ class HomeScreenState extends State<HomeScreen> {
                   builder: (BuildContext context) => const ManageWorkspacesScreen(),
                 ),
               );
+              // Recharger les boards après la gestion des workspaces
+              await _loadData();
             },
           ),
         ],
@@ -65,64 +75,43 @@ class HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'Welcome back!',
-                  style: TextStyle(
-                    fontSize: 32,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
+                Center(
+                  child: Text(
+                    'Welcome Back',
+                    style: GoogleFonts.itim(
+                      fontSize: 44,
+                      color: const Color(0xFFC27C88),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Ready to work?',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey,
+                Center(
+                  child: Text(
+                    'Ready to work ?',
+                    style: GoogleFonts.itim(
+                      fontSize: 20,
+                      color: const Color(0xFF314A43),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
-                const BoardCarousel(),
-
-                const SizedBox(height: 20),
-
-                if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
-                        ? Center(child: Text('Erreur: $_errorMessage'))
-                        : Consumer<WorkspaceProvider>(
-                            builder: (BuildContext context, WorkspaceProvider provider, Widget? child) {
-                              if (provider.workspaces.isEmpty) {
-                                return const Center(child: Text('Aucun workspace trouvé.'));
-                              }
-
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: provider.workspaces.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final Workspace workspace = provider.workspaces[index];
-
-                                  return ListTile(
-                                    title: Text(workspace.displayName),
-                                    subtitle: Text(workspace.desc ?? 'Aucune description'),
-                                    trailing: const Icon(Icons.arrow_forward),
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute<void>(
-                                          builder: (BuildContext context) => BoardsScreen(
-                                            workspaceId: workspace.id,
-                                            workspaceName: workspace.displayName,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                if (_isLoading) 
+                  const Center(child: CircularProgressIndicator()) 
+                else if (_errorMessage != null)
+                  Center(child: Text('Erreur: $_errorMessage'))
+                else
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BoardCarousel(),
+                      SizedBox(height: 45),
+                      RecentNotificationsList(),
+                    ],
+                  ),
               ],
             ),
           ),
