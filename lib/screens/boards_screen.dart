@@ -69,7 +69,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
           child: Text(
             widget.workspaceName,
             style: GoogleFonts.itim(
-              fontSize: 30,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               color: const Color(0xFFC0CDA9),
             ),
@@ -78,7 +78,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
       ),
       body: Column(
         children: [
-          /// **Boutons de navigation entre Table et Board**
+         
           const Padding(
             padding: EdgeInsets.all(10),
             child: Row(
