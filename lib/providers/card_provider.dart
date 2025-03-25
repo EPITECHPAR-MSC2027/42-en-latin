@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluter/models/card.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
@@ -26,20 +28,51 @@ class CardProvider with ChangeNotifier {
   }
 
   /// **Créer une nouvelle carte**
-  Future<void> addCard(String listId, String name, String desc) async {
+  Future<void> addCard(
+    String listId,
+    String name,
+    String desc, {
+    File? imageFile,
+  }) async {
     final Map<String, dynamic>? newCard = await _trelloService.createCard(
       listId,
       name,
       desc,
     );
     if (newCard != null) {
-      _cards.add(CardModel.fromJson(newCard));
+      // Créez la carte initialement
+      CardModel card = CardModel.fromJson(newCard);
+
+      // Si une image est fournie, essayez de l'attacher
+      if (imageFile != null) {
+        final bool attachmentSuccess = await _trelloService.attachImageToCard(
+          card.id,
+          imageFile,
+        );
+        if (attachmentSuccess) {
+          // Récupérer l'URL mise à jour après l'ajout de l'image
+          final String? newImageUrl = await _trelloService.getImageUrlForCard(
+            card.id,
+          );
+          if (newImageUrl != null) {
+            card = card.copyWith(imageUrl: newImageUrl);
+          }
+        }
+      }
+      // Ajoutez la carte mise à jour à la liste locale et notifiez les listeners
+      _cards.add(card);
       notifyListeners();
     }
   }
 
   /// **Mettre à jour une carte**
-  Future<void> editCard(String cardId, String newName, String newDesc) async {
+  /// **Mettre à jour une carte**
+  Future<void> editCard(
+    String cardId,
+    String newName,
+    String newDesc, {
+    File? imageFile,
+  }) async {
     final bool success = await _trelloService.updateCard(
       cardId,
       newName,
@@ -50,12 +83,27 @@ class CardProvider with ChangeNotifier {
         (CardModel card) => card.id == cardId,
       );
       if (index != -1) {
-        _cards[index] = CardModel(
-          id: cardId,
+        CardModel updatedCard = _cards[index].copyWith(
           name: newName,
           desc: newDesc,
-          listId: _cards[index].listId,
         );
+        if (imageFile != null) {
+          // Attacher la nouvelle image
+          final bool attachmentSuccess = await _trelloService.attachImageToCard(
+            cardId,
+            imageFile,
+          );
+          if (attachmentSuccess) {
+            // Récupérer l'URL mise à jour après l'ajout de l'image
+            final String? newImageUrl = await _trelloService.getImageUrlForCard(
+              cardId,
+            );
+            if (newImageUrl != null) {
+              updatedCard = updatedCard.copyWith(imageUrl: newImageUrl);
+            }
+          }
+        }
+        _cards[index] = updatedCard;
         notifyListeners();
       }
     }

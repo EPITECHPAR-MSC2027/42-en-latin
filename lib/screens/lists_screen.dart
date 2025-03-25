@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:fluter/models/card.dart';
 import 'package:fluter/models/list.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 /// ============================================================
@@ -349,45 +352,42 @@ class ListsScreenState extends State<ListsScreen> {
               ),
             ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      style: GoogleFonts.itim(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    if (card.desc.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        card.desc,
-                        style: GoogleFonts.itim(
-                          fontSize: 12,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ],
+              Text(
+                card.name,
+                style: GoogleFonts.itim(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                onPressed: () async {
-                  final cardProvider = Provider.of<CardProvider>(
-                    context,
-                    listen: false,
-                  );
-                  await cardProvider.removeCard(card.id);
-                  await cardProvider.fetchCardsByBoard(card.listId);
-                },
-              ),
+              if (card.desc.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  card.desc,
+                  style: GoogleFonts.itim(fontSize: 12, color: Colors.black87),
+                ),
+              ],
+              if (card.imageUrl != null && card.imageUrl!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(
+                    card.imageUrl!,
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 50,
+                        color: Colors.grey,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -406,41 +406,73 @@ class ListsScreenState extends State<ListsScreen> {
   ) async {
     String name = '';
     String desc = '';
+    File? selectedImage;
 
     await showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Créer une Carte'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Nom'),
-                  onChanged: (String val) => name = val,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Créer une Carte'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Nom'),
+                    onChanged: (String val) => name = val,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    onChanged: (String val) => desc = val,
+                  ),
+                  const SizedBox(height: 8),
+                  // Bouton pour sélectionner une image
+                  ElevatedButton(
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? pickedFile = await picker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+                      if (pickedFile != null) {
+                        setState(() {
+                          selectedImage = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    child: Text(
+                      selectedImage == null
+                          ? 'Sélectionner une image'
+                          : 'Image sélectionnée',
+                      style: GoogleFonts.itim(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Annuler'),
                 ),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  onChanged: (String val) => desc = val,
+                TextButton(
+                  onPressed: () async {
+                    await provider.addCard(
+                      listId,
+                      name,
+                      desc,
+                      imageFile: selectedImage,
+                    );
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                    await provider.fetchCardsByBoard(listId);
+                  },
+                  child: const Text('Créer'),
                 ),
               ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await provider.addCard(listId, name, desc);
-                  if (!context.mounted) return;
-                  Navigator.pop(context);
-                  await provider.fetchCardsByBoard(listId);
-                },
-                child: const Text('Créer'),
-              ),
-            ],
-          ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -451,43 +483,95 @@ class ListsScreenState extends State<ListsScreen> {
   ) async {
     String newName = card.name;
     String newDesc = card.desc;
+    File? selectedImage; // Pas d'image sélectionnée initialement
 
     await showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Modifier la Carte'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: TextEditingController(text: newName),
-                  decoration: const InputDecoration(labelText: 'Nom'),
-                  onChanged: (String val) => newName = val,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Modifier la Carte'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    controller: TextEditingController(text: newName),
+                    decoration: const InputDecoration(labelText: 'Nom'),
+                    onChanged: (String val) => newName = val,
+                  ),
+                  TextField(
+                    controller: TextEditingController(text: newDesc),
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    onChanged: (String val) => newDesc = val,
+                  ),
+                  const SizedBox(height: 8),
+                  // Afficher l'image actuelle si présente
+                  if (card.imageUrl != null)
+                    Column(
+                      children: [
+                        Image.network(
+                          card.imageUrl!,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Pour supprimer l'image, on définit selectedImage à null et on pourra traiter cela dans l'update.
+                            setState(() {
+                              selectedImage = File('');
+                            });
+                          },
+                          child: const Text("Supprimer l'image"),
+                        ),
+                      ],
+                    ),
+                  // Bouton pour sélectionner une nouvelle image
+                  ElevatedButton(
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? pickedFile = await picker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+                      if (pickedFile != null) {
+                        setState(() {
+                          selectedImage = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    child: Text(
+                      selectedImage == null
+                          ? 'Sélectionner une nouvelle image'
+                          : 'Nouvelle image sélectionnée',
+                      style: GoogleFonts.itim(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Annuler'),
                 ),
-                TextField(
-                  controller: TextEditingController(text: newDesc),
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  onChanged: (String val) => newDesc = val,
+                TextButton(
+                  onPressed: () async {
+                    await provider.editCard(
+                      card.id,
+                      newName,
+                      newDesc,
+                      imageFile: selectedImage,
+                    );
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                    await provider.fetchCardsByBoard(card.listId);
+                  },
+                  child: const Text('Enregistrer'),
                 ),
               ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await provider.editCard(card.id, newName, newDesc);
-                  if (!context.mounted) return;
-                  Navigator.pop(context);
-                  await provider.fetchCardsByBoard(card.listId);
-                },
-                child: const Text('Enregistrer'),
-              ),
-            ],
-          ),
+            );
+          },
+        );
+      },
     );
   }
 

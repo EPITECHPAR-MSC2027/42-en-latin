@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fluter/models/board.dart';
 import 'package:fluter/models/list.dart';
 import 'package:fluter/models/notification.dart';
 import 'package:fluter/utils/templates.dart'; // Import des templates
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 /// Service permettant de gérer les données de l'API Trello
 
@@ -483,6 +485,46 @@ class TrelloService {
       body: <String, String>{'idList': newListId},
     );
     return response.statusCode == 200;
+  }
+
+  /// Attache une image à une carte en utilisant un fichier local.
+  Future<bool> attachImageToCard(String cardId, File imageFile) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/attachments?key=$apiKey&token=$token',
+    );
+
+    final request = http.MultipartRequest('POST', url);
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        filename: path.basename(imageFile.path),
+      ),
+    );
+    final response = await request.send();
+    return response.statusCode == 200;
+  }
+
+  /// **Récupérer l'URL de l'image attachée à une carte**
+  Future<String?> getImageUrlForCard(String cardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/attachments?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> attachments = jsonDecode(response.body);
+      if (attachments.isNotEmpty) {
+        final String attachmentId = attachments.first['id'];
+        final String fileName = attachments.first['name'];
+        // Construire l'URL avec l'authentification
+        final String imageUrl =
+            '$baseUrl/cards/$cardId/attachments/$attachmentId/download/$fileName?key=$apiKey&token=$token';
+        return imageUrl;
+      }
+    }
+    return null;
   }
 
   //---------------------------------------------------------------------------//

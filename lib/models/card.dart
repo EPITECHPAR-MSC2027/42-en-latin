@@ -8,11 +8,13 @@ class CardModel {
   /// [name] : Nom de la carte.
   /// [desc] : Description de la carte.
   /// [listId] : Identifiant de la liste à laquelle appartient la carte.
+  /// [imageUrl] : URL de l'image de la carte.
   CardModel({
     required this.id,
     required this.name,
     required this.desc,
     required this.listId,
+    this.imageUrl,
   });
 
   /// Convertir un JSON en `CardModel`.
@@ -25,16 +27,18 @@ class CardModel {
       name: json['name'],
       desc: json['desc'] ?? '',
       listId: json['idList'],
+      imageUrl: json['imageUrl'],
     );
   }
 
   /// Méthode pour créer une copie modifiée d'un `CardModel`
-  CardModel copyWith({String? id, String? name, String? desc, String? listId}) {
+  CardModel copyWith({String? id, String? name, String? desc, String? listId, String? imageUrl}) {
     return CardModel(
       id: id ?? this.id,
       name: name ?? this.name,
       desc: desc ?? this.desc,
       listId: listId ?? this.listId,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
@@ -49,4 +53,7 @@ class CardModel {
 
   /// Identifiant de la liste à laquelle appartient la carte.
   final String listId;
+
+  /// URL de l'image de la carte.
+  final String? imageUrl;
 }
