@@ -28,7 +28,8 @@ class BoardCarousel extends StatelessWidget {
                 'Latest boards',
                 style: GoogleFonts.itim(
                   fontSize: 20,
-                  color: const Color(0xFF314A43),
+    color: const Color(0xFF314A43),
+
                   fontWeight: FontWeight.bold,
                 ),
               ),
