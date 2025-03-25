@@ -70,13 +70,11 @@ class TrelloService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } 
-      
+      }
     } catch (e) {
       throw Exception('Erreur lors de la création du board : $e');
     }
-      return null;
-    
+    return null;
   }
 
   /// **Créer un board en appliquant un template**
@@ -123,15 +121,17 @@ class TrelloService {
 
   /// **Supprimer un Board et tout son contenu (listes et cartes)**
   Future<bool> deleteBoard(String boardId) async {
-  try {
-    final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
-    final http.Response response = await http.delete(url);
+    try {
+      final Uri url = Uri.parse(
+        '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
+      );
+      final http.Response response = await http.delete(url);
 
-    return response.statusCode == 200;
-  } catch (e) {
-    return false;
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
-}
 
   /// **Mettre à jour un Board**
   Future<bool> updateBoard(
@@ -191,14 +191,14 @@ class TrelloService {
       final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'lastOpened': DateTime.now().toIso8601String(),
-        }),
+        body: json.encode({'lastOpened': DateTime.now().toIso8601String()}),
       );
 
       return response.statusCode == 200;
     } catch (e) {
-      throw Exception("Erreur lors de la mise à jour de la date d'ouverture : $e");
+      throw Exception(
+        "Erreur lors de la mise à jour de la date d'ouverture : $e",
+      );
     }
   }
 
@@ -386,9 +386,8 @@ class TrelloService {
           '$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token',
         );
         await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
-     
       }
-    } 
+    }
   }
 
   //---------------------------------------------------------------------------//
@@ -474,6 +473,18 @@ class TrelloService {
     return response.statusCode == 200;
   }
 
+  /// **Déplacer une carte vers une autre liste**
+  Future<bool> updateCardList(String cardId, String newListId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.put(
+      url,
+      body: <String, String>{'idList': newListId},
+    );
+    return response.statusCode == 200;
+  }
+
   //---------------------------------------------------------------------------//
   //                              NOTIFICATIONS                                 //
   //---------------------------------------------------------------------------//
@@ -520,8 +531,8 @@ class TrelloService {
     final listName = json['data']?['list']?['name'] ?? '';
 
     return '$memberName a effectué une action${boardName.isNotEmpty ? ' sur le board $boardName' : ''}'
-           '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
-           '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
+        '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
+        '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
   }
 
   /// **Marquer une notification comme lue**
@@ -569,7 +580,9 @@ class TrelloService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur: impossible de charger les informations utilisateur');
+      throw Exception(
+        'Erreur: impossible de charger les informations utilisateur',
+      );
     }
   }
 

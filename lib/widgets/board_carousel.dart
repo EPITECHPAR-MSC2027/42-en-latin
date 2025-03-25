@@ -5,10 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
-  const BoardCarousel({
-    super.key,
-    this.maxBoards = 5,
-  });
+  const BoardCarousel({super.key, this.maxBoards = 5});
 
   final int maxBoards;
 
@@ -19,9 +16,7 @@ class BoardCarousel extends StatelessWidget {
         final recentBoards = boardsProvider.getRecentBoards(limit: maxBoards);
 
         if (recentBoards.isEmpty) {
-          return const Center(
-            child: Text('No recent boards'),
-          );
+          return const Center(child: Text('No recent boards'));
         }
 
         return Column(
@@ -33,68 +28,88 @@ class BoardCarousel extends StatelessWidget {
                 'Latest boards',
                 style: GoogleFonts.itim(
                   fontSize: 20,
-                  color:  const Color(0xFF314A43),
+    color: const Color(0xFF314A43),
+
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            SizedBox(
-              height: 145,
-              child: PageView.builder(
-                padEnds: false,
-                controller: PageController(viewportFraction: 0.85),
-                itemCount: recentBoards.length,
-                itemBuilder: (context, index) {
-                  final board = recentBoards[index];
-                  return GestureDetector(
-                    onTap: () async {
-                      await boardsProvider.markBoardAsOpened(board.id);
-                      if (!context.mounted) return;
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ListsScreen(
-                            boardId: board.id,
-                            boardName: board.name,
+            Stack(
+              clipBehavior: Clip.none, // Permet à l'image de dépasser
+              children: [
+                // Carousel des boards
+                SizedBox(
+                  height: 145,
+                  child: PageView.builder(
+                    padEnds: false,
+                    controller: PageController(viewportFraction: 0.85),
+                    itemCount: recentBoards.length,
+                    itemBuilder: (context, index) {
+                      final board = recentBoards[index];
+                      return GestureDetector(
+                        onTap: () async {
+                          await boardsProvider.markBoardAsOpened(board.id);
+                          if (!context.mounted) return;
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ListsScreen(
+                                    boardId: board.id,
+                                    boardName: board.name,
+                                  ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          color: const Color(0xFFC0CCC9),
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  board.name,
+                                  style: GoogleFonts.itim(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF314A43),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Last opened : ${_formatDate(board.lastOpened)}',
+                                  style: GoogleFonts.itim(
+                                    color: const Color(0xFF314A43),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
-                    child: Card(
-                      color: const Color(0xFFC0CCC9),
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              board.name,
-                              style: GoogleFonts.itim(
-                                fontSize: 21,
-                                fontWeight: FontWeight.bold,
-                                color:  const Color(0xFF314A43),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Last opened : ${_formatDate(board.lastOpened)}',
-                              style: GoogleFonts.itim(
-                              color:  const Color(0xFF314A43),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                ),
+
+                // Bonhomme assis sur le carousel
+                Positioned(
+                  top: -83, // Positionner en dehors du carousel
+                  right: 5, // Coller à droite
+                  child: Image.asset(
+                    'documentation/pic2.png', // Assurez-vous que le chemin est correct
+                    width: 100, // Taille de l'image
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -105,4 +120,4 @@ class BoardCarousel extends StatelessWidget {
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-} 
+}
