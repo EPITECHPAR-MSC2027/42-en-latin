@@ -1,10 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:fluter/models/board.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/models/board.dart';
 
 class WorkspaceScreen extends StatefulWidget {
   const WorkspaceScreen({super.key});
@@ -36,7 +38,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         context,
         listen: false,
       );
-      for (var workspace in workspaceProvider.workspaces) {
+      for (final workspace in workspaceProvider.workspaces) {
         final List<Board> boards = await workspaceProvider
             .fetchBoardsByWorkspace(workspace.id);
         setState(() {
@@ -179,6 +181,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               TextButton(
                 onPressed: () async {
                   await provider.removeWorkspace(workspace.id);
+                  // ignore: duplicate_ignore
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
@@ -313,7 +316,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                     if (boards.isNotEmpty)
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 16
+                                          vertical: 10, horizontal: 16,
                                         ),
                                         child: Row(
                                           children:
