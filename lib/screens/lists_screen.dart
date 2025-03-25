@@ -520,7 +520,7 @@ class ListsScreenState extends State<ListsScreen> {
                     await provider.addList(widget.boardId, name);
                     await provider.fetchListsByBoard(widget.boardId);
 
-                    setState(() {}); // ✅ Rafraîchir immédiatement l'UI
+                    setState(() {});
                     if (!context.mounted) return;
                     Navigator.pop(context);
                   }
@@ -559,7 +559,7 @@ class ListsScreenState extends State<ListsScreen> {
                   await listProvider.editList(list.id, newName);
                   await listProvider.fetchListsByBoard(widget.boardId);
 
-                  setState(() {}); // ✅ Rafraîchir l'UI immédiatement
+                  setState(() {});
                   if (!context.mounted) return;
                   Navigator.pop(context);
                 },
