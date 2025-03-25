@@ -28,6 +28,16 @@ class CardModel {
     );
   }
 
+  /// Méthode pour créer une copie modifiée d'un `CardModel`
+  CardModel copyWith({String? id, String? name, String? desc, String? listId}) {
+    return CardModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      desc: desc ?? this.desc,
+      listId: listId ?? this.listId,
+    );
+  }
+
   /// Identifiant unique de la carte.
   final String id;
 

@@ -119,7 +119,9 @@ class ListsScreenState extends State<ListsScreen> {
                   height: 160,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 8), // Espacement entre l'image et le texte
+                const SizedBox(
+                  height: 8,
+                ), // Espacement entre l'image et le texte
                 Text(
                   'End of the lists',
                   style: GoogleFonts.itim(
@@ -135,7 +137,6 @@ class ListsScreenState extends State<ListsScreen> {
       ),
     );
   }
-
 
   // ============================================================
   //                FLOATING ACTION BUTTON
@@ -165,7 +166,6 @@ class ListsScreenState extends State<ListsScreen> {
       ),
     );
   }
-
 
   // ============================================================
   //                         LISTS
@@ -199,94 +199,108 @@ class ListsScreenState extends State<ListsScreen> {
     final cardProvider = Provider.of<CardProvider>(context);
     final List<CardModel> cards = cardProvider.fetchCardsByList(list.id);
 
-    return SizedBox(
-      width: width,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFD2E3F7),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(25),
-              blurRadius: 4,
-              offset: const Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ------------------------------
-            // HEADER (LIST NAME + ACTION BUTTONS)
-            // ------------------------------
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    list.name,
-                    style: GoogleFonts.itim(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.add, color: Colors.black),
-                      onPressed: () async {
-                        await _addCardDialog(context, list.id, cardProvider);
-                      },
-                    ),
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.black),
-                      onSelected: (String value) async {
-                        if (value == 'Modifier') {
-                          await _editListDialog(context, list);
-                        } else if (value == 'Supprimer') {
-                          await _deleteList(context, list);
-                        }
-                      },
-                      itemBuilder:
-                          (BuildContext context) => [
-                            const PopupMenuItem(
-                              value: 'Modifier',
-                              child: Text('Modifier'),
-                            ),
-                            const PopupMenuItem(
-                              value: 'Supprimer',
-                              child: Text('Supprimer'),
-                            ),
-                          ],
-                    ),
-                  ],
+    return DragTarget<CardModel>(
+      onAcceptWithDetails: (details) async {
+        final card = details.data;
+        await cardProvider.moveCardToList(card.id, list.id);
+        await cardProvider.fetchCardsByBoard(widget.boardId);
+        setState(() {}); // Pour forcer la reconstruction
+      },
+
+      builder: (context, candidateData, rejectedData) {
+        return SizedBox(
+          width: width,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD2E3F7),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(25),
+                  blurRadius: 4,
+                  offset: const Offset(2, 2),
                 ),
               ],
             ),
-            const SizedBox(height: 3),
-            // ------------------------------
-            //             CARDS
-            // ------------------------------
-            Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-                  cards.isEmpty
-                      ? [
-                        const Text(
-                          'Aucune carte',
-                          style: TextStyle(color: Colors.black54),
+              children: [
+                // HEADER (nom de la liste + boutons d'action)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        list.name,
+                        style: GoogleFonts.itim(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                      ]
-                      : cards.map(_buildCard).toList(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.black),
+                          onPressed: () async {
+                            await _addCardDialog(
+                              context,
+                              list.id,
+                              cardProvider,
+                            );
+                          },
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.black,
+                          ),
+                          onSelected: (String value) async {
+                            if (value == 'Modifier') {
+                              await _editListDialog(context, list);
+                            } else if (value == 'Supprimer') {
+                              await _deleteList(context, list);
+                            }
+                          },
+                          itemBuilder:
+                              (BuildContext context) => [
+                                const PopupMenuItem(
+                                  value: 'Modifier',
+                                  child: Text('Modifier'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'Supprimer',
+                                  child: Text('Supprimer'),
+                                ),
+                              ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                // Liste des cartes
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:
+                      cards.isEmpty
+                          ? [
+                            const Text(
+                              'Aucune carte',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                          ]
+                          : cards.map(_buildCard).toList(),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -294,6 +308,23 @@ class ListsScreenState extends State<ListsScreen> {
   //                        CARDS
   // ============================================================
   Widget _buildCard(CardModel card) {
+    return LongPressDraggable<CardModel>(
+      data: card,
+      feedback: Material(
+        color: Colors.transparent,
+        child: SizedBox(
+          width: 200, // largeur fixe pour le feedback
+          height:
+              60, // hauteur fixe pour le feedback (ajustez selon vos besoins)
+          child: _cardContent(card),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.3, child: _cardContent(card)),
+      child: _cardContent(card),
+    );
+  }
+
+  Widget _cardContent(CardModel card) {
     return GestureDetector(
       onTap: () async {
         await _editCardDialog(
@@ -349,7 +380,10 @@ class ListsScreenState extends State<ListsScreen> {
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: () async {
-                  final cardProvider = Provider.of<CardProvider>(context, listen: false);
+                  final cardProvider = Provider.of<CardProvider>(
+                    context,
+                    listen: false,
+                  );
                   await cardProvider.removeCard(card.id);
                   await cardProvider.fetchCardsByBoard(card.listId);
                 },
@@ -460,34 +494,41 @@ class ListsScreenState extends State<ListsScreen> {
   /// ============================================================
   ///                    DIALOGS (LIST EDITION)
   /// ============================================================
-  Future<void> _addListDialog(BuildContext context, ListProvider provider) async {
+  Future<void> _addListDialog(
+    BuildContext context,
+    ListProvider provider,
+  ) async {
     String name = '';
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer une Liste'),
-        content: TextField(
-          decoration: const InputDecoration(labelText: 'Nom de la liste'),
-          onChanged: (String val) => name = val,
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () async {
-              if (name.isNotEmpty) {
-                await provider.addList(widget.boardId, name);
-                await provider.fetchListsByBoard(widget.boardId);
-                
-                setState(() {}); // ✅ Rafraîchir immédiatement l'UI
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Créer'),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Créer une Liste'),
+            content: TextField(
+              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              onChanged: (String val) => name = val,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (name.isNotEmpty) {
+                    await provider.addList(widget.boardId, name);
+                    await provider.fetchListsByBoard(widget.boardId);
+
+                    setState(() {}); // ✅ Rafraîchir immédiatement l'UI
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Créer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -496,35 +537,38 @@ class ListsScreenState extends State<ListsScreen> {
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier la Liste'),
-        content: TextField(
-          controller: TextEditingController(text: newName),
-          decoration: const InputDecoration(labelText: 'Nom de la liste'),
-          onChanged: (String val) => newName = val,
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final listProvider = Provider.of<ListProvider>(context, listen: false);
-              await listProvider.editList(list.id, newName);
-              await listProvider.fetchListsByBoard(widget.boardId);
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Modifier la Liste'),
+            content: TextField(
+              controller: TextEditingController(text: newName),
+              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              onChanged: (String val) => newName = val,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final listProvider = Provider.of<ListProvider>(
+                    context,
+                    listen: false,
+                  );
+                  await listProvider.editList(list.id, newName);
+                  await listProvider.fetchListsByBoard(widget.boardId);
 
-              setState(() {}); // ✅ Rafraîchir l'UI immédiatement
-              if (!context.mounted) return;
-              Navigator.pop(context);
-            },
-            child: const Text('Enregistrer'),
+                  setState(() {}); // ✅ Rafraîchir l'UI immédiatement
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                child: const Text('Enregistrer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
-
 
   Future<void> _deleteList(BuildContext context, ListModel list) async {
     final listProvider = Provider.of<ListProvider>(context, listen: false);
