@@ -38,6 +38,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
   void _initializeBoards() {
     _fetchBoardsFuture = Future.microtask(_fetchBoards);
   }
+  
 
   /// **Récupère les boards du workspace.**
   Future<List<Board>> _fetchBoards() async {
@@ -52,6 +53,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
       setState(() => _isLoading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
