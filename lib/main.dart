@@ -5,6 +5,7 @@ import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
 import 'package:fluter/screens/profile_screen.dart';
+import 'package:fluter/screens/weather_screen.dart';
 import 'package:fluter/screens/workspace_screen.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: {
-        '/': (context) => const HomeScreen(),
+        //'/': (context) => const HomeScreen(),
+        '/': (context) => const WeatherScreen(),
         //'/': (context) => const WorkspaceScreen(),
         '/workspace': (context) => const WorkspaceScreen(),
         '/profile': (context) => const ProfileScreen(),
