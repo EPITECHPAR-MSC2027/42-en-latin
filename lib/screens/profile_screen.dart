@@ -69,46 +69,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       Text(
-                        'Hi, ${user.fullName}',
+                        'Bonjour, ${user.fullName}',
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(user.avatarUrl),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.email,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      if (user.bio != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          user.bio!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            // ignore: deprecated_member_use
+                            color: Colors.white.withOpacity(0.9),
                           ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user.email,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Themes',
+                        style: GoogleFonts.itim(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF314A43),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        height: 50,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // TODO: Implémenter le changement de thème
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF737C7B),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                if (user.bio != null)
-                                  Text(
-                                    user.bio!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      // ignore: deprecated_member_use
-                                      color: Colors.white.withOpacity(0.9),
-                                    ),
-                                  ),
-                              ],
+                                child: Text(
+                                  'Original',
+                                  style: GoogleFonts.itim(color: Color(0xFFD4F0CC)),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // TODO: Implémenter le changement de thème
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF5C9CF),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Bubble',
+                                  style: GoogleFonts.itim(color: Color(0xFFCF78B5)),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // TODO: Implémenter le changement de thème
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF3785D8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Starry Night',
+                                  style: GoogleFonts.itim(color: Color(0xFFABC8FF)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
