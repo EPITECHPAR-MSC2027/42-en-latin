@@ -1,5 +1,6 @@
 import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/favorites_carousel.dart';
@@ -31,24 +32,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: const Color(0xFFC0CCC9),
-        automaticallyImplyLeading: false,
-      ),
-      body: Consumer<UserProvider>(
-        builder: (context, userProvider, child) {
-          final user = userProvider.user;
+    return Consumer2<UserProvider, ThemeProvider>(
+      builder: (context, userProvider, themeProvider, child) {
+        final user = userProvider.user;
 
-          if (user == null) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+        if (user == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-          return SingleChildScrollView(
+        return Scaffold(
+          backgroundColor: themeProvider.backgroundColor,
+          appBar: AppBar(
+            title: Text(
+              'Profile',
+              style: GoogleFonts.itim(
+                color: themeProvider.textColor,
+              ),
+            ),
+            backgroundColor: themeProvider.appBarColor,
+            automaticallyImplyLeading: false,
+          ),
+          body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -60,9 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Theme.of(context).primaryColor,
-                        // ignore: deprecated_member_use
-                        Theme.of(context).primaryColor.withOpacity(0.8),
+                        themeProvider.appBarColor,
+                        themeProvider.appBarColor.withOpacity(0.8),
                       ],
                     ),
                   ),
@@ -73,15 +78,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: themeProvider.textColor,
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         user.email,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
+                          color: themeProvider.textColor,
                         ),
                       ),
                       if (user.bio != null) ...[
@@ -90,8 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           user.bio!,
                           style: TextStyle(
                             fontSize: 14,
-                            // ignore: deprecated_member_use
-                            color: Colors.white.withOpacity(0.9),
+                            color: themeProvider.textColor.withOpacity(0.9),
                           ),
                         ),
                       ],
@@ -108,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF314A43),
+                          color: themeProvider.textColor,
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -121,10 +125,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: const EdgeInsets.only(right: 20),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // TODO: Implémenter le changement de thème
+                                  context.read<ThemeProvider>().setTheme('Original');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF737C7B),
+                                  backgroundColor: themeProvider.appBarColor,
+                                  foregroundColor: themeProvider.textColor,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -132,7 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: Text(
                                   'Original',
-                                  style: GoogleFonts.itim(color: Color(0xFFD4F0CC)),
+                                  style: GoogleFonts.itim(),
                                 ),
                               ),
                             ),
@@ -140,10 +145,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: const EdgeInsets.only(right: 20),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // TODO: Implémenter le changement de thème
+                                  context.read<ThemeProvider>().setTheme('Bubble');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFF5C9CF),
+                                  backgroundColor: themeProvider.appBarColor,
+                                  foregroundColor: themeProvider.textColor,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -151,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: Text(
                                   'Bubble',
-                                  style: GoogleFonts.itim(color: Color(0xFFCF78B5)),
+                                  style: GoogleFonts.itim(),
                                 ),
                               ),
                             ),
@@ -159,10 +165,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: const EdgeInsets.only(right: 20),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // TODO: Implémenter le changement de thème
+                                  context.read<ThemeProvider>().setTheme('Starry Night');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF3785D8),
+                                  backgroundColor: themeProvider.appBarColor,
+                                  foregroundColor: themeProvider.textColor,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -170,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: Text(
                                   'Starry Night',
-                                  style: GoogleFonts.itim(color: Color(0xFFABC8FF)),
+                                  style: GoogleFonts.itim(),
                                 ),
                               ),
                             ),
@@ -188,14 +195,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         'Recent Activity',
-                        style: GoogleFonts.itim(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF314A43)),
+                        style: GoogleFonts.itim(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: themeProvider.textColor,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Consumer<ActivityProvider>(
                         builder: (context, activityProvider, child) {
-                          final activities = activityProvider.recentActivities; // Utilise les 5 plus récentes
+                          final activities = activityProvider.recentActivities;
                           if (activities.isEmpty) {
-                            return const Text('Aucune activité récente.');
+                            return Text(
+                              'Aucune activité récente.',
+                              style: TextStyle(color: themeProvider.textColor),
+                            );
                           }
                           return ListView.builder(
                             shrinkWrap: true,
@@ -204,10 +218,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             itemBuilder: (context, index) {
                               final activity = activities[index];
                               return ListTile(
-                                leading: const Icon(Icons.history),
-                                title: Text(activity.displayText),
+                                leading: Icon(Icons.history, color: themeProvider.textColor),
+                                title: Text(
+                                  activity.displayText,
+                                  style: TextStyle(color: themeProvider.textColor),
+                                ),
                                 subtitle: Text(
                                   '${activity.timestamp.day}/${activity.timestamp.month}/${activity.timestamp.year} à ${activity.timestamp.hour}:${activity.timestamp.minute.toString().padLeft(2, '0')}',
+                                  style: TextStyle(color: themeProvider.textColor.withOpacity(0.7)),
                                 ),
                               );
                             },
@@ -219,10 +237,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavBar(),
+          ),
+          bottomNavigationBar: const BottomNavBar(),
+        );
+      },
     );
   }
 }
