@@ -54,9 +54,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       routes: {
-        //'/': (context) => const HomeScreen(),
-        '/': (context) => const WeatherScreen(),
-        //'/': (context) => const WorkspaceScreen(),
+        '/': (context) => const HomeScreen(),
+        //'/': (context) => const WeatherScreen(),
+        '/': (context) => const WorkspaceScreen(),
         '/workspace': (context) => const WorkspaceScreen(),
         '/profile': (context) => const ProfileScreen(),
       },

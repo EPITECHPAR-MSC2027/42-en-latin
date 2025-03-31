@@ -29,7 +29,7 @@ _fetchWeather() async {
  {
   ///print("1");
   //final weather = await _weatherService.getWeather('London');
-  final weather = await _weatherService.getWeather(await _weatherService.getCurrentCity());
+  final weather = await _weatherService.getWeather('Le Kremlin-Bicêtre');
    print(weather.temperature);
    print(weather.cityName);
    print(weather.mainCondition);
