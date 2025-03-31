@@ -114,7 +114,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
   /// **Méthode pour modifier un board via BoardProvider**
   Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
     String newName = board.name;
-    String newDesc = board.desc ?? '';
+    String newDesc = board.desc;
 
     await showDialog(
       context: context,
