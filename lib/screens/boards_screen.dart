@@ -30,6 +30,7 @@ class _BoardScreenState extends State<BoardScreen> {
       await _loadBoards();
     });
   }
+  
 
   Future<void> _loadBoards() async {
     try {
@@ -168,7 +169,7 @@ class _BoardScreenState extends State<BoardScreen> {
                                 child: ListTile(
                                   title: Text(board.name,
                                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  subtitle: Text(board.desc ?? 'Aucune description'),
+                                  subtitle: Text(board.desc),
                                   trailing: PopupMenuButton<String>(
                                     onSelected: (String value) async {
                                       if (value == 'edit') {

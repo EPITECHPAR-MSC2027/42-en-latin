@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:fluter/models/board.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -13,144 +16,179 @@ class WorkspaceScreen extends StatefulWidget {
 }
 
 class _WorkspaceScreenState extends State<WorkspaceScreen> {
-  // Variables d'état pour gérer le chargement et les erreurs
   bool _isLoading = true;
   String? _errorMessage;
+  final Map<String, List<Board>> _workspaceBoards = {};
 
   @override
   void initState() {
     super.initState();
-    // Initialisation des workspaces dès que l'écran est affiché
     _initializeWorkspaces();
   }
 
-  // Fonction pour initialiser les workspaces
   void _initializeWorkspaces() {
-    // Utilisation de Future.microtask pour exécuter la tâche immédiatement
     Future.microtask(() async {
       await _loadWorkspaces();
     });
   }
 
-  // Fonction pour charger les workspaces via le provider
+  Future<void> _fetchBoardsForWorkspaces() async {
+    try {
+      final workspaceProvider = Provider.of<WorkspaceProvider>(
+        context,
+        listen: false,
+      );
+      for (final workspace in workspaceProvider.workspaces) {
+        final List<Board> boards = await workspaceProvider
+            .fetchBoardsByWorkspace(workspace.id);
+        setState(() {
+          _workspaceBoards[workspace.id] = boards;
+        });
+      }
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    }
+  }
+
   Future<void> _loadWorkspaces() async {
     try {
-      // Récupérer les workspaces via le provider
-      await Provider.of<WorkspaceProvider>(context, listen: false).fetchWorkspaces();
+      await Provider.of<WorkspaceProvider>(
+        context,
+        listen: false,
+      ).fetchWorkspaces();
+      await _fetchBoardsForWorkspaces();
     } catch (e) {
-      // En cas d'erreur, afficher le message d'erreur
       setState(() => _errorMessage = e.toString());
     } finally {
-      // Une fois le chargement terminé, mettre à jour l'état de chargement
       setState(() => _isLoading = false);
     }
   }
 
-  // Afficher un dialogue pour ajouter un nouveau workspace
-  Future<void> _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) async {
-    // Variables pour stocker les informations du nouveau workspace
+  Future<void> _addWorkspaceDialog(
+    BuildContext context,
+    WorkspaceProvider provider,
+  ) async {
     String name = '';
     String displayName = '';
     String desc = '';
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer un Workspace'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-                decoration: const InputDecoration(labelText: 'Nom'),
-                onChanged: (String val) => name = val),
-            TextField(
-                decoration: const InputDecoration(labelText: 'Nom affiché'),
-                onChanged: (String val) => displayName = val),
-            TextField(
-                decoration: const InputDecoration(labelText: 'Description'),
-                onChanged: (String val) => desc = val),
-          ],
-        ),
-        actions: <Widget>[
-          // Bouton pour annuler l'ajout
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour créer un workspace
-          TextButton(
-            onPressed: () async {
-              // Ajouter le nouveau workspace
-              await provider.addWorkspace(name, displayName, desc);
-              Navigator.pop(context);
-            },
-            child: const Text('Créer'),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Créer un Workspace'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Nom'),
+                  onChanged: (String val) => name = val,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Nom affiché'),
+                  onChanged: (String val) => displayName = val,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  onChanged: (String val) => desc = val,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.addWorkspace(name, displayName, desc);
+                  Navigator.pop(context);
+                },
+                child: const Text('Créer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
-  // Afficher un dialogue pour modifier un workspace existant
-  Future<void> _editWorkspaceDialog(BuildContext context, workspace, WorkspaceProvider provider) async {
-    // Variables pour stocker les nouvelles valeurs
+  Future<void> _editWorkspaceDialog(
+    BuildContext context,
+    workspace,
+    WorkspaceProvider provider,
+  ) async {
     String newDisplayName = workspace.displayName;
     String newDesc = workspace.desc ?? '';
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier Workspace'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              controller: TextEditingController(text: newDisplayName),
-              decoration: const InputDecoration(labelText: 'Nom affiché'),
-              onChanged: (String val) => newDisplayName = val,
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Modifier Workspace'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  controller: TextEditingController(text: newDisplayName),
+                  decoration: const InputDecoration(labelText: 'Nom affiché'),
+                  onChanged: (String val) => newDisplayName = val,
+                ),
+                TextField(
+                  controller: TextEditingController(text: newDesc),
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  onChanged: (String val) => newDesc = val,
+                ),
+              ],
             ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (String val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          // Bouton pour annuler les modifications
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour enregistrer les modifications
-          TextButton(
-            onPressed: () async {
-              // Sauvegarder les modifications du workspace
-              await provider.editWorkspace(workspace.id, newDisplayName, newDesc);
-              Navigator.pop(context);
-            },
-            child: const Text('Enregistrer'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.editWorkspace(
+                    workspace.id,
+                    newDisplayName,
+                    newDesc,
+                  );
+                  Navigator.pop(context);
+                },
+                child: const Text('Enregistrer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
-  // Afficher un dialogue pour supprimer un workspace
-  Future<void> _deleteWorkspaceDialog(BuildContext context, workspace, WorkspaceProvider provider) async {
+  Future<void> _deleteWorkspaceDialog(
+    BuildContext context,
+    workspace,
+    WorkspaceProvider provider,
+  ) async {
     await showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Supprimer Workspace'),
-        content: Text('Êtes-vous sûr de vouloir supprimer le workspace "${workspace.displayName}" ?'),
-        actions: <Widget>[
-          // Bouton pour annuler la suppression
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour confirmer la suppression
-          TextButton(
-            onPressed: () async {
-              // Supprimer le workspace
-              await provider.removeWorkspace(workspace.id);
-              Navigator.pop(context);
-            },
-            child: const Text('Supprimer'),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Supprimer Workspace'),
+            content: Text(
+              'Êtes-vous sûr de vouloir supprimer le workspace "${workspace.displayName}" ?',
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await provider.removeWorkspace(workspace.id);
+                  // ignore: duplicate_ignore
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                },
+                child: const Text('Supprimer'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -161,71 +199,90 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          // SingleChildScrollView pour permettre le défilement du contenu
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                // AppBar personnalisée
-                AppBar(
-                  backgroundColor: const Color(0xFFC0CDA9),
-                  centerTitle: true,
-                  elevation: 0,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Vos WorkSpaces',
-                        style: GoogleFonts.itim(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF889596),
-                        ),
+          // Utilisation d'un Column avec Expanded pour prendre tout l'espace
+          Column(
+            children: [
+              AppBar(
+                backgroundColor: const Color(0xFFC0CDA9),
+                centerTitle: true,
+                elevation: 0,
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Vos WorkSpaces',
+                      style: GoogleFonts.itim(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF889596),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 80),
-                // Afficher un indicateur de chargement si _isLoading est vrai
-                if (_isLoading) const Center(child: CircularProgressIndicator()) 
-                // Si une erreur se produit, afficher le message d'erreur
-                else _errorMessage != null
-                        ? Center(child: Text('Erreur: $_errorMessage'))
-                        : Consumer<WorkspaceProvider>(
-                            builder: (context, provider, child) {
-                              final workspaces = provider.workspaces;
-                              if (workspaces.isEmpty) {
-                                return const Center(child: Text('Aucun workspace trouvé.'));
-                              }
-                              // Affichage de la liste des workspaces
-                              return ListView.builder(
-                                shrinkWrap: true,  // Empêche la ListView de se développer à l'extérieur
-                                padding: const EdgeInsets.all(16),
-                                itemCount: workspaces.length,
-                                itemBuilder: (context, index) {
-                                  final workspace = workspaces[index];
-                                  return Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 3,
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    child: ListTile(
+              ),
+              const SizedBox(height: 80),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
+                _errorMessage != null
+                    ? Center(child: Text('Erreur: $_errorMessage'))
+                    : Expanded(
+                      child: Consumer<WorkspaceProvider>(
+                        builder: (context, provider, child) {
+                          final workspaces = provider.workspaces;
+                          if (workspaces.isEmpty) {
+                            return const Center(
+                              child: Text('Aucun workspace trouvé.'),
+                            );
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: workspaces.length,
+                            itemBuilder: (context, index) {
+                              final workspace = workspaces[index];
+                              final boards =
+                                  _workspaceBoards[workspace.id]
+                                      ?.take(3)
+                                      .toList() ??
+                                  [];
+                              return Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 3,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                color: const Color(0XFFC9D2E3),
+                                child: Column(
+                                  children: [
+                                    ListTile(
                                       contentPadding: const EdgeInsets.all(16),
                                       title: Text(
                                         workspace.displayName,
                                         style: const TextStyle(
+                                          color: Color(
+                                                          0xFFC27C88,
+                                                        ), 
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      subtitle: Text(workspace.desc ?? 'Aucune description'),
+                                      subtitle: Text(
+                                        workspace.desc ?? 'Aucune description',
+                                      ),
                                       trailing: PopupMenuButton<String>(
                                         onSelected: (String value) async {
                                           if (value == 'edit') {
-                                            await _editWorkspaceDialog(context, workspace, provider);
+                                            await _editWorkspaceDialog(
+                                              context,
+                                              workspace,
+                                              provider,
+                                            );
                                           } else if (value == 'delete') {
-                                            await _deleteWorkspaceDialog(context, workspace, provider);
+                                            await _deleteWorkspaceDialog(
+                                              context,
+                                              workspace,
+                                              provider,
+                                            );
                                           }
                                         },
                                         itemBuilder: (BuildContext context) {
@@ -241,34 +298,81 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                           ];
                                         },
                                       ),
-                                      // Navigation vers l'écran des boards du workspace
                                       onTap: () async {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
+
                                             builder: (context) =>BoardScreen(
                                               workspaceId: workspace.id,
                                               workspaceName: workspace.displayName,
                                             ),
+
                                           ),
                                         );
-                                        // Recharger les workspaces après la navigation
                                         _initializeWorkspaces();
                                       },
                                     ),
-                                  );
-                                },
+                                    if (boards.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 16,
+                                        ),
+                                        child: Row(
+                                          children:
+                                              boards.map((board) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        right: 5,
+                                                      ),
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      // Logique pour naviguer vers un board spécifique si nécessaire
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      minimumSize: const Size(
+                                                        100,
+                                                        40,
+                                                      ),
+                                                      backgroundColor:
+                                                          const Color(
+                                                            0xFF889596,
+                                                          ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      board.name,
+                                                      style: const TextStyle(
+                                                        color: Color(
+                                                          0xFFD4F0CC,
+                                                        ), 
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               );
                             },
-                          ),
-              ],
-            ),
+                          );
+                        },
+                      ),
+                    ),
+            ],
           ),
-          
-          // Image en arrière-plan qui reste fixe pendant le défilement
+          // Positionner l'image de façon fixe à gauche
           Positioned(
-            left: -40,
-            top: 3,
+            left: 0,
+            top: -20,
             child: SafeArea(
               child: Image.asset(
                 'documentation/pic.png',
@@ -277,26 +381,30 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               ),
             ),
           ),
-          
         ],
       ),
-      
-      // Bouton flottant pour ajouter un nouveau workspace
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 20, left: 20), 
-        child: FloatingActionButton(
-          onPressed: () async {
-            await _addWorkspaceDialog(context, Provider.of<WorkspaceProvider>(context, listen: false));
-            _initializeWorkspaces(); // Recharger la liste après création
-          },
-          backgroundColor: const Color(0xFFC0CDA9),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      floatingActionButton: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            bottom: 80,
+            left: 20,
+          ), // Augmenter l'espacement en bas
+          child: FloatingActionButton(
+            onPressed: () async {
+              await _addWorkspaceDialog(
+                context,
+                Provider.of<WorkspaceProvider>(context, listen: false),
+              );
+              _initializeWorkspaces();
+            },
+            backgroundColor: const Color(0xFFC0CDA9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.add, color: Color(0xFFD97C83)),
           ),
-          child: const Icon(Icons.settings, color: Color(0xFFD97C83)),
         ),
       ),
-      // Navigation vers la barre de navigation inférieure
       bottomNavigationBar: const BottomNavBar(),
     );
   }
