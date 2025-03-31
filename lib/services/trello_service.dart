@@ -84,22 +84,22 @@ class TrelloService {
     String desc,
     String templateId,
   ) async {
-    // 1️⃣ Créer un board vide
+    // Créer un board vide
     final board = await createBoard(workspaceId, name, desc);
     if (board == null || !board.containsKey('id')) return null;
 
     final String boardId = board['id'];
 
-    // 2️⃣ Supprimer toutes les listes existantes avant d'ajouter le template
+    // Supprimer toutes les listes existantes avant d'ajouter le template
     await deleteAllLists(boardId);
 
-    // 3️⃣ Vérifier si le template existe
+    // Vérifier si le template existe
     final Map<String, List<String>>? template = templateCards[templateId];
     if (template == null) {
       return null;
     }
 
-    // 4️⃣ Ajouter les listes et cartes du template
+    // Ajouter les listes et cartes du template
     for (final entry in template.entries) {
       final String listName = entry.key;
       final List<String> cards = entry.value;
@@ -385,7 +385,7 @@ class TrelloService {
         final Uri deleteUrl = Uri.parse(
           '$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token',
         );
-        await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
+        await http.put(deleteUrl, body: {'value': 'true'});
       }
     }
   }
@@ -614,5 +614,52 @@ class TrelloService {
     } else {
       throw Exception('Erreur: impossible de charger les activités récentes');
     }
+  }
+
+  //--------------------------------------------------------------------------//
+  //                                MEMBRES                                   //
+  //--------------------------------------------------------------------------//
+  // Récupère les membres associés à un board.
+  Future<List<Map<String, dynamic>>> getBoardMembers(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId/members?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les membres du board');
+    }
+  }
+
+  // Récupère les membres déjà assignés à une carte.
+  Future<List<Map<String, dynamic>>> getCardMembers(String cardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/members?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les membres de la carte');
+    }
+  }
+
+  // Ajoute un membre à une carte.
+  Future<bool> addMemberToCard(String cardId, String memberId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/idMembers?key=$apiKey&token=$token&value=$memberId',
+    );
+    final http.Response response = await http.post(url);
+    return response.statusCode == 200;
+  }
+
+  // Retire un membre d'une carte.
+  Future<bool> removeMemberFromCard(String cardId, String memberId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/idMembers/$memberId?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.delete(url);
+    return response.statusCode == 200;
   }
 }
