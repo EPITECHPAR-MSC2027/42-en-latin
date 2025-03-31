@@ -3,19 +3,25 @@ import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 
 class RecentNotificationsList extends StatelessWidget {
   const RecentNotificationsList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NotificationProvider>(
-      builder: (context, notificationProvider, child) {
+    return Consumer2<NotificationProvider, ThemeProvider>(
+      builder: (context, notificationProvider, themeProvider, child) {
         final recentNotifications = notificationProvider.getRecentNotifications();
 
         if (recentNotifications.isEmpty) {
-          return const Center(
-            child: Text('No recent notification'),
+          return Center(
+            child: Text(
+              'No recent notification',
+              style: TextStyle(
+                color: themeProvider.vertText.withOpacity(0.5),
+              ),
+            ),
           );
         }
 
@@ -29,7 +35,7 @@ class RecentNotificationsList extends StatelessWidget {
                 style: GoogleFonts.itim(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color:  const Color(0xFF314A43),
+                  color: themeProvider.vertText,
                 ),
               ),
             ),
@@ -42,21 +48,24 @@ class RecentNotificationsList extends StatelessWidget {
                 return Card(
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 4),
-                  color:  const Color(0xFFC9D2E3),
+                  color: themeProvider.bleuClair,
                   child: ListTile(
                     leading: Icon(
                       _getNotificationIcon(notification.type),
-                      color: notification.isRead ? Colors.grey : const Color(0xFF737C7B),
+                      color: notification.isRead ? themeProvider.grisClair : themeProvider.vertGris,
                     ),
                     title: Text(
                       notification.message,
                       style: GoogleFonts.itim(
-                        color: notification.isRead ? Colors.grey : const Color.fromARGB(255, 74, 66, 111),
+                        color: notification.isRead ? themeProvider.grisClair : themeProvider.vertText,
                       ),
                     ),
                     subtitle: Text(
                       _formatDate(notification.date),
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: themeProvider.vertText.withOpacity(0.7),
+                      ),
                     ),
                     onTap: () async {
                       await notificationProvider.markAsRead(notification.id);

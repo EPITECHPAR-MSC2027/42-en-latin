@@ -1,5 +1,6 @@
 import 'package:fluter/providers/activity_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/favorites_carousel.dart';
@@ -31,24 +32,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: const Color(0xFFC0CCC9),
-        automaticallyImplyLeading: false,
-      ),
-      body: Consumer<UserProvider>(
-        builder: (context, userProvider, child) {
-          final user = userProvider.user;
+    return Consumer2<UserProvider, ThemeProvider>(
+      builder: (context, userProvider, themeProvider, child) {
+        final user = userProvider.user;
 
-          if (user == null) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+        if (user == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-          return SingleChildScrollView(
+        return Scaffold(
+          backgroundColor: themeProvider.beige,
+          appBar: AppBar(
+            title: Text(
+              'Profile',
+              style: GoogleFonts.itim(
+                color: themeProvider.vertText,
+              ),
+            ),
+            backgroundColor: themeProvider.vertGris,
+            automaticallyImplyLeading: false,
+          ),
+          body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -60,9 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Theme.of(context).primaryColor,
-                        // ignore: deprecated_member_use
-                        Theme.of(context).primaryColor.withOpacity(0.8),
+                        themeProvider.bleuClair,
+                        themeProvider.bleuClair.withOpacity(0.8),
                       ],
                     ),
                   ),
@@ -73,42 +78,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: themeProvider.vertText,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(user.avatarUrl),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.email,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: themeProvider.vertText,
+                        ),
+                      ),
+                      if (user.bio != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          user.bio!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: themeProvider.vertText.withOpacity(0.9),
                           ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user.email,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Themes',
+                        style: GoogleFonts.itim(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: themeProvider.vertText,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        height: 50,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<ThemeProvider>().setTheme('Original');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF737C7B),
+                                  foregroundColor: Color(0xFFD4F0CC),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                if (user.bio != null)
-                                  Text(
-                                    user.bio!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      // ignore: deprecated_member_use
-                                      color: Colors.white.withOpacity(0.9),
-                                    ),
-                                  ),
-                              ],
+                                child: Text(
+                                  'Original',
+                                  style: GoogleFonts.itim(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<ThemeProvider>().setTheme('Bubble');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFE39DB9),
+                                  foregroundColor: Color(0xFFEDEDFF),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Bubble',
+                                  style: GoogleFonts.itim(),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context.read<ThemeProvider>().setTheme('Starry Night');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFABC8FF),
+                                  foregroundColor: Color(0xFF3785D8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Starry Night',
+                                  style: GoogleFonts.itim(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -121,14 +195,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         'Recent Activity',
-                        style: GoogleFonts.itim(fontSize: 25, fontWeight: FontWeight.bold, color: const Color(0xFF314A43)),
+                        style: GoogleFonts.itim(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: themeProvider.vertText,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Consumer<ActivityProvider>(
                         builder: (context, activityProvider, child) {
-                          final activities = activityProvider.recentActivities; // Utilise les 5 plus récentes
+                          final activities = activityProvider.recentActivities;
                           if (activities.isEmpty) {
-                            return const Text('Aucune activité récente.');
+                            return Text(
+                              'Aucune activité récente.',
+                              style: TextStyle(color: themeProvider.vertText),
+                            );
                           }
                           return ListView.builder(
                             shrinkWrap: true,
@@ -137,10 +218,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             itemBuilder: (context, index) {
                               final activity = activities[index];
                               return ListTile(
-                                leading: const Icon(Icons.history),
-                                title: Text(activity.displayText),
+                                leading: Icon(Icons.history, color: themeProvider.vertText),
+                                title: Text(
+                                  activity.displayText,
+                                  style: TextStyle(color: themeProvider.vertText),
+                                ),
                                 subtitle: Text(
                                   '${activity.timestamp.day}/${activity.timestamp.month}/${activity.timestamp.year} à ${activity.timestamp.hour}:${activity.timestamp.minute.toString().padLeft(2, '0')}',
+                                  style: TextStyle(color: themeProvider.vertText.withOpacity(0.7)),
                                 ),
                               );
                             },
@@ -152,10 +237,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavBar(),
+          ),
+          bottomNavigationBar: const BottomNavBar(),
+        );
+      },
     );
   }
 }

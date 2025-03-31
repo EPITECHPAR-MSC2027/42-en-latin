@@ -5,6 +5,7 @@ import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
@@ -52,6 +53,9 @@ void main() {
             trelloService: trelloService,
           ),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -65,16 +69,55 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Trello App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      routes: {
-        '/': (context) => const HomeScreen(),
-        //'/': (context) => const WorkspaceScreen(),
-        '/workspace': (context) => const WorkspaceScreen(),
-        '/profile': (context) => const ProfileScreen(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Trello App',
+          theme: ThemeData(
+            primaryColor: themeProvider.vertGris,
+            scaffoldBackgroundColor: themeProvider.beige,
+            textTheme: TextTheme(
+              bodyLarge: TextStyle(color: themeProvider.vertText),
+              bodyMedium: TextStyle(color: themeProvider.vertText),
+              titleLarge: TextStyle(color: themeProvider.vertText),
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: themeProvider.vertGris,
+              titleTextStyle: TextStyle(
+                color: themeProvider.vertText,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              backgroundColor: themeProvider.vertGris,
+              selectedItemColor: themeProvider.vertText,
+              unselectedItemColor: themeProvider.vertText.withOpacity(0.5),
+            ),
+            cardTheme: CardTheme(
+              color: themeProvider.blanc,
+              elevation: 2,
+            ),
+            listTileTheme: ListTileThemeData(
+              textColor: themeProvider.vertText,
+              iconColor: themeProvider.vertText,
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeProvider.vertGris,
+                foregroundColor: themeProvider.vertText,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
+          ),
+          routes: {
+            '/': (context) => const HomeScreen(),
+            '/workspace': (context) => const WorkspaceScreen(),
+            '/profile': (context) => const ProfileScreen(),
+          },
+        );
       },
     );
   }
