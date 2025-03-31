@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fluter/models/board.dart';
 import 'package:fluter/models/list.dart';
+import 'package:fluter/models/notification.dart';
 import 'package:fluter/utils/templates.dart'; // Import des templates
 import 'package:http/http.dart' as http;
 
@@ -69,13 +70,11 @@ class TrelloService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } 
-      
+      }
     } catch (e) {
       throw Exception('Erreur lors de la création du board : $e');
     }
-      return null;
-    
+    return null;
   }
 
   /// **Créer un board en appliquant un template**
@@ -122,15 +121,17 @@ class TrelloService {
 
   /// **Supprimer un Board et tout son contenu (listes et cartes)**
   Future<bool> deleteBoard(String boardId) async {
-  try {
-    final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
-    final http.Response response = await http.delete(url);
+    try {
+      final Uri url = Uri.parse(
+        '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
+      );
+      final http.Response response = await http.delete(url);
 
-    return response.statusCode == 200;
-  } catch (e) {
-    return false;
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
-}
 
   /// **Mettre à jour un Board**
   Future<bool> updateBoard(
@@ -177,6 +178,27 @@ class TrelloService {
       return templates;
     } else {
       return [];
+    }
+  }
+
+  /// **Mettre à jour la date de dernière ouverture d'un board**
+  Future<bool> updateBoardLastOpened(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
+    );
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'lastOpened': DateTime.now().toIso8601String()}),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      throw Exception(
+        "Erreur lors de la mise à jour de la date d'ouverture : $e",
+      );
     }
   }
 
@@ -364,9 +386,8 @@ class TrelloService {
           '$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token',
         );
         await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
-     
       }
-    } 
+    }
   }
 
   //---------------------------------------------------------------------------//
@@ -386,6 +407,23 @@ class TrelloService {
     } else {
       throw Exception(
         'Erreur: impossible de charger les cartes de la liste $listId',
+      );
+    }
+  }
+
+  /// **Récupérer les cartes d'un board**
+  Future<List<Map<String, dynamic>>> getCardsByBoard(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId/cards?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception(
+        'Erreur: impossible de charger les cartes du board $boardId',
       );
     }
   }
@@ -433,5 +471,148 @@ class TrelloService {
     final http.Response response = await http.delete(url);
 
     return response.statusCode == 200;
+  }
+
+  /// **Déplacer une carte vers une autre liste**
+  Future<bool> updateCardList(String cardId, String newListId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.put(
+      url,
+      body: <String, String>{'idList': newListId},
+    );
+    return response.statusCode == 200;
+  }
+
+  //---------------------------------------------------------------------------//
+  //                              NOTIFICATIONS                                 //
+  //---------------------------------------------------------------------------//
+
+  /// **Récupérer les notifications**
+  Future<List<TrelloNotification>> getNotifications() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/notifications?key=$apiKey&token=$token&limit=50&read_filter=all&memberCreator=true&memberCreator_fields=fullName&board=true&board_fields=name&card=true&card_fields=name&list=true&list_fields=name',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> notificationsJson = json.decode(response.body);
+      return notificationsJson.map((json) {
+        // Extraire les informations du board si présentes
+        String? boardId;
+        String? boardName;
+        if (json['data']?['board'] != null) {
+          boardId = json['data']['board']['id'];
+          boardName = json['data']['board']['name'];
+        }
+
+        return TrelloNotification(
+          id: json['id'],
+          type: json['type'],
+          message: json['data']?['text'] ?? _getDefaultMessage(json),
+          date: DateTime.parse(json['date']),
+          isRead: !json['unread'],
+          boardId: boardId,
+          boardName: boardName,
+        );
+      }).toList();
+    } else {
+      throw Exception('Erreur: impossible de charger les notifications');
+    }
+  }
+
+  /// Obtient un message par défaut si le texte n'est pas disponible
+  String _getDefaultMessage(Map<String, dynamic> json) {
+    final memberName = json['memberCreator']?['fullName'] ?? "Quelqu'un";
+    final boardName = json['data']?['board']?['name'] ?? '';
+    final cardName = json['data']?['card']?['name'] ?? '';
+    final listName = json['data']?['list']?['name'] ?? '';
+
+    return '$memberName a effectué une action${boardName.isNotEmpty ? ' sur le board $boardName' : ''}'
+        '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
+        '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
+  }
+
+  /// **Marquer une notification comme lue**
+  Future<bool> markNotificationAsRead(String notificationId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/notifications/$notificationId?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'unread': false}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  /// **Marquer toutes les notifications comme lues**
+  Future<bool> markAllNotificationsAsRead() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/notifications?key=$apiKey&token=$token',
+    );
+
+    final http.Response response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'unread': false}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  //---------------------------------------------------------------------------//
+  //                                  USER INFO                                  //
+  //---------------------------------------------------------------------------//
+
+  /// **Récupérer les informations de l'utilisateur**
+  Future<Map<String, dynamic>> getUserInfo() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me?key=$apiKey&token=$token&fields=all',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception(
+        'Erreur: impossible de charger les informations utilisateur',
+      );
+    }
+  }
+
+  /// **Récupérer les favoris**
+  Future<List<Map<String, dynamic>>> getFavorites() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/boards?key=$apiKey&token=$token&filter=starred',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les favoris');
+    }
+  }
+
+  /// **Récupérer les activités récentes de l'utilisateur**
+  Future<List<Map<String, dynamic>>> getRecentActivities() async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/actions?key=$apiKey&token=$token&filter=all',
+    );
+
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les activités récentes');
+    }
   }
 }
