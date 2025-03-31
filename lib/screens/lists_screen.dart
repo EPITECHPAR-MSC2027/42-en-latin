@@ -298,7 +298,7 @@ class ListsScreenState extends State<ListsScreen> {
                       cards.isEmpty
                           ? [
                             Text(
-                              'Aucune carte',
+                              'No cards',
                               // ignore: deprecated_member_use
                               style: TextStyle(color: themeProvider.vertText.withOpacity(0.5)),
                             ),
@@ -392,14 +392,14 @@ class ListsScreenState extends State<ListsScreen> {
                 icon: Icon(
                   Icons.person_add,
                   color: themeProvider.vert,
-                  size: 20,
+                  size: 16,
                 ),
                 onPressed: () async {
                   await _updateCollaboratorsDialog(context, card.id, widget.boardId);
                 },
               ),
               IconButton(
-                icon: Icon(Icons.delete, color: themeProvider.rouge, size: 20),
+                icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
                 onPressed: () async {
                   final cardProvider = Provider.of<CardProvider>(
                     context,
@@ -432,12 +432,12 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Créer une Carte'),
+            title: const Text('Create a Card'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
-                  decoration: const InputDecoration(labelText: 'Nom'),
+                  decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (String val) => name = val,
                 ),
                 TextField(
@@ -449,7 +449,7 @@ class ListsScreenState extends State<ListsScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -458,7 +458,7 @@ class ListsScreenState extends State<ListsScreen> {
                   Navigator.pop(context);
                   await provider.fetchCardsByBoard(listId);
                 },
-                child: const Text('Créer'),
+                child: const Text('Create'),
               ),
             ],
           ),
@@ -477,13 +477,13 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Modifier la Carte'),
+            title: const Text('Edit Card'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
                   controller: TextEditingController(text: newName),
-                  decoration: const InputDecoration(labelText: 'Nom'),
+                  decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (String val) => newName = val,
                 ),
                 TextField(
@@ -496,7 +496,7 @@ class ListsScreenState extends State<ListsScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -505,7 +505,7 @@ class ListsScreenState extends State<ListsScreen> {
                   Navigator.pop(context);
                   await provider.fetchCardsByBoard(card.listId);
                 },
-                child: const Text('Enregistrer'),
+                child: const Text('Save'),
               ),
             ],
           ),
@@ -543,7 +543,7 @@ class ListsScreenState extends State<ListsScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Mettre à jour les collaborateurs'),
+              title: const Text('Update Collaborators'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -553,7 +553,7 @@ class ListsScreenState extends State<ListsScreen> {
                         final String memberName =
                             member['fullName'] ??
                             member['username'] ??
-                            'Inconnu';
+                            'Unknown';
                         final bool isSelected = selectedMemberIds.contains(
                           memberId,
                         );
@@ -576,17 +576,15 @@ class ListsScreenState extends State<ListsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Annuler'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () async {
                     bool allSuccess = true;
-                    // Pour chaque membre du board, vérifie s'il faut l'ajouter ou le retirer.
                     for (final member in boardMembers) {
                       final String memberId = member['id'] as String;
                       if (selectedMemberIds.contains(memberId) &&
                           !currentMemberIds.contains(memberId)) {
-                        // Ajouter ce membre
                         final bool success = await trelloService.addMemberToCard(
                           cardId,
                           memberId,
@@ -594,7 +592,6 @@ class ListsScreenState extends State<ListsScreen> {
                         if (!success) allSuccess = false;
                       } else if (!selectedMemberIds.contains(memberId) &&
                           currentMemberIds.contains(memberId)) {
-                        // Retirer ce membre
                         final bool success = await trelloService.removeMemberFromCard(
                           cardId,
                           memberId,
@@ -607,13 +604,13 @@ class ListsScreenState extends State<ListsScreen> {
                       SnackBar(
                         content: Text(
                           allSuccess
-                              ? 'Collaborateurs mis à jour'
-                              : 'Erreur lors de la mise à jour de certains collaborateurs',
+                              ? 'Collaborators updated'
+                              : 'Error updating some collaborators',
                         ),
                       ),
                     );
                   },
-                  child: const Text('Mettre à jour'),
+                  child: const Text('Update'),
                 ),
               ],
             );
@@ -636,15 +633,15 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Créer une Liste'),
+            title: const Text('Create a List'),
             content: TextField(
-              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              decoration: const InputDecoration(labelText: 'List name'),
               onChanged: (String val) => name = val,
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -657,7 +654,7 @@ class ListsScreenState extends State<ListsScreen> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text('Créer'),
+                child: const Text('Create'),
               ),
             ],
           ),
@@ -671,16 +668,16 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Modifier la Liste'),
+            title: const Text('Edit List'),
             content: TextField(
               controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              decoration: const InputDecoration(labelText: 'List name'),
               onChanged: (String val) => newName = val,
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -695,7 +692,7 @@ class ListsScreenState extends State<ListsScreen> {
                   if (!context.mounted) return;
                   Navigator.pop(context);
                 },
-                child: const Text('Enregistrer'),
+                child: const Text('Save'),
               ),
             ],
           ),

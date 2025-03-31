@@ -77,7 +77,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text(
-          'Créer un Workspace',
+          'Create a Workspace',
           style: TextStyle(color: context.watch<ThemeProvider>().vertText),
         ),
         content: Column(
@@ -85,7 +85,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           children: <Widget>[
             TextField(
               decoration: InputDecoration(
-                labelText: 'Nom',
+                labelText: 'Name',
                 labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
@@ -93,7 +93,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             ),
             TextField(
               decoration: InputDecoration(
-                labelText: 'Nom affiché',
+                labelText: 'Display name',
                 labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
@@ -113,7 +113,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Annuler',
+              'Cancel',
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
           ),
@@ -123,7 +123,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               Navigator.pop(context);
             },
             child: Text(
-              'Créer',
+              'Create',
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
           ),
@@ -144,7 +144,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text(
-          'Modifier Workspace',
+          'Edit Workspace',
           style: TextStyle(color: context.watch<ThemeProvider>().vertText),
         ),
         content: Column(
@@ -153,7 +153,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             TextField(
               controller: TextEditingController(text: newDisplayName),
               decoration: InputDecoration(
-                labelText: 'Nom affiché',
+                labelText: 'Display name',
                 labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
@@ -174,7 +174,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Annuler',
+              'Cancel',
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
           ),
@@ -188,7 +188,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               Navigator.pop(context);
             },
             child: Text(
-              'Enregistrer',
+              'Save',
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
           ),
@@ -206,18 +206,18 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text(
-          'Supprimer Workspace',
+          'Delete Workspace',
           style: TextStyle(color: context.watch<ThemeProvider>().vertText),
         ),
         content: Text(
-          'Êtes-vous sûr de vouloir supprimer le workspace "${workspace.displayName}" ?',
+          'Are you sure you want to delete the workspace "${workspace.displayName}"?',
           style: TextStyle(color: context.watch<ThemeProvider>().vertText),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Annuler',
+              'Cancel',
               style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
           ),
@@ -227,7 +227,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               Navigator.pop(context);
             },
             child: Text(
-              'Supprimer',
+              'Delete',
               style: TextStyle(color: context.watch<ThemeProvider>().rouge),
             ),
           ),
@@ -251,21 +251,26 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                     backgroundColor: themeProvider.vertGris,
                     centerTitle: true,
                     elevation: 0,
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Vos WorkSpaces',
-                          style: GoogleFonts.itim(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: themeProvider.vertText,
+                    toolbarHeight: 80,
+                    automaticallyImplyLeading: false,
+                    title: Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '          Your WorkSpaces',
+                            style: GoogleFonts.itim(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: themeProvider.vertText,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 80),
+                  const SizedBox(height: 5),
                   if (_isLoading)
                     Center(
                       child: CircularProgressIndicator(
@@ -287,7 +292,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                           if (workspaces.isEmpty) {
                             return Center(
                               child: Text(
-                                'Aucun workspace trouvé.',
+                                'No workspaces found.',
                                 style: TextStyle(
                                   // ignore: deprecated_member_use
                                   color: themeProvider.vertText.withOpacity(0.5),
@@ -321,7 +326,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         ),
                                       ),
                                       subtitle: Text(
-                                        workspace.desc ?? 'Aucune description',
+                                        workspace.desc ?? 'No description',
                                         style: TextStyle(color: themeProvider.vertText),
                                       ),
                                       trailing: PopupMenuButton<String>(
@@ -345,14 +350,14 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                             PopupMenuItem<String>(
                                               value: 'edit',
                                               child: Text(
-                                                'Modifier',
+                                                'Edit',
                                                 style: TextStyle(color: themeProvider.vertText),
                                               ),
                                             ),
                                             PopupMenuItem<String>(
                                               value: 'delete',
                                               child: Text(
-                                                'Supprimer',
+                                                'Delete',
                                                 style: TextStyle(color: themeProvider.rouge),
                                               ),
                                             ),
@@ -414,12 +419,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 ],
               ),
               Positioned(
-                left: -53,
-                top: -6,
+                left: -30,
+                top: 1,
                 child: SafeArea(
                   child: Image.asset(
                     'documentation/pic.png',
-                    height: 100,
+                    height: 125,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -430,7 +435,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             child: Padding(
               padding: const EdgeInsets.only(
                 bottom: 20,
-                left: 20,
+                left: 30,
               ),
               child: FloatingActionButton(
                 onPressed: () async {
