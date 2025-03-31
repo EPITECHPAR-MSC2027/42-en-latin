@@ -181,8 +181,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               TextButton(
                 onPressed: () async {
                   await provider.removeWorkspace(workspace.id);
-                  // ignore: duplicate_ignore
-                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
                 child: const Text('Supprimer'),
@@ -259,9 +257,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                       title: Text(
                                         workspace.displayName,
                                         style: const TextStyle(
-                                          color: Color(
-                                                          0xFFC27C88,
-                                                        ), 
+                                          color: Color(0xFFC27C88),
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -302,12 +298,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-
-                                            builder: (context) =>BoardsScreen(
+                                            builder: (context) => BoardsScreen(
                                               workspaceId: workspace.id,
                                               workspaceName: workspace.displayName,
                                             ),
-
                                           ),
                                         );
                                         _initializeWorkspaces();
@@ -318,45 +312,29 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 16,
                                         ),
-                                        child: Row(
-                                          children:
-                                              boards.map((board) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                        right: 5,
-                                                      ),
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      // Logique pour naviguer vers un board spécifique si nécessaire
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      minimumSize: const Size(
-                                                        100,
-                                                        40,
-                                                      ),
-                                                      backgroundColor:
-                                                          const Color(
-                                                            0xFF889596,
-                                                          ),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      board.name,
-                                                      style: const TextStyle(
-                                                        color: Color(
-                                                          0xFFD4F0CC,
-                                                        ), 
-                                                      ),
-                                                    ),
+                                        child: Wrap( // Utilisation de Wrap pour gérer les débordements
+                                          spacing: 5, // Espacement horizontal entre les éléments
+                                          runSpacing: 5, // Espacement vertical entre les lignes si les éléments dépassent
+                                          children: boards.map((board) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(right: 8),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF889596), // Couleur de fond
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: Text(
+                                                  board.name,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFD4F0CC),
+                                                    fontSize: 16, // Ajuste la taille du texte si nécessaire
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                );
-                                              }).toList(),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
                                         ),
                                       ),
                                   ],
@@ -371,12 +349,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           ),
           // Positionner l'image de façon fixe à gauche
           Positioned(
-            left: 0,
-            top: -20,
+            left: -53,
+            top: -6,
             child: SafeArea(
               child: Image.asset(
                 'documentation/pic.png',
-                height: 130,
+                height: 100,
                 fit: BoxFit.contain,
               ),
             ),
@@ -386,9 +364,9 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
       floatingActionButton: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(
-            bottom: 80,
-            left: 20,
-          ), // Augmenter l'espacement en bas
+            bottom: 20, // Positionner un peu plus bas
+            left: 20, // Positionner à gauche
+          ), 
           child: FloatingActionButton(
             onPressed: () async {
               await _addWorkspaceDialog(
