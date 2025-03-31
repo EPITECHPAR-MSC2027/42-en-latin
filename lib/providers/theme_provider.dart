@@ -8,7 +8,7 @@ class ThemeProvider with ChangeNotifier {
   Color _blanc = const Color(0xFFFFFFFF);
   Color _grisClair = const Color(0xFFE0E0E0);
   Color _vert = const Color(0xFF4CAF50);
-  Color _rouge = const Color(0xFFE57373);
+  Color _rouge = const Color(0xFFC27C88);
   Color _vertSucces = const Color(0xFF81C784);
   Color _orange = const Color(0xFFFFB74D);
   Color _bleuClair = const Color(0xFFC9d2e3);
@@ -36,7 +36,7 @@ class ThemeProvider with ChangeNotifier {
         _blanc = const Color(0xFFFFFFFF);
         _grisClair = const Color(0xFFE0E0E0);
         _vert = const Color(0xFF4CAF50);
-        _rouge = const Color(0xFFE57373);
+        _rouge = const Color(0xFFC27C88);
         _vertSucces = const Color(0xFF81C784);
         _orange = const Color(0xFFFFB74D);
         _bleuClair = const Color(0xFFC9d2e3);
@@ -62,7 +62,7 @@ class ThemeProvider with ChangeNotifier {
         _blanc = const Color(0xFF4A90E2);
         _grisClair = const Color(0xFFABC8FF);
         _vert = const Color(0xFFABC8FF);
-        _rouge = const Color(0xFFE57373);
+        _rouge = const Color(0xFFADC6E5);
         _vertSucces = const Color(0xFF81C784);
         _orange = const Color(0xFFFFB74D);
         _bleuClair = const Color(0xFF1c1dab);
