@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
-
+import 'package:fluter/widgets/notifications_dropdown.dart';
 
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
@@ -62,23 +62,6 @@ class HomeScreenState extends State<HomeScreen> {
             backgroundColor: themeProvider.vertGris,
             actions: <Widget>[
               const NotificationsDropdown(),
-              IconButton(
-                icon: Icon(
-                  Icons.settings,
-                  color: themeProvider.vertText,
-                ),
-                tooltip: 'Gérer les Workspaces',
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const ManageWorkspacesScreen(),
-                    ),
-                  );
-                  // Recharger les boards après la gestion des workspaces
-                  await _loadData();
-                },
-              ),
             ],
           ),
           body: SafeArea(
