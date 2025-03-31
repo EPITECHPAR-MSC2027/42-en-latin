@@ -303,7 +303,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                           context,
                                           MaterialPageRoute(
 
-                                            builder: (context) =>BoardScreen(
+                                            builder: (context) =>BoardsScreen(
                                               workspaceId: workspace.id,
                                               workspaceName: workspace.displayName,
                                             ),
