@@ -74,38 +74,38 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Trello App',
           theme: ThemeData(
-            primaryColor: themeProvider.appBarColor,
-            scaffoldBackgroundColor: themeProvider.backgroundColor,
+            primaryColor: themeProvider.vertGris,
+            scaffoldBackgroundColor: themeProvider.beige,
             textTheme: TextTheme(
-              bodyLarge: TextStyle(color: themeProvider.textColor),
-              bodyMedium: TextStyle(color: themeProvider.textColor),
-              titleLarge: TextStyle(color: themeProvider.textColor),
+              bodyLarge: TextStyle(color: themeProvider.vertText),
+              bodyMedium: TextStyle(color: themeProvider.vertText),
+              titleLarge: TextStyle(color: themeProvider.vertText),
             ),
             appBarTheme: AppBarTheme(
-              backgroundColor: themeProvider.appBarColor,
+              backgroundColor: themeProvider.vertGris,
               titleTextStyle: TextStyle(
-                color: themeProvider.textColor,
+                color: themeProvider.vertText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
-              backgroundColor: themeProvider.appBarColor,
-              selectedItemColor: themeProvider.textColor,
-              unselectedItemColor: themeProvider.textColor.withOpacity(0.5),
+              backgroundColor: themeProvider.vertGris,
+              selectedItemColor: themeProvider.vertText,
+              unselectedItemColor: themeProvider.vertText.withOpacity(0.5),
             ),
             cardTheme: CardTheme(
-              color: themeProvider.backgroundColor,
+              color: themeProvider.blanc,
               elevation: 2,
             ),
             listTileTheme: ListTileThemeData(
-              textColor: themeProvider.textColor,
-              iconColor: themeProvider.textColor,
+              textColor: themeProvider.vertText,
+              iconColor: themeProvider.vertText,
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.appBarColor,
-                foregroundColor: themeProvider.textColor,
+                backgroundColor: themeProvider.vertGris,
+                foregroundColor: themeProvider.vertText,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),

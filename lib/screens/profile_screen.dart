@@ -43,15 +43,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         return Scaffold(
-          backgroundColor: themeProvider.backgroundColor,
+          backgroundColor: themeProvider.beige,
           appBar: AppBar(
             title: Text(
               'Profile',
               style: GoogleFonts.itim(
-                color: themeProvider.textColor,
+                color: themeProvider.vertText,
               ),
             ),
-            backgroundColor: themeProvider.appBarColor,
+            backgroundColor: themeProvider.vertGris,
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -66,19 +66,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        themeProvider.appBarColor,
-                        themeProvider.appBarColor.withOpacity(0.8),
+                        themeProvider.rouge,
+                        themeProvider.rouge.withOpacity(0.8),
                       ],
                     ),
                   ),
                   child: Column(
                     children: [
                       Text(
-                        'Bonjour, ${user.fullName}',
+                        'Hi, ${user.fullName}',
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: themeProvider.textColor,
+                          color: themeProvider.vertText,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -86,7 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         user.email,
                         style: TextStyle(
                           fontSize: 16,
-                          color: themeProvider.textColor,
+                          color: themeProvider.vertText,
                         ),
                       ),
                       if (user.bio != null) ...[
@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           user.bio!,
                           style: TextStyle(
                             fontSize: 14,
-                            color: themeProvider.textColor.withOpacity(0.9),
+                            color: themeProvider.vertText.withOpacity(0.9),
                           ),
                         ),
                       ],
@@ -112,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: themeProvider.textColor,
+                          color: themeProvider.vertText,
                         ),
                       ),
                       const SizedBox(height: 15),
@@ -128,8 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Original');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.appBarColor,
-                                  foregroundColor: themeProvider.textColor,
+                                  backgroundColor: themeProvider.vertGris,
+                                  foregroundColor: themeProvider.vertText,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -148,8 +148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Bubble');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.appBarColor,
-                                  foregroundColor: themeProvider.textColor,
+                                  backgroundColor: themeProvider.vertGris,
+                                  foregroundColor: themeProvider.vertText,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -168,8 +168,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Starry Night');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.appBarColor,
-                                  foregroundColor: themeProvider.textColor,
+                                  backgroundColor: themeProvider.vertGris,
+                                  foregroundColor: themeProvider.vertText,
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -198,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: themeProvider.textColor,
+                          color: themeProvider.vertText,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -208,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           if (activities.isEmpty) {
                             return Text(
                               'Aucune activité récente.',
-                              style: TextStyle(color: themeProvider.textColor),
+                              style: TextStyle(color: themeProvider.vertText),
                             );
                           }
                           return ListView.builder(
@@ -218,14 +218,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             itemBuilder: (context, index) {
                               final activity = activities[index];
                               return ListTile(
-                                leading: Icon(Icons.history, color: themeProvider.textColor),
+                                leading: Icon(Icons.history, color: themeProvider.vertText),
                                 title: Text(
                                   activity.displayText,
-                                  style: TextStyle(color: themeProvider.textColor),
+                                  style: TextStyle(color: themeProvider.vertText),
                                 ),
                                 subtitle: Text(
                                   '${activity.timestamp.day}/${activity.timestamp.month}/${activity.timestamp.year} à ${activity.timestamp.hour}:${activity.timestamp.minute.toString().padLeft(2, '0')}',
-                                  style: TextStyle(color: themeProvider.textColor.withOpacity(0.7)),
+                                  style: TextStyle(color: themeProvider.vertText.withOpacity(0.7)),
                                 ),
                               );
                             },
