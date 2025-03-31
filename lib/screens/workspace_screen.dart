@@ -246,7 +246,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => BoardsScreen(
+                                            builder: (context) =>BoardScreen(
                                               workspaceId: workspace.id,
                                               workspaceName: workspace.displayName,
                                             ),

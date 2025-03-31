@@ -10,8 +10,8 @@ class FavoritesCarousel extends StatelessWidget {
   const FavoritesCarousel({super.key});
 
   Color _getBackgroundColor(String? colorStr) {
-    if (colorStr == null) return Color(0xFF889596);
-    return Color(0xFF889596);
+    if (colorStr == null) return const Color(0xFF889596);
+    return const Color(0xFF889596);
   }
 
   @override

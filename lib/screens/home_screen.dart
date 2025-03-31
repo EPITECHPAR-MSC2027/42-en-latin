@@ -1,9 +1,7 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
-import 'package:fluter/screens/ManageWorkspacesScreen.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
-import 'package:fluter/widgets/notifications_dropdown.dart';
 import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,23 +51,7 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Home Page'),
         backgroundColor: const Color(0xFFC0CCC9),
-        actions: <Widget>[
-          const NotificationsDropdown(),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Gérer les Workspaces',
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (BuildContext context) => const ManageWorkspacesScreen(),
-                ),
-              );
-              // Recharger les boards après la gestion des workspaces
-              await _loadData();
-            },
-          ),
-        ],
+        
       ),
       body: SafeArea(
         child: SingleChildScrollView(
