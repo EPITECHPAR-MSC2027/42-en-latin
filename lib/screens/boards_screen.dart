@@ -101,6 +101,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
             onPressed: () async {
               // Création d'un board en utilisant BoardProvider
               await provider.addBoard(widget.workspaceId, name, desc, selectedTemplateId);
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après ajout
             },
@@ -114,7 +115,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
   /// **Méthode pour modifier un board via BoardProvider**
   Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
     String newName = board.name;
-    String newDesc = board.desc ?? '';
+    String newDesc = board.desc;
 
     await showDialog(
       context: context,
@@ -140,6 +141,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
           TextButton(
             onPressed: () async {
               await provider.editBoard(board.id, newName, newDesc); // Utilisation de BoardProvider
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après modification
             },
@@ -162,6 +164,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
           TextButton(
             onPressed: () async {
               await provider.removeBoard(board.id); // Utilisation de BoardProvider
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après suppression
             },
@@ -208,9 +211,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
               ),
             ),
             /// **Affichage du contenu selon le mode sélectionné**
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
+            if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
                     ? Center(child: Text('Erreur: $_errorMessage'))
                     : FutureBuilder<List<Board>>(
                         future: _fetchBoardsFuture,
