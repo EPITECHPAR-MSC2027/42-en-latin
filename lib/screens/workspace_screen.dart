@@ -1,13 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:fluter/models/board.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
 
 class WorkspaceScreen extends StatefulWidget {
   const WorkspaceScreen({super.key});
@@ -289,6 +289,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                               child: Text(
                                 'Aucun workspace trouvé.',
                                 style: TextStyle(
+                                  // ignore: deprecated_member_use
                                   color: themeProvider.vertText.withOpacity(0.5),
                                 ),
                               ),

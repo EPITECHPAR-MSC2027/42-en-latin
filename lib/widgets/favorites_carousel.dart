@@ -1,10 +1,10 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
 
 class FavoritesCarousel extends StatelessWidget {
   // ignore: public_member_api_docs
@@ -24,6 +24,7 @@ class FavoritesCarousel extends StatelessWidget {
                 'Aucun tableau favori trouvé.',
                 style: TextStyle(
                   fontSize: 16,
+                  // ignore: deprecated_member_use
                   color: themeProvider.vertText.withOpacity(0.5),
                 ),
               ),
@@ -73,7 +74,6 @@ class FavoritesCarousel extends StatelessWidget {
                             borderRadius: BorderRadius.circular(15),
                             side: BorderSide(
                               color: themeProvider.grisClair,
-                              width: 1,
                             ),
                           ),
                           child: InkWell(
@@ -147,7 +147,6 @@ class FavoritesCarousel extends StatelessWidget {
                               borderRadius: BorderRadius.circular(15),
                               side: BorderSide(
                                 color: themeProvider.grisClair,
-                                width: 1,
                               ),
                             ),
                             child: InkWell(
@@ -206,5 +205,3 @@ class FavoritesCarousel extends StatelessWidget {
     );
   }
 }
-
-

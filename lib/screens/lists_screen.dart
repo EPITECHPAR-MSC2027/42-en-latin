@@ -299,6 +299,7 @@ class ListsScreenState extends State<ListsScreen> {
                           ? [
                             Text(
                               'Aucune carte',
+                              // ignore: deprecated_member_use
                               style: TextStyle(color: themeProvider.vertText.withOpacity(0.5)),
                             ),
                           ]
@@ -378,6 +379,7 @@ class ListsScreenState extends State<ListsScreen> {
                         card.desc,
                         style: GoogleFonts.itim(
                           fontSize: 12,
+                          // ignore: deprecated_member_use
                           color: themeProvider.vertText.withOpacity(0.7),
                         ),
                       ),

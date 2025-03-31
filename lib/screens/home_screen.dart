@@ -1,13 +1,13 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
+import 'package:fluter/widgets/notifications_dropdown.dart';
 import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
-import 'package:fluter/widgets/notifications_dropdown.dart';
 
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
@@ -60,8 +60,8 @@ class HomeScreenState extends State<HomeScreen> {
               ),
             ),
             backgroundColor: themeProvider.vertGris,
-            actions: <Widget>[
-              const NotificationsDropdown(),
+            actions: const <Widget>[
+              NotificationsDropdown(),
             ],
           ),
           body: SafeArea(
@@ -109,12 +109,12 @@ class HomeScreenState extends State<HomeScreen> {
                         ),
                       )
                     else
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BoardCarousel(),
-                          const SizedBox(height: 45),
-                          const RecentNotificationsList(),
+                          BoardCarousel(),
+                          SizedBox(height: 45),
+                          RecentNotificationsList(),
                         ],
                       ),
                   ],

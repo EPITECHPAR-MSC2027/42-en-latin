@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:fluter/models/board.dart';
 import 'package:fluter/providers/board_provider.dart'; // BoardProvider pour add, edit, remove
-import 'package:fluter/providers/workspace_provider.dart'; // WorkspaceProvider pour fetchBoardsByWorkspace
 import 'package:fluter/providers/theme_provider.dart';
+import 'package:fluter/providers/workspace_provider.dart'; // WorkspaceProvider pour fetchBoardsByWorkspace
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/utils/templates.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -316,6 +316,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
                       ),
                       subtitle: Text(
                         board.desc,
+                        // ignore: deprecated_member_use
                         style: TextStyle(color: themeProvider.vertText.withOpacity(0.7)),
                       ),
                       trailing: PopupMenuButton<String>(

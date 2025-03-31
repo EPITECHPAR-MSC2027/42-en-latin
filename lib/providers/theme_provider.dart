@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class ThemeProvider with ChangeNotifier {
-  // Couleurs par défaut (Original)
   Color _beige = const Color(0xFFFFEDE3);
   Color _vertGris = const Color(0xFFC0CCC9);
   Color _vertText = const Color(0xFF314A43);
@@ -14,7 +13,7 @@ class ThemeProvider with ChangeNotifier {
   Color _bleuClair = const Color(0xFFC9d2e3);
   Color _vertfavorite = const Color(0xFF879596);
 
-  // Getters pour les couleurs
+  // Getters
   Color get beige => _beige;
   Color get vertGris => _vertGris;
   Color get vertText => _vertText;

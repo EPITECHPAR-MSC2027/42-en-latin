@@ -112,14 +112,14 @@ class ManageListsScreenState extends State<ManageListsScreen> {
                                         Icons.edit,
                                         color: themeProvider.vertText,
                                       ),
-                                      onPressed: () => _editListDialog(context, list),
+                                      onPressed: () async => _editListDialog(context, list),
                                     ),
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
                                         color: themeProvider.rouge,
                                       ),
-                                      onPressed: () => _deleteList(context, list),
+                                      onPressed: () async => _deleteList(context, list),
                                     ),
                                   ],
                                 ),
@@ -131,7 +131,7 @@ class ManageListsScreenState extends State<ManageListsScreen> {
                     ),
           floatingActionButton: FloatingActionButton(
             backgroundColor: themeProvider.vertGris,
-            onPressed: () => _addListDialog(context),
+            onPressed: () async => _addListDialog(context),
             child: Icon(Icons.add, color: themeProvider.rouge),
           ),
         );
