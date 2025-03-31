@@ -66,8 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        themeProvider.rouge,
-                        themeProvider.rouge.withOpacity(0.8),
+                        themeProvider.bleuClair,
+                        themeProvider.bleuClair.withOpacity(0.8),
                       ],
                     ),
                   ),
@@ -128,8 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Original');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.vertGris,
-                                  foregroundColor: themeProvider.vertText,
+                                  backgroundColor: Color(0xFF737C7B),
+                                  foregroundColor: Color(0xFFD4F0CC),
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -148,8 +148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Bubble');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.vertGris,
-                                  foregroundColor: themeProvider.vertText,
+                                  backgroundColor: Color(0xFFE39DB9),
+                                  foregroundColor: Color(0xFFEDEDFF),
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -168,8 +168,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context.read<ThemeProvider>().setTheme('Starry Night');
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeProvider.vertGris,
-                                  foregroundColor: themeProvider.vertText,
+                                  backgroundColor: Color(0xFFABC8FF),
+                                  foregroundColor: Color(0xFF3785D8),
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
