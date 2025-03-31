@@ -50,23 +50,42 @@ class BoardsProvider with ChangeNotifier {
   }
 
   /// **Ajouter un Board avec ou sans template**
-  Future<void> addBoard(
+Future<bool> addBoard(
   String workspaceId, 
   String boardName, 
   String boardDesc, 
+  String? selectedTemplateId, 
   {String? templateId,}
 ) async {
   try {
     if (templateId != null && templateCards.containsKey(templateId)) {
-      // ✅ Créer un board AVEC un template local
+      // Créer un board AVEC un template local
       final board = await _trelloService.createBoardWithTemplate(
-        workspaceId, boardName, boardDesc, templateId,
+        workspaceId, 
+        boardName, 
+        boardDesc, 
+        templateId
       );
 
       if (board != null) {
-        notifyListeners(); // ✅ Informe les listeners qu'un changement a eu lieu
+        // Informer les listeners que l'ajout a eu lieu
+        notifyListeners();
+        return true; // Assurez-vous de renvoyer un indicateur de succès
+      }
+    } else {
+      // Créer un board SANS template
+      final board = await _trelloService.createBoard(
+        workspaceId, 
+        boardName, 
+        boardDesc
+      );
+
+      if (board != null) {
+        notifyListeners(); // Notify listeners du changement
+        return true;
       }
     }
+    return false;
   } catch (error) {
     throw Exception('Erreur lors de la création du board : $error');
   }

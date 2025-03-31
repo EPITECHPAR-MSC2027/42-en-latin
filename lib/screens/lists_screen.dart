@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:fluter/models/card.dart';
 import 'package:fluter/models/list.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
+import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -377,6 +380,17 @@ class ListsScreenState extends State<ListsScreen> {
                   ],
                 ),
               ),
+              // Ajouter un collaborateur depuis ce bouton
+              IconButton(
+                icon: const Icon(
+                  Icons.person_add,
+                  color: Colors.green,
+                  size: 20,
+                ),
+                onPressed: () async {
+                  await _updateCollaboratorsDialog(context, card.id, widget.boardId);
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: () async {
@@ -488,6 +502,117 @@ class ListsScreenState extends State<ListsScreen> {
               ),
             ],
           ),
+    );
+  }
+
+  Future<void> _updateCollaboratorsDialog(
+    BuildContext context,
+    String cardId,
+    String boardId,
+  ) async {
+    final trelloService = Provider.of<TrelloService>(context, listen: false);
+    List<Map<String, dynamic>> boardMembers = [];
+    List<Map<String, dynamic>> cardMembers = [];
+
+    try {
+      boardMembers = await trelloService.getBoardMembers(boardId);
+      cardMembers = await trelloService.getCardMembers(cardId);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur lors du chargement des collaborateurs')),
+      );
+      return;
+    }
+
+    // Crée un ensemble des IDs actuellement assignés à la carte.
+    final Set<String> currentMemberIds =
+        cardMembers.map((m) => m['id'] as String).toSet();
+    // Cet ensemble sera modifié dans le dialog.
+    final Set<String> selectedMemberIds = Set<String>.from(currentMemberIds);
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Mettre à jour les collaborateurs'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children:
+                      boardMembers.map((member) {
+                        final String memberId = member['id'] as String;
+                        final String memberName =
+                            member['fullName'] ??
+                            member['username'] ??
+                            'Inconnu';
+                        final bool isSelected = selectedMemberIds.contains(
+                          memberId,
+                        );
+                        return CheckboxListTile(
+                          value: isSelected,
+                          title: Text(memberName),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              if (value == true) {
+                                selectedMemberIds.add(memberId);
+                              } else {
+                                selectedMemberIds.remove(memberId);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Annuler'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    bool allSuccess = true;
+                    // Pour chaque membre du board, vérifie s'il faut l'ajouter ou le retirer.
+                    for (final member in boardMembers) {
+                      final String memberId = member['id'] as String;
+                      if (selectedMemberIds.contains(memberId) &&
+                          !currentMemberIds.contains(memberId)) {
+                        // Ajouter ce membre
+                        final bool success = await trelloService.addMemberToCard(
+                          cardId,
+                          memberId,
+                        );
+                        if (!success) allSuccess = false;
+                      } else if (!selectedMemberIds.contains(memberId) &&
+                          currentMemberIds.contains(memberId)) {
+                        // Retirer ce membre
+                        final bool success = await trelloService.removeMemberFromCard(
+                          cardId,
+                          memberId,
+                        );
+                        if (!success) allSuccess = false;
+                      }
+                    }
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          allSuccess
+                              ? 'Collaborateurs mis à jour'
+                              : 'Erreur lors de la mise à jour de certains collaborateurs',
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Mettre à jour'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
