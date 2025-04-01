@@ -64,7 +64,7 @@ Future<bool> addBoard(
         workspaceId, 
         boardName, 
         boardDesc, 
-        templateId
+        templateId,
       );
 
       if (board != null) {

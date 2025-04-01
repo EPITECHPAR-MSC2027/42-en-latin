@@ -146,8 +146,9 @@ class TrelloService {
     final http.Response response = await http.put(
       url,
       headers: <String, String>{'Content-Type': 'application/json'},
-      body: jsonEncode(<String, String>{'Name': newName, 'desc': newDesc}),
+      body: jsonEncode(<String, String>{'name': newName, 'desc': newDesc}),
     );
+   
 
     if (response.statusCode == 200) {
       return true;

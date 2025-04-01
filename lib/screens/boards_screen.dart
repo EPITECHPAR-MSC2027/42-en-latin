@@ -111,44 +111,51 @@ class _BoardsScreenState extends State<BoardsScreen> {
     );
   }
 
-  /// **Méthode pour modifier un board via BoardProvider**
-  Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
-    String newName = board.name;
-    String newDesc = board.desc ?? '';
+Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
+  final TextEditingController nameController = TextEditingController(text: board.name);
+  final TextEditingController descController = TextEditingController(text: board.desc);
 
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier Board'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom'),
-              onChanged: (val) => newName = val,
-            ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () async {
-              await provider.editBoard(board.id, newName, newDesc); // Utilisation de BoardProvider
-              Navigator.pop(context);
-              setState(_initializeBoards); // Recharge les boards après modification
-            },
-            child: const Text('Enregistrer'),
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text('Modifier Board'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Nom'),
+          ),
+          TextField(
+            controller: descController,
+            decoration: const InputDecoration(labelText: 'Description'),
           ),
         ],
       ),
-    );
-  }
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await provider.editBoard(board.id, nameController.text, descController.text);
+           
+          
+
+            if (mounted) {
+              Navigator.pop(context);
+              setState(_initializeBoards); // Forcer le rafraîchissement
+            }
+          },
+          child: const Text('Enregistrer'),
+        ),
+      ],
+    ),
+  );
+}
+
+
 
   /// **Méthode pour supprimer un board via BoardProvider**
   Future<void> _deleteBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
@@ -208,9 +215,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
               ),
             ),
             /// **Affichage du contenu selon le mode sélectionné**
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
+            if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
                     ? Center(child: Text('Erreur: $_errorMessage'))
                     : FutureBuilder<List<Board>>(
                         future: _fetchBoardsFuture,
