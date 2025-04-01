@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
   /// **Constructeur de HomeScreen**
