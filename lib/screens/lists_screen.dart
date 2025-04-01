@@ -4,6 +4,7 @@ import 'package:fluter/models/card.dart';
 import 'package:fluter/models/list.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -55,27 +56,30 @@ class ListsScreenState extends State<ListsScreen> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    const double listWidthPercentage = 0.48; // 48% de la largeur de l'écran
+    const double listWidthPercentage = 0.48;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      appBar: _buildAppBar(),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          backgroundColor: themeProvider.beige,
+          appBar: _buildAppBar(themeProvider),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator(color: themeProvider.vertText))
               : _errorMessage != null
-              ? Center(child: Text('Erreur: $_errorMessage'))
-              : _buildBody(screenWidth, listWidthPercentage),
-      floatingActionButton: _buildFloatingActionButton(),
+                  ? Center(child: Text('Erreur: $_errorMessage', style: TextStyle(color: themeProvider.rouge)))
+                  : _buildBody(screenWidth, listWidthPercentage, themeProvider),
+          floatingActionButton: _buildFloatingActionButton(themeProvider),
+        );
+      },
     );
   }
 
   // ============================================================
   //                         APP BAR
   // ============================================================
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(ThemeProvider themeProvider) {
     return AppBar(
-      backgroundColor: const Color(0xFF889596),
+      backgroundColor: themeProvider.vertGris,
       title: Padding(
         padding: const EdgeInsets.only(left: 10),
         child: Text(
@@ -83,7 +87,7 @@ class ListsScreenState extends State<ListsScreen> {
           style: GoogleFonts.itim(
             fontSize: 30,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFFC0CDA9),
+            color: themeProvider.vertText,
           ),
         ),
       ),
@@ -93,7 +97,7 @@ class ListsScreenState extends State<ListsScreen> {
   // ============================================================
   //                          BODY
   // ============================================================
-  Widget _buildBody(double screenWidth, double listWidthPercentage) {
+  Widget _buildBody(double screenWidth, double listWidthPercentage, ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
@@ -104,11 +108,11 @@ class ListsScreenState extends State<ListsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _buildColumn(true, screenWidth, listWidthPercentage),
+                  child: _buildColumn(true, screenWidth, listWidthPercentage, themeProvider),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildColumn(false, screenWidth, listWidthPercentage),
+                  child: _buildColumn(false, screenWidth, listWidthPercentage, themeProvider),
                 ),
               ],
             ),
@@ -130,7 +134,7 @@ class ListsScreenState extends State<ListsScreen> {
                   style: GoogleFonts.itim(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: themeProvider.vertText,
                   ),
                 ),
               ],
@@ -144,9 +148,9 @@ class ListsScreenState extends State<ListsScreen> {
   // ============================================================
   //                FLOATING ACTION BUTTON
   // ============================================================
-  FloatingActionButton _buildFloatingActionButton() {
+  FloatingActionButton _buildFloatingActionButton(ThemeProvider themeProvider) {
     return FloatingActionButton.extended(
-      backgroundColor: const Color(0xFFC0CDA9),
+      backgroundColor: themeProvider.vertGris,
       onPressed: () async {
         await _addListDialog(
           context,
@@ -160,11 +164,11 @@ class ListsScreenState extends State<ListsScreen> {
             style: GoogleFonts.itim(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFFD97E8D),
+              color: themeProvider.rouge,
             ),
           ),
           const SizedBox(width: 8), // Espacement entre le texte et l'icône
-          const Icon(Icons.add, color: Color(0xFFD97E8D)),
+          Icon(Icons.add, color: themeProvider.rouge),
         ],
       ),
     );
@@ -177,6 +181,7 @@ class ListsScreenState extends State<ListsScreen> {
     bool isLeftColumn,
     double screenWidth,
     double widthPercentage,
+    ThemeProvider themeProvider,
   ) {
     final provider = Provider.of<ListProvider>(context, listen: false);
     final List<ListModel> filteredLists = [];
@@ -192,13 +197,14 @@ class ListsScreenState extends State<ListsScreen> {
               child: _buildListContainer(
                 list,
                 width: screenWidth * widthPercentage,
+                themeProvider: themeProvider,
               ),
             );
           }).toList(),
     );
   }
 
-  Widget _buildListContainer(ListModel list, {required double width}) {
+  Widget _buildListContainer(ListModel list, {required double width, required ThemeProvider themeProvider}) {
     final cardProvider = Provider.of<CardProvider>(context);
     final List<CardModel> cards = cardProvider.fetchCardsByList(list.id);
 
@@ -216,7 +222,7 @@ class ListsScreenState extends State<ListsScreen> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFD2E3F7),
+              color: themeProvider.bleuClair,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -239,7 +245,7 @@ class ListsScreenState extends State<ListsScreen> {
                         style: GoogleFonts.itim(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: themeProvider.vertText,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -248,7 +254,7 @@ class ListsScreenState extends State<ListsScreen> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.add, color: Colors.black),
+                          icon: Icon(Icons.add, color: themeProvider.vertText),
                           onPressed: () async {
                             await _addCardDialog(
                               context,
@@ -258,9 +264,9 @@ class ListsScreenState extends State<ListsScreen> {
                           },
                         ),
                         PopupMenuButton<String>(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.more_vert,
-                            color: Colors.black,
+                            color: themeProvider.vertText,
                           ),
                           onSelected: (String value) async {
                             if (value == 'Modifier') {
@@ -269,17 +275,16 @@ class ListsScreenState extends State<ListsScreen> {
                               await _deleteList(context, list);
                             }
                           },
-                          itemBuilder:
-                              (BuildContext context) => [
-                                const PopupMenuItem(
-                                  value: 'Modifier',
-                                  child: Text('Modifier'),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'Supprimer',
-                                  child: Text('Supprimer'),
-                                ),
-                              ],
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem(
+                              value: 'Modifier',
+                              child: Text('Modifier', style: TextStyle(color: themeProvider.vertText)),
+                            ),
+                            PopupMenuItem(
+                              value: 'Supprimer',
+                              child: Text('Supprimer', style: TextStyle(color: themeProvider.rouge)),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -292,12 +297,13 @@ class ListsScreenState extends State<ListsScreen> {
                   children:
                       cards.isEmpty
                           ? [
-                            const Text(
-                              'Aucune carte',
-                              style: TextStyle(color: Colors.black54),
+                            Text(
+                              'No cards',
+                              // ignore: deprecated_member_use
+                              style: TextStyle(color: themeProvider.vertText.withOpacity(0.5)),
                             ),
                           ]
-                          : cards.map(_buildCard).toList(),
+                          : cards.map((card) => _buildCard(card, themeProvider)).toList(),
                 ),
               ],
             ),
@@ -310,7 +316,7 @@ class ListsScreenState extends State<ListsScreen> {
   // ============================================================
   //                        CARDS
   // ============================================================
-  Widget _buildCard(CardModel card) {
+  Widget _buildCard(CardModel card, ThemeProvider themeProvider) {
     return LongPressDraggable<CardModel>(
       data: card,
       feedback: Material(
@@ -319,15 +325,15 @@ class ListsScreenState extends State<ListsScreen> {
           width: 200, // largeur fixe pour le feedback
           height:
               60, // hauteur fixe pour le feedback (ajustez selon vos besoins)
-          child: _cardContent(card),
+          child: _cardContent(card, themeProvider),
         ),
       ),
-      childWhenDragging: Opacity(opacity: 0.3, child: _cardContent(card)),
-      child: _cardContent(card),
+      childWhenDragging: Opacity(opacity: 0.3, child: _cardContent(card, themeProvider)),
+      child: _cardContent(card, themeProvider),
     );
   }
 
-  Widget _cardContent(CardModel card) {
+  Widget _cardContent(CardModel card, ThemeProvider themeProvider) {
     return GestureDetector(
       onTap: () async {
         await _editCardDialog(
@@ -342,7 +348,7 @@ class ListsScreenState extends State<ListsScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: themeProvider.blanc,
             borderRadius: BorderRadius.circular(6),
             boxShadow: [
               BoxShadow(
@@ -364,7 +370,7 @@ class ListsScreenState extends State<ListsScreen> {
                       style: GoogleFonts.itim(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: themeProvider.vertText,
                       ),
                     ),
                     if (card.desc.isNotEmpty) ...[
@@ -373,7 +379,8 @@ class ListsScreenState extends State<ListsScreen> {
                         card.desc,
                         style: GoogleFonts.itim(
                           fontSize: 12,
-                          color: Colors.black87,
+                          // ignore: deprecated_member_use
+                          color: themeProvider.vertText.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -382,17 +389,17 @@ class ListsScreenState extends State<ListsScreen> {
               ),
               // Ajouter un collaborateur depuis ce bouton
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.person_add,
-                  color: Colors.green,
-                  size: 20,
+                  color: themeProvider.vert,
+                  size: 16,
                 ),
                 onPressed: () async {
                   await _updateCollaboratorsDialog(context, card.id, widget.boardId);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
                 onPressed: () async {
                   final cardProvider = Provider.of<CardProvider>(
                     context,
@@ -425,12 +432,12 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Créer une Carte'),
+            title: const Text('Create a Card'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
-                  decoration: const InputDecoration(labelText: 'Nom'),
+                  decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (String val) => name = val,
                 ),
                 TextField(
@@ -442,7 +449,7 @@ class ListsScreenState extends State<ListsScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -451,7 +458,7 @@ class ListsScreenState extends State<ListsScreen> {
                   Navigator.pop(context);
                   await provider.fetchCardsByBoard(listId);
                 },
-                child: const Text('Créer'),
+                child: const Text('Create'),
               ),
             ],
           ),
@@ -470,13 +477,13 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Modifier la Carte'),
+            title: const Text('Edit Card'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextField(
                   controller: TextEditingController(text: newName),
-                  decoration: const InputDecoration(labelText: 'Nom'),
+                  decoration: const InputDecoration(labelText: 'Name'),
                   onChanged: (String val) => newName = val,
                 ),
                 TextField(
@@ -489,7 +496,7 @@ class ListsScreenState extends State<ListsScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -498,7 +505,7 @@ class ListsScreenState extends State<ListsScreen> {
                   Navigator.pop(context);
                   await provider.fetchCardsByBoard(card.listId);
                 },
-                child: const Text('Enregistrer'),
+                child: const Text('Save'),
               ),
             ],
           ),
@@ -536,7 +543,7 @@ class ListsScreenState extends State<ListsScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Mettre à jour les collaborateurs'),
+              title: const Text('Update Collaborators'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -546,7 +553,7 @@ class ListsScreenState extends State<ListsScreen> {
                         final String memberName =
                             member['fullName'] ??
                             member['username'] ??
-                            'Inconnu';
+                            'Unknown';
                         final bool isSelected = selectedMemberIds.contains(
                           memberId,
                         );
@@ -569,17 +576,15 @@ class ListsScreenState extends State<ListsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Annuler'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () async {
                     bool allSuccess = true;
-                    // Pour chaque membre du board, vérifie s'il faut l'ajouter ou le retirer.
                     for (final member in boardMembers) {
                       final String memberId = member['id'] as String;
                       if (selectedMemberIds.contains(memberId) &&
                           !currentMemberIds.contains(memberId)) {
-                        // Ajouter ce membre
                         final bool success = await trelloService.addMemberToCard(
                           cardId,
                           memberId,
@@ -587,7 +592,6 @@ class ListsScreenState extends State<ListsScreen> {
                         if (!success) allSuccess = false;
                       } else if (!selectedMemberIds.contains(memberId) &&
                           currentMemberIds.contains(memberId)) {
-                        // Retirer ce membre
                         final bool success = await trelloService.removeMemberFromCard(
                           cardId,
                           memberId,
@@ -600,13 +604,13 @@ class ListsScreenState extends State<ListsScreen> {
                       SnackBar(
                         content: Text(
                           allSuccess
-                              ? 'Collaborateurs mis à jour'
-                              : 'Erreur lors de la mise à jour de certains collaborateurs',
+                              ? 'Collaborators updated'
+                              : 'Error updating some collaborators',
                         ),
                       ),
                     );
                   },
-                  child: const Text('Mettre à jour'),
+                  child: const Text('Update'),
                 ),
               ],
             );
@@ -629,15 +633,15 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Créer une Liste'),
+            title: const Text('Create a List'),
             content: TextField(
-              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              decoration: const InputDecoration(labelText: 'List name'),
               onChanged: (String val) => name = val,
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -650,7 +654,7 @@ class ListsScreenState extends State<ListsScreen> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text('Créer'),
+                child: const Text('Create'),
               ),
             ],
           ),
@@ -664,16 +668,16 @@ class ListsScreenState extends State<ListsScreen> {
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('Modifier la Liste'),
+            title: const Text('Edit List'),
             content: TextField(
               controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom de la liste'),
+              decoration: const InputDecoration(labelText: 'List name'),
               onChanged: (String val) => newName = val,
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -688,7 +692,7 @@ class ListsScreenState extends State<ListsScreen> {
                   if (!context.mounted) return;
                   Navigator.pop(context);
                 },
-                child: const Text('Enregistrer'),
+                child: const Text('Save'),
               ),
             ],
           ),

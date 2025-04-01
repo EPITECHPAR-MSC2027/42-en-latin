@@ -92,6 +92,7 @@ class MyApp extends StatelessWidget {
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
               backgroundColor: themeProvider.vertGris,
               selectedItemColor: themeProvider.vertText,
+              // ignore: deprecated_member_use
               unselectedItemColor: themeProvider.vertText.withOpacity(0.5),
             ),
             cardTheme: CardTheme(
