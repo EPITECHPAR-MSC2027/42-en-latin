@@ -1,9 +1,9 @@
 import 'package:fluter/providers/board_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
 
 class BoardCarousel extends StatelessWidget {
   const BoardCarousel({super.key, this.maxBoards = 5});
@@ -21,6 +21,7 @@ class BoardCarousel extends StatelessWidget {
             child: Text(
               'No recent boards',
               style: TextStyle(
+                // ignore: deprecated_member_use
                 color: themeProvider.vertText.withOpacity(0.5),
               ),
             ),
