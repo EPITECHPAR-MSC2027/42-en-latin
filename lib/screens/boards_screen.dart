@@ -113,45 +113,52 @@ class _BoardsScreenState extends State<BoardsScreen> {
     );
   }
 
-  /// **Méthode pour modifier un board via BoardProvider**
-  Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
-    String newName = board.name;
-    String newDesc = board.desc;
 
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier Board'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              controller: TextEditingController(text: newName),
-              decoration: const InputDecoration(labelText: 'Nom'),
-              onChanged: (val) => newName = val,
-            ),
-            TextField(
-              controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
-              onChanged: (val) => newDesc = val,
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () async {
-              await provider.editBoard(board.id, newName, newDesc); // Utilisation de BoardProvider
-              // ignore: use_build_context_synchronously
-              Navigator.pop(context);
-              setState(_initializeBoards); // Recharge les boards après modification
-            },
-            child: const Text('Enregistrer'),
+Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
+  final TextEditingController nameController = TextEditingController(text: board.name);
+  final TextEditingController descController = TextEditingController(text: board.desc);
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: const Text('Modifier Board'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Nom'),
+          ),
+          TextField(
+            controller: descController,
+            decoration: const InputDecoration(labelText: 'Description'),
           ),
         ],
       ),
-    );
-  }
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await provider.editBoard(board.id, nameController.text, descController.text);
+           
+          
+
+            if (mounted) {
+              Navigator.pop(context);
+              setState(_initializeBoards); // Forcer le rafraîchissement
+            }
+          },
+          child: const Text('Enregistrer'),
+        ),
+      ],
+    ),
+  );
+}
+
+
 
   /// **Méthode pour supprimer un board via BoardProvider**
   Future<void> _deleteBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
@@ -200,58 +207,19 @@ class _BoardsScreenState extends State<BoardsScreen> {
                 ),
               ),
             ),
-          ),
-          body: SingleChildScrollView(  // Enroulez le body avec un SingleChildScrollView
-            child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(width: 10),
-                    ],
-                  ),
-                ),
-                /// **Affichage du contenu selon le mode sélectionné**
-                if (_isLoading)
-                  Center(
-                    child: CircularProgressIndicator(
-                      color: themeProvider.vertText,
-                    ),
-                  )
-                else if (_errorMessage != null)
-                  Center(
-                    child: Text(
-                      'Erreur: $_errorMessage',
-                      style: TextStyle(color: themeProvider.rouge),
-                    ),
-                  )
-                else
-                  FutureBuilder<List<Board>>(
-                    future: _fetchBoardsFuture,
-                    builder: (BuildContext context, AsyncSnapshot<List<Board>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: themeProvider.vertText,
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            'Erreur: ${snapshot.error}',
-                            style: TextStyle(color: themeProvider.rouge),
-                          ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(
-                          child: Text(
-                            'Aucun board trouvé pour ce workspace.',
-                            style: TextStyle(color: themeProvider.vertText),
-                          ),
-                        );
-                      }
+            /// **Affichage du contenu selon le mode sélectionné**
+            if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
+                    ? Center(child: Text('Erreur: $_errorMessage'))
+                    : FutureBuilder<List<Board>>(
+                        future: _fetchBoardsFuture,
+                        builder: (BuildContext context, AsyncSnapshot<List<Board>> snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Erreur: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
+                          }
 
                       return _isTableView
                           ? _buildTableView(snapshot.data!, themeProvider)
