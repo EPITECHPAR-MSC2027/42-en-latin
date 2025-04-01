@@ -63,20 +63,10 @@ class ListsScreenState extends State<ListsScreen> {
         return Scaffold(
           backgroundColor: themeProvider.beige,
           appBar: _buildAppBar(themeProvider),
-          body:
-              _isLoading
-                  ? Center(
-                    child: CircularProgressIndicator(
-                      color: themeProvider.vertText,
-                    ),
-                  )
-                  : _errorMessage != null
-                  ? Center(
-                    child: Text(
-                      'Erreur: $_errorMessage',
-                      style: TextStyle(color: themeProvider.rouge),
-                    ),
-                  )
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator(color: themeProvider.vertText))
+              : _errorMessage != null
+                  ? Center(child: Text('Erreur: $_errorMessage', style: TextStyle(color: themeProvider.rouge)))
                   : _buildBody(screenWidth, listWidthPercentage, themeProvider),
           floatingActionButton: _buildFloatingActionButton(themeProvider),
         );
@@ -107,11 +97,7 @@ class ListsScreenState extends State<ListsScreen> {
   // ============================================================
   //                          BODY
   // ============================================================
-  Widget _buildBody(
-    double screenWidth,
-    double listWidthPercentage,
-    ThemeProvider themeProvider,
-  ) {
+  Widget _buildBody(double screenWidth, double listWidthPercentage, ThemeProvider themeProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
@@ -122,21 +108,11 @@ class ListsScreenState extends State<ListsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _buildColumn(
-                    true,
-                    screenWidth,
-                    listWidthPercentage,
-                    themeProvider,
-                  ),
+                  child: _buildColumn(true, screenWidth, listWidthPercentage, themeProvider),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildColumn(
-                    false,
-                    screenWidth,
-                    listWidthPercentage,
-                    themeProvider,
-                  ),
+                  child: _buildColumn(false, screenWidth, listWidthPercentage, themeProvider),
                 ),
               ],
             ),
@@ -228,11 +204,7 @@ class ListsScreenState extends State<ListsScreen> {
     );
   }
 
-  Widget _buildListContainer(
-    ListModel list, {
-    required double width,
-    required ThemeProvider themeProvider,
-  }) {
+  Widget _buildListContainer(ListModel list, {required double width, required ThemeProvider themeProvider}) {
     final cardProvider = Provider.of<CardProvider>(context);
     final List<CardModel> cards = cardProvider.fetchCardsByList(list.id);
 
@@ -303,27 +275,16 @@ class ListsScreenState extends State<ListsScreen> {
                               await _deleteList(context, list);
                             }
                           },
-                          itemBuilder:
-                              (BuildContext context) => [
-                                PopupMenuItem(
-                                  value: 'Modifier',
-                                  child: Text(
-                                    'Modifier',
-                                    style: TextStyle(
-                                      color: themeProvider.vertText,
-                                    ),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'Supprimer',
-                                  child: Text(
-                                    'Supprimer',
-                                    style: TextStyle(
-                                      color: themeProvider.rouge,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem(
+                              value: 'Modifier',
+                              child: Text('Modifier', style: TextStyle(color: themeProvider.vertText)),
+                            ),
+                            PopupMenuItem(
+                              value: 'Supprimer',
+                              child: Text('Supprimer', style: TextStyle(color: themeProvider.rouge)),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -339,14 +300,10 @@ class ListsScreenState extends State<ListsScreen> {
                             Text(
                               'No cards',
                               // ignore: deprecated_member_use
-                              style: TextStyle(
-                                color: themeProvider.vertText.withOpacity(0.5),
-                              ),
+                              style: TextStyle(color: themeProvider.vertText.withOpacity(0.5)),
                             ),
                           ]
-                          : cards
-                              .map((card) => _buildCard(card, themeProvider))
-                              .toList(),
+                          : cards.map((card) => _buildCard(card, themeProvider)).toList(),
                 ),
               ],
             ),
@@ -371,10 +328,7 @@ class ListsScreenState extends State<ListsScreen> {
           child: _cardContent(card, themeProvider),
         ),
       ),
-      childWhenDragging: Opacity(
-        opacity: 0.3,
-        child: _cardContent(card, themeProvider),
-      ),
+      childWhenDragging: Opacity(opacity: 0.3, child: _cardContent(card, themeProvider)),
       child: _cardContent(card, themeProvider),
     );
   }
@@ -434,40 +388,26 @@ class ListsScreenState extends State<ListsScreen> {
                 ),
               ),
               // Ajouter un collaborateur depuis ce bouton
-              Column(
-                mainAxisSize:
-                    MainAxisSize.min, // Réduit l'espace occupé par le Row
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.person_add,
-                      color: themeProvider.vert,
-                      size: 16,
-                    ),
-                    onPressed: () async {
-                      await _updateCollaboratorsDialog(
-                        context,
-                        card.id,
-                        widget.boardId,
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                      color: themeProvider.rouge,
-                      size: 16,
-                    ),
-                    onPressed: () async {
-                      final cardProvider = Provider.of<CardProvider>(
-                        context,
-                        listen: false,
-                      );
-                      await cardProvider.removeCard(card.id);
-                      await cardProvider.fetchCardsByBoard(card.listId);
-                    },
-                  ),
-                ],
+              IconButton(
+                icon: Icon(
+                  Icons.person_add,
+                  color: themeProvider.vert,
+                  size: 16,
+                ),
+                onPressed: () async {
+                  await _updateCollaboratorsDialog(context, card.id, widget.boardId);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
+                onPressed: () async {
+                  final cardProvider = Provider.of<CardProvider>(
+                    context,
+                    listen: false,
+                  );
+                  await cardProvider.removeCard(card.id);
+                  await cardProvider.fetchCardsByBoard(card.listId);
+                },
               ),
             ],
           ),
@@ -586,9 +526,7 @@ class ListsScreenState extends State<ListsScreen> {
       cardMembers = await trelloService.getCardMembers(cardId);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erreur lors du chargement des collaborateurs'),
-        ),
+        const SnackBar(content: Text('Erreur lors du chargement des collaborateurs')),
       );
       return;
     }
@@ -647,13 +585,17 @@ class ListsScreenState extends State<ListsScreen> {
                       final String memberId = member['id'] as String;
                       if (selectedMemberIds.contains(memberId) &&
                           !currentMemberIds.contains(memberId)) {
-                        final bool success = await trelloService
-                            .addMemberToCard(cardId, memberId);
+                        final bool success = await trelloService.addMemberToCard(
+                          cardId,
+                          memberId,
+                        );
                         if (!success) allSuccess = false;
                       } else if (!selectedMemberIds.contains(memberId) &&
                           currentMemberIds.contains(memberId)) {
-                        final bool success = await trelloService
-                            .removeMemberFromCard(cardId, memberId);
+                        final bool success = await trelloService.removeMemberFromCard(
+                          cardId,
+                          memberId,
+                        );
                         if (!success) allSuccess = false;
                       }
                     }
