@@ -1,5 +1,6 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/favorites_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,24 +10,23 @@ class FavoritesCarousel extends StatelessWidget {
   // ignore: public_member_api_docs
   const FavoritesCarousel({super.key});
 
-  Color _getBackgroundColor(String? colorStr) {
-    if (colorStr == null) return const Color(0xFF889596);
-    return const Color(0xFF889596);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<FavoritesProvider>(
-      builder: (context, favoritesProvider, child) {
+    return Consumer2<FavoritesProvider, ThemeProvider>(
+      builder: (context, favoritesProvider, themeProvider, child) {
         final favorites = favoritesProvider.favorites;
 
         if (favorites.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(20),
+          return Padding(
+            padding: const EdgeInsets.all(20),
             child: Center(
               child: Text(
                 'Aucun tableau favori trouvé.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 16,
+                  // ignore: deprecated_member_use
+                  color: themeProvider.vertText.withOpacity(0.5),
+                ),
               ),
             ),
           );
@@ -51,7 +51,7 @@ class FavoritesCarousel extends StatelessWidget {
                   style: GoogleFonts.itim(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF314A43),
+                    color: themeProvider.vertText,
                   ),
                 ),
               ),
@@ -69,7 +69,13 @@ class FavoritesCarousel extends StatelessWidget {
                         width: 160,
                         child: Card(
                           elevation: 4,
-                          color: _getBackgroundColor(favorite.backgroundColor),
+                          color: themeProvider.vertfavorite,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: BorderSide(
+                              color: themeProvider.grisClair,
+                            ),
+                          ),
                           child: InkWell(
                             onTap: () async {
                               await Provider.of<BoardsProvider>(context, listen: false)
@@ -92,17 +98,16 @@ class FavoritesCarousel extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.star,
-                                    // ignore: deprecated_member_use
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Color(0xffffffff),
                                     size: 32,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     favorite.name,
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: Color(0xffffffff),
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -137,7 +142,13 @@ class FavoritesCarousel extends StatelessWidget {
                           width: 160,
                           child: Card(
                             elevation: 4,
-                            color: _getBackgroundColor(favorite.backgroundColor),
+                            color: themeProvider.vertfavorite,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              side: BorderSide(
+                                color: themeProvider.grisClair,
+                              ),
+                            ),
                             child: InkWell(
                               onTap: () async {
                                 await Provider.of<BoardsProvider>(context, listen: false)
@@ -160,17 +171,16 @@ class FavoritesCarousel extends StatelessWidget {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.star,
-                                      // ignore: deprecated_member_use
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Color(0xffffffff),
                                       size: 32,
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       favorite.name,
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: Color(0xffffffff),
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),

@@ -77,7 +77,7 @@ Future<bool> addBoard(
       final board = await _trelloService.createBoard(
         workspaceId, 
         boardName, 
-        boardDesc
+        boardDesc,
       );
 
       if (board != null) {

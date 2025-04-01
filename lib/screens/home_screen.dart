@@ -1,11 +1,14 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
+import 'package:fluter/widgets/notifications_dropdown.dart';
 import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
@@ -46,61 +49,83 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      appBar: AppBar(
-        title: const Text('Home Page'),
-        backgroundColor: const Color(0xFFC0CCC9),
-        
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    'Welcome Back',
-                    style: GoogleFonts.itim(
-                      fontSize: 44,
-                      color: const Color(0xFFC27C88),
-                      fontWeight: FontWeight.bold,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          backgroundColor: themeProvider.beige,
+          appBar: AppBar(
+            title: Text(
+              'Home Page',
+              style: GoogleFonts.itim(
+                color: themeProvider.vertText,
+              ),
+            ),
+            backgroundColor: themeProvider.vertGris,
+            actions: const <Widget>[
+              NotificationsDropdown(),
+            ],
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Text(
+                        'Welcome Back',
+                        style: GoogleFonts.itim(
+                          fontSize: 44,
+                          color: themeProvider.rouge,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    'Ready to work ?',
-                    style: GoogleFonts.itim(
-                      fontSize: 20,
-                      color: const Color(0xFF314A43),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        'Ready to work ?',
+                        style: GoogleFonts.itim(
+                          fontSize: 20,
+                          color: themeProvider.vertText,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 40),
+                    if (_isLoading)
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: themeProvider.vertText,
+                        ),
+                      )
+                    else if (_errorMessage != null)
+                      Center(
+                        child: Text(
+                          'Erreur: $_errorMessage',
+                          style: TextStyle(
+                            color: themeProvider.rouge,
+                          ),
+                        ),
+                      )
+                    else
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BoardCarousel(),
+                          SizedBox(height: 45),
+                          RecentNotificationsList(),
+                        ],
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 40),
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else if (_errorMessage != null)
-                  Center(child: Text('Erreur: $_errorMessage'))
-                else
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BoardCarousel(),
-                      SizedBox(height: 45),
-                      RecentNotificationsList(),
-                    ],
-                  ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: const BottomNavBar(),
+          bottomNavigationBar: const BottomNavBar(),
+        );
+      },
     );
   }
 }
