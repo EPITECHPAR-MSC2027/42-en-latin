@@ -8,7 +8,7 @@ import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
+import 'package:fluter/screens/weather_screen.dart';
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
   /// **Constructeur de HomeScreen**
@@ -69,6 +69,7 @@ class HomeScreenState extends State<HomeScreen> {
               await _loadData();
             },
           ),
+          WeatherScreen(),
         ],
       ),
       body: SafeArea(

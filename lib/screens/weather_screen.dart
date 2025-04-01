@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:fluter/services/weather_service.dart';
 import 'package:flutter/material.dart';
-import 'package:weather/weather.dart';
 
 import 'dart:developer';
+
+import 'package:fluter/models/weather.dart';
+
 
 class WeatherScreen extends StatefulWidget 
 {
@@ -55,7 +57,11 @@ void initState()
 @override
 Widget build(BuildContext context)
 {
-  return Scaffold();
+  return Column(children: [
+    Text(_weather?.cityName ?? ''),
+    Text(_weather?.temperature.toString() ?? ''),
+    Text(_weather?.mainCondition ?? ''),
+  ],);
 }
 
 
