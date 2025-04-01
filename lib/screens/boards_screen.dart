@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:fluter/models/board.dart';
 import 'package:fluter/providers/board_provider.dart'; // BoardProvider pour add, edit, remove
-import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart'; // WorkspaceProvider pour fetchBoardsByWorkspace
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/utils/templates.dart';
@@ -102,7 +101,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
             onPressed: () async {
               // Création d'un board en utilisant BoardProvider
               await provider.addBoard(widget.workspaceId, name, desc, selectedTemplateId);
-              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après ajout
             },
@@ -112,7 +110,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
       ),
     );
   }
-
 
 Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
   final TextEditingController nameController = TextEditingController(text: board.name);
@@ -172,7 +169,6 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
           TextButton(
             onPressed: () async {
               await provider.removeBoard(board.id); // Utilisation de BoardProvider
-              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après suppression
             },
@@ -185,26 +181,37 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return Scaffold(
-          backgroundColor: themeProvider.beige,
-          appBar: AppBar(
-            backgroundColor: themeProvider.vertGris,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: themeProvider.vertText),
-              onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFEDE3), // Fond beige rosé
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF889596), // Fond de l'AppBar
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Text(
+            widget.workspaceName,
+            style: GoogleFonts.itim(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFFC0CDA9),
             ),
-            title: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text(
-                widget.workspaceName,
-                style: GoogleFonts.itim(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: themeProvider.vertText,
-                ),
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(  // Enroulez le body avec un SingleChildScrollView
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 10),
+                ],
               ),
             ),
             /// **Affichage du contenu selon le mode sélectionné**
@@ -221,42 +228,37 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                             return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
                           }
 
-                      return _isTableView
-                          ? _buildTableView(snapshot.data!, themeProvider)
-                          : Center(
-                              child: Text(
-                                'Mode Board non implémenté.',
-                                style: TextStyle(color: themeProvider.vertText),
-                              ),
-                            );
-                    },
-                  ),
-              ],
-            ),
+                          return _isTableView
+                              ? _buildTableView(snapshot.data!) // Affichage Table
+                              : const Center(
+                                  child: Text('Mode Board non implémenté.'),
+                                );
+                        },
+                      ),
+          ],
+        ),
+      ),
+      /// **Bouton flottant pour créer un board**
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20, right: 20),
+        child: FloatingActionButton(
+          onPressed: () async {
+            // Affiche la fenêtre de création de board
+            await _addBoardDialog(context, context.read<BoardsProvider>());
+            setState(_initializeBoards); // Recharge les boards après création
+          },
+          backgroundColor: const Color(0xFFC0CDA9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          /// **Bouton flottant pour créer un board**
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 20, right: 20),
-            child: FloatingActionButton(
-              onPressed: () async {
-                // Affiche la fenêtre de création de board
-                await _addBoardDialog(context, context.read<BoardsProvider>());
-                setState(_initializeBoards); // Recharge les boards après création
-              },
-              backgroundColor: themeProvider.vertGris,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.add, color: themeProvider.rouge),
-            ),
-          ),
-          bottomNavigationBar: const BottomNavBar(),
-        );
-      },
+          child: const Icon(Icons.add, color: Color(0xFFD97C83)),
+        ),
+      ),
+      bottomNavigationBar: const BottomNavBar(),
     );
   }
 
-  Widget _buildTableView(List<Board> boards, ThemeProvider themeProvider) {
+  Widget _buildTableView(List<Board> boards) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Align(
@@ -266,7 +268,7 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
             maxWidth: MediaQuery.of(context).size.width * 0.9, // Limite la largeur si besoin
           ),
           decoration: BoxDecoration(
-            color: themeProvider.bleuClair,
+            color: Colors.blue[100],
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -278,15 +280,8 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                 return Column(
                   children: [
                     ListTile(
-                      title: Text(
-                        board.name,
-                        style: TextStyle(color: themeProvider.vertText),
-                      ),
-                      subtitle: Text(
-                        board.desc,
-                        // ignore: deprecated_member_use
-                        style: TextStyle(color: themeProvider.vertText.withOpacity(0.7)),
-                      ),
+                      title: Text(board.name),
+                      subtitle: Text(board.desc),
                       trailing: PopupMenuButton<String>(
                         onSelected: (value) async {
                           if (value == 'edit') {
@@ -297,19 +292,13 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                         },
                         itemBuilder: (BuildContext context) {
                           return [
-                            PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                               value: 'edit',
-                              child: Text(
-                                'Modifier',
-                                style: TextStyle(color: themeProvider.vertText),
-                              ),
+                              child: Text('Modifier'),
                             ),
-                            PopupMenuItem<String>(
+                            const PopupMenuItem<String>(
                               value: 'delete',
-                              child: Text(
-                                'Supprimer',
-                                style: TextStyle(color: themeProvider.rouge),
-                              ),
+                              child: Text('Supprimer'),
                             ),
                           ];
                         },
@@ -327,8 +316,8 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                       },
                     ),
                     if (index < boards.length - 1) // Empêche un divider après le dernier élément
-                      Divider(
-                        color: themeProvider.rouge,
+                      const Divider(
+                        color: Color(0xFFD97C83),
                         thickness: 1,
                         height: 10, // Espacement vertical
                       ),
