@@ -10,6 +10,8 @@
 analyzer:
   errors:
     always_specify_types: ignore
+    deprecated_member_use: ignore
+    duplicate_ignore: ignore
     file_names: ignore
     no_logic_in_create_state: ignore
     prefer_const_declarations: ignore

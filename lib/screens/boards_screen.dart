@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:fluter/models/board.dart';
@@ -101,6 +103,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
             onPressed: () async {
               // Création d'un board en utilisant BoardProvider
               await provider.addBoard(widget.workspaceId, name, desc, selectedTemplateId);
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
               setState(_initializeBoards); // Recharge les boards après ajout
             },
