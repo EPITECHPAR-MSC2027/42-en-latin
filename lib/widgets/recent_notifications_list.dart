@@ -1,9 +1,9 @@
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
 
 class RecentNotificationsList extends StatelessWidget {
   const RecentNotificationsList({super.key});
@@ -19,6 +19,7 @@ class RecentNotificationsList extends StatelessWidget {
             child: Text(
               'No recent notification',
               style: TextStyle(
+                // ignore: deprecated_member_use
                 color: themeProvider.vertText.withOpacity(0.5),
               ),
             ),
@@ -64,6 +65,7 @@ class RecentNotificationsList extends StatelessWidget {
                       _formatDate(notification.date),
                       style: TextStyle(
                         fontSize: 12,
+                        // ignore: deprecated_member_use
                         color: themeProvider.vertText.withOpacity(0.7),
                       ),
                     ),

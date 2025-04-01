@@ -110,12 +110,12 @@ class HomeScreenState extends State<HomeScreen> {
                         ),
                       )
                     else
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BoardCarousel(),
-                          const SizedBox(height: 45),
-                          const RecentNotificationsList(),
+                          BoardCarousel(),
+                          SizedBox(height: 45),
+                          RecentNotificationsList(),
                         ],
                       ),
                   ],
