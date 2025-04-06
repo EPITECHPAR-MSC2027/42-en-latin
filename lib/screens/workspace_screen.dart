@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:fluter/models/board.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -13,42 +17,58 @@ class WorkspaceScreen extends StatefulWidget {
 }
 
 class _WorkspaceScreenState extends State<WorkspaceScreen> {
-  // Variables d'état pour gérer le chargement et les erreurs
   bool _isLoading = true;
   String? _errorMessage;
+  final Map<String, List<Board>> _workspaceBoards = {};
 
   @override
   void initState() {
     super.initState();
-    // Initialisation des workspaces dès que l'écran est affiché
     _initializeWorkspaces();
   }
 
-  // Fonction pour initialiser les workspaces
   void _initializeWorkspaces() {
-    // Utilisation de Future.microtask pour exécuter la tâche immédiatement
     Future.microtask(() async {
       await _loadWorkspaces();
     });
   }
 
-  // Fonction pour charger les workspaces via le provider
+  Future<void> _fetchBoardsForWorkspaces() async {
+    try {
+      final workspaceProvider = Provider.of<WorkspaceProvider>(
+        context,
+        listen: false,
+      );
+      for (final workspace in workspaceProvider.workspaces) {
+        final List<Board> boards = await workspaceProvider
+            .fetchBoardsByWorkspace(workspace.id);
+        setState(() {
+          _workspaceBoards[workspace.id] = boards;
+        });
+      }
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
+    }
+  }
+
   Future<void> _loadWorkspaces() async {
     try {
-      // Récupérer les workspaces via le provider
-      await Provider.of<WorkspaceProvider>(context, listen: false).fetchWorkspaces();
+      await Provider.of<WorkspaceProvider>(
+        context,
+        listen: false,
+      ).fetchWorkspaces();
+      await _fetchBoardsForWorkspaces();
     } catch (e) {
-      // En cas d'erreur, afficher le message d'erreur
       setState(() => _errorMessage = e.toString());
     } finally {
-      // Une fois le chargement terminé, mettre à jour l'état de chargement
       setState(() => _isLoading = false);
     }
   }
 
-  // Afficher un dialogue pour ajouter un nouveau workspace
-  Future<void> _addWorkspaceDialog(BuildContext context, WorkspaceProvider provider) async {
-    // Variables pour stocker les informations du nouveau workspace
+  Future<void> _addWorkspaceDialog(
+    BuildContext context,
+    WorkspaceProvider provider,
+  ) async {
     String name = '';
     String displayName = '';
     String desc = '';
@@ -56,98 +76,160 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer un Workspace'),
+        title: Text(
+          'Create a Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
-                decoration: const InputDecoration(labelText: 'Nom'),
-                onChanged: (String val) => name = val),
+              decoration: InputDecoration(
+                labelText: 'Name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => name = val,
+            ),
             TextField(
-                decoration: const InputDecoration(labelText: 'Nom affiché'),
-                onChanged: (String val) => displayName = val),
+              decoration: InputDecoration(
+                labelText: 'Display name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => displayName = val,
+            ),
             TextField(
-                decoration: const InputDecoration(labelText: 'Description'),
-                onChanged: (String val) => desc = val),
+              decoration: InputDecoration(
+                labelText: 'Description',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => desc = val,
+            ),
           ],
         ),
         actions: <Widget>[
-          // Bouton pour annuler l'ajout
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour créer un workspace
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
+          ),
           TextButton(
             onPressed: () async {
-              // Ajouter le nouveau workspace
               await provider.addWorkspace(name, displayName, desc);
               Navigator.pop(context);
             },
-            child: const Text('Créer'),
+            child: Text(
+              'Create',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Afficher un dialogue pour modifier un workspace existant
-  Future<void> _editWorkspaceDialog(BuildContext context, workspace, WorkspaceProvider provider) async {
-    // Variables pour stocker les nouvelles valeurs
+  Future<void> _editWorkspaceDialog(
+    BuildContext context,
+    workspace,
+    WorkspaceProvider provider,
+  ) async {
     String newDisplayName = workspace.displayName;
     String newDesc = workspace.desc ?? '';
 
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Modifier Workspace'),
+        title: Text(
+          'Edit Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
               controller: TextEditingController(text: newDisplayName),
-              decoration: const InputDecoration(labelText: 'Nom affiché'),
+              decoration: InputDecoration(
+                labelText: 'Display name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
               onChanged: (String val) => newDisplayName = val,
             ),
             TextField(
               controller: TextEditingController(text: newDesc),
-              decoration: const InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(
+                labelText: 'Description',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
               onChanged: (String val) => newDesc = val,
             ),
           ],
         ),
         actions: <Widget>[
-          // Bouton pour annuler les modifications
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour enregistrer les modifications
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
+          ),
           TextButton(
             onPressed: () async {
-              // Sauvegarder les modifications du workspace
-              await provider.editWorkspace(workspace.id, newDisplayName, newDesc);
+              await provider.editWorkspace(
+                workspace.id,
+                newDisplayName,
+                newDesc,
+              );
               Navigator.pop(context);
             },
-            child: const Text('Enregistrer'),
+            child: Text(
+              'Save',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Afficher un dialogue pour supprimer un workspace
-  Future<void> _deleteWorkspaceDialog(BuildContext context, workspace, WorkspaceProvider provider) async {
+  Future<void> _deleteWorkspaceDialog(
+    BuildContext context,
+    workspace,
+    WorkspaceProvider provider,
+  ) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Supprimer Workspace'),
-        content: Text('Êtes-vous sûr de vouloir supprimer le workspace "${workspace.displayName}" ?'),
+        title: Text(
+          'Delete Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
+        content: Text(
+          'Are you sure you want to delete the workspace "${workspace.displayName}"?',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
         actions: <Widget>[
-          // Bouton pour annuler la suppression
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-          // Bouton pour confirmer la suppression
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
+          ),
           TextButton(
             onPressed: () async {
-              // Supprimer le workspace
               await provider.removeWorkspace(workspace.id);
               Navigator.pop(context);
             },
-            child: const Text('Supprimer'),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: context.watch<ThemeProvider>().rouge),
+            ),
           ),
         ],
       ),
@@ -156,92 +238,131 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // SingleChildScrollView pour permettre le défilement du contenu
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                // AppBar personnalisée
-                AppBar(
-                  backgroundColor: const Color(0xFFC0CDA9),
-                  centerTitle: true,
-                  elevation: 0,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Vos WorkSpaces',
-                        style: GoogleFonts.itim(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF889596),
-                        ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          backgroundColor: themeProvider.beige,
+          body: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Column(
+                children: [
+                  AppBar(
+                    backgroundColor: themeProvider.vertGris,
+                    centerTitle: true,
+                    elevation: 0,
+                    toolbarHeight: 80,
+                    title: Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Your WorkSpaces',
+                            style: GoogleFonts.itim(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: themeProvider.vertText,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 80),
-                // Afficher un indicateur de chargement si _isLoading est vrai
-                if (_isLoading) const Center(child: CircularProgressIndicator()) 
-                // Si une erreur se produit, afficher le message d'erreur
-                else _errorMessage != null
-                        ? Center(child: Text('Erreur: $_errorMessage'))
-                        : Consumer<WorkspaceProvider>(
-                            builder: (context, provider, child) {
-                              final workspaces = provider.workspaces;
-                              if (workspaces.isEmpty) {
-                                return const Center(child: Text('Aucun workspace trouvé.'));
-                              }
-                              // Affichage de la liste des workspaces
-                              return ListView.builder(
-                                shrinkWrap: true,  // Empêche la ListView de se développer à l'extérieur
-                                padding: const EdgeInsets.all(16),
-                                itemCount: workspaces.length,
-                                itemBuilder: (context, index) {
-                                  final workspace = workspaces[index];
-                                  return Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 3,
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    child: ListTile(
+                  const SizedBox(height: 5),
+                  if (_isLoading)
+                    Center(
+                      child: CircularProgressIndicator(
+                        color: themeProvider.vertText,
+                      ),
+                    )
+                  else if (_errorMessage != null)
+                    Center(
+                      child: Text(
+                        'Erreur: $_errorMessage',
+                        style: TextStyle(color: themeProvider.rouge),
+                      ),
+                    )
+                  else
+                    Expanded(
+                      child: Consumer<WorkspaceProvider>(
+                        builder: (context, provider, child) {
+                          final workspaces = provider.workspaces;
+                          if (workspaces.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'No workspaces found.',
+                                style: TextStyle(
+                                  // ignore: deprecated_member_use
+                                  color: themeProvider.vertText.withOpacity(0.5),
+                                ),
+                              ),
+                            );
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: workspaces.length,
+                            itemBuilder: (context, index) {
+                              final workspace = workspaces[index];
+                              final boards = _workspaceBoards[workspace.id]?.take(3).toList() ?? [];
+                              return Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 3,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                color: themeProvider.bleuClair,
+                                child: Column(
+                                  children: [
+                                    ListTile(
                                       contentPadding: const EdgeInsets.all(16),
                                       title: Text(
                                         workspace.displayName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
+                                          color: themeProvider.rouge,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      subtitle: Text(workspace.desc ?? 'Aucune description'),
+                                      subtitle: Text(
+                                        workspace.desc ?? 'No description',
+                                        style: TextStyle(color: themeProvider.vertText),
+                                      ),
                                       trailing: PopupMenuButton<String>(
                                         onSelected: (String value) async {
                                           if (value == 'edit') {
-                                            await _editWorkspaceDialog(context, workspace, provider);
+                                            await _editWorkspaceDialog(
+                                              context,
+                                              workspace,
+                                              provider,
+                                            );
                                           } else if (value == 'delete') {
-                                            await _deleteWorkspaceDialog(context, workspace, provider);
+                                            await _deleteWorkspaceDialog(
+                                              context,
+                                              workspace,
+                                              provider,
+                                            );
                                           }
                                         },
                                         itemBuilder: (BuildContext context) {
                                           return [
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'edit',
-                                              child: Text('Modifier'),
+                                              child: Text(
+                                                'Edit',
+                                                style: TextStyle(color: themeProvider.vertText),
+                                              ),
                                             ),
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'delete',
-                                              child: Text('Supprimer'),
+                                              child: Text(
+                                                'Delete',
+                                                style: TextStyle(color: themeProvider.rouge),
+                                              ),
                                             ),
                                           ];
                                         },
                                       ),
-                                      // Navigation vers l'écran des boards du workspace
                                       onTap: () async {
                                         await Navigator.push(
                                           context,
@@ -252,52 +373,88 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                             ),
                                           ),
                                         );
-                                        // Recharger les workspaces après la navigation
                                         _initializeWorkspaces();
                                       },
                                     ),
-                                  );
-                                },
+                                    if (boards.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 16,
+                                        ),
+                                        child: Wrap(
+                                          spacing: 5,
+                                          runSpacing: 5,
+                                          children: boards.map((board) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(right: 8),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: themeProvider.vertfavorite,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: Text(
+                                                  board.name,
+                                                  style: TextStyle(
+                                                    color: themeProvider.blanc,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               );
                             },
-                          ),
-              ],
-            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+              Positioned(
+                left: -30,
+                top: 4,
+                child: SafeArea(
+                  child: Image.asset(
+                    'documentation/pic.png',
+                    height: 122,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ],
           ),
-          
-          // Image en arrière-plan qui reste fixe pendant le défilement
-          Positioned(
-            left: -40,
-            top: 3,
-            child: SafeArea(
-              child: Image.asset(
-                'documentation/pic.png',
-                height: 130,
-                fit: BoxFit.contain,
+          floatingActionButton: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                bottom: 20,
+                left: 30,
+              ),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  await _addWorkspaceDialog(
+                    context,
+                    Provider.of<WorkspaceProvider>(context, listen: false),
+                  );
+                  _initializeWorkspaces();
+                },
+                backgroundColor: themeProvider.vertGris,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.add, color: themeProvider.rouge),
               ),
             ),
           ),
-          
-        ],
-      ),
-      
-      // Bouton flottant pour ajouter un nouveau workspace
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 20, left: 20), 
-        child: FloatingActionButton(
-          onPressed: () async {
-            await _addWorkspaceDialog(context, Provider.of<WorkspaceProvider>(context, listen: false));
-            _initializeWorkspaces(); // Recharger la liste après création
-          },
-          backgroundColor: const Color(0xFFC0CDA9),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(Icons.settings, color: Color(0xFFD97C83)),
-        ),
-      ),
-      // Navigation vers la barre de navigation inférieure
-      bottomNavigationBar: const BottomNavBar(),
+          bottomNavigationBar: const BottomNavBar(),
+        );
+      },
     );
   }
 }

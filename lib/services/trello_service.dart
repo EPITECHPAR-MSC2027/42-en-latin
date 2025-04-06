@@ -70,13 +70,11 @@ class TrelloService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } 
-      
+      }
     } catch (e) {
       throw Exception('Erreur lors de la création du board : $e');
     }
-      return null;
-    
+    return null;
   }
 
   /// **Créer un board en appliquant un template**
@@ -86,22 +84,22 @@ class TrelloService {
     String desc,
     String templateId,
   ) async {
-    // 1️⃣ Créer un board vide
+    // Créer un board vide
     final board = await createBoard(workspaceId, name, desc);
     if (board == null || !board.containsKey('id')) return null;
 
     final String boardId = board['id'];
 
-    // 2️⃣ Supprimer toutes les listes existantes avant d'ajouter le template
+    // Supprimer toutes les listes existantes avant d'ajouter le template
     await deleteAllLists(boardId);
 
-    // 3️⃣ Vérifier si le template existe
+    // Vérifier si le template existe
     final Map<String, List<String>>? template = templateCards[templateId];
     if (template == null) {
       return null;
     }
 
-    // 4️⃣ Ajouter les listes et cartes du template
+    // Ajouter les listes et cartes du template
     for (final entry in template.entries) {
       final String listName = entry.key;
       final List<String> cards = entry.value;
@@ -123,15 +121,17 @@ class TrelloService {
 
   /// **Supprimer un Board et tout son contenu (listes et cartes)**
   Future<bool> deleteBoard(String boardId) async {
-  try {
-    final Uri url = Uri.parse('$baseUrl/boards/$boardId?key=$apiKey&token=$token');
-    final http.Response response = await http.delete(url);
+    try {
+      final Uri url = Uri.parse(
+        '$baseUrl/boards/$boardId?key=$apiKey&token=$token',
+      );
+      final http.Response response = await http.delete(url);
 
-    return response.statusCode == 200;
-  } catch (e) {
-    return false;
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
-}
 
   /// **Mettre à jour un Board**
   Future<bool> updateBoard(
@@ -146,8 +146,9 @@ class TrelloService {
     final http.Response response = await http.put(
       url,
       headers: <String, String>{'Content-Type': 'application/json'},
-      body: jsonEncode(<String, String>{'Name': newName, 'desc': newDesc}),
+      body: jsonEncode(<String, String>{'name': newName, 'desc': newDesc}),
     );
+   
 
     if (response.statusCode == 200) {
       return true;
@@ -192,13 +193,28 @@ class TrelloService {
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'lastOpened': DateTime.now().toIso8601String(),
+          'lastOpened': DateTime.now().toUtc().toIso8601String(),
         }),
       );
 
       return response.statusCode == 200;
     } catch (e) {
-      throw Exception("Erreur lors de la mise à jour de la date d'ouverture : $e");
+      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture : $e');
+    }
+  }
+
+  /// **Récupérer les boards récents**
+  Future<List<Board>> getRecentBoards({int limit = 5}) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/boards?key=$apiKey&token=$token&sort=dateLastActivity&sortBy=dateLastActivity&sortOrder=desc&limit=$limit',
+    );
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> boardsJson = json.decode(response.body);
+      return boardsJson.map((dynamic json) => Board.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur: impossible de charger les boards récents');
     }
   }
 
@@ -385,10 +401,9 @@ class TrelloService {
         final Uri deleteUrl = Uri.parse(
           '$baseUrl/lists/${list["id"]}/closed?key=$apiKey&token=$token',
         );
-        await http.put(deleteUrl, body: {'value': 'true'}); // ✅ Ferme la liste
-     
+        await http.put(deleteUrl, body: {'value': 'true'});
       }
-    } 
+    }
   }
 
   //---------------------------------------------------------------------------//
@@ -474,6 +489,18 @@ class TrelloService {
     return response.statusCode == 200;
   }
 
+  /// **Déplacer une carte vers une autre liste**
+  Future<bool> updateCardList(String cardId, String newListId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.put(
+      url,
+      body: <String, String>{'idList': newListId},
+    );
+    return response.statusCode == 200;
+  }
+
   //---------------------------------------------------------------------------//
   //                              NOTIFICATIONS                                 //
   //---------------------------------------------------------------------------//
@@ -514,14 +541,14 @@ class TrelloService {
 
   /// Obtient un message par défaut si le texte n'est pas disponible
   String _getDefaultMessage(Map<String, dynamic> json) {
-    final memberName = json['memberCreator']?['fullName'] ?? "Quelqu'un";
+    final memberName = json['memberCreator']?['fullName'] ?? "Someone";
     final boardName = json['data']?['board']?['name'] ?? '';
     final cardName = json['data']?['card']?['name'] ?? '';
     final listName = json['data']?['list']?['name'] ?? '';
 
-    return '$memberName a effectué une action${boardName.isNotEmpty ? ' sur le board $boardName' : ''}'
-           '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
-           '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
+    return '$memberName performed an action${boardName.isNotEmpty ? ' on board $boardName' : ''}'
+        '${cardName.isNotEmpty ? ' (card: $cardName)' : ''}'
+        '${listName.isNotEmpty ? ' in list $listName' : ''}';
   }
 
   /// **Marquer une notification comme lue**
@@ -569,7 +596,9 @@ class TrelloService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Erreur: impossible de charger les informations utilisateur');
+      throw Exception(
+        'Erreur: impossible de charger les informations utilisateur',
+      );
     }
   }
 
@@ -601,5 +630,52 @@ class TrelloService {
     } else {
       throw Exception('Erreur: impossible de charger les activités récentes');
     }
+  }
+
+  //--------------------------------------------------------------------------//
+  //                                MEMBRES                                   //
+  //--------------------------------------------------------------------------//
+  // Récupère les membres associés à un board.
+  Future<List<Map<String, dynamic>>> getBoardMembers(String boardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/boards/$boardId/members?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les membres du board');
+    }
+  }
+
+  // Récupère les membres déjà assignés à une carte.
+  Future<List<Map<String, dynamic>>> getCardMembers(String cardId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/members?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Erreur: impossible de charger les membres de la carte');
+    }
+  }
+
+  // Ajoute un membre à une carte.
+  Future<bool> addMemberToCard(String cardId, String memberId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/idMembers?key=$apiKey&token=$token&value=$memberId',
+    );
+    final http.Response response = await http.post(url);
+    return response.statusCode == 200;
+  }
+
+  // Retire un membre d'une carte.
+  Future<bool> removeMemberFromCard(String cardId, String memberId) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/cards/$cardId/idMembers/$memberId?key=$apiKey&token=$token',
+    );
+    final http.Response response = await http.delete(url);
+    return response.statusCode == 200;
   }
 }

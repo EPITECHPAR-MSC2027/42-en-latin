@@ -10,12 +10,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
-  google_fonts: ^6.1.0 
+  geocoding: ^3.0.0
+  geolocator: ^13.0.2
   http: 1.3.0
   nested: ^1.0.0
   provider: ^6.0.0
-  
-
+  shared_preferences: ^2.2.2
+  weather: ^3.0.0 
+  google_fonts: ^6.1.0 
   
 
 dev_dependencies:
@@ -42,6 +44,7 @@ flutter:
  assets:
    - documentation/pic.png
    - documentation/pic1.png
+   - documentation/pic2.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

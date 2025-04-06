@@ -1,6 +1,9 @@
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class NotificationsDropdown extends StatelessWidget {
@@ -28,7 +31,7 @@ class NotificationsDropdown extends StatelessWidget {
               return [
                 const PopupMenuItem(
                   enabled: false,
-                  child: Text('Aucune notification'),
+                  child: Text('No notifications'),
                 ),
               ];
             }
@@ -37,7 +40,7 @@ class NotificationsDropdown extends StatelessWidget {
               if (unreadCount > 0)
                 PopupMenuItem(
                   child: ListTile(
-                    title: const Text('Tout marquer comme lu'),
+                    title: const Text('Mark all as read'),
                     trailing: const Icon(Icons.done_all),
                     contentPadding: EdgeInsets.zero,
                     onTap: () async {
@@ -50,7 +53,7 @@ class NotificationsDropdown extends StatelessWidget {
               const PopupMenuItem(
                 enabled: false,
                 child: Text(
-                  'Notifications récentes',
+                  'Recent notifications',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -80,6 +83,8 @@ class NotificationsDropdown extends StatelessWidget {
                       if (!context.mounted) return;
                       
                       if (notification.boardId != null) {
+                        await Provider.of<BoardsProvider>(context, listen: false)
+                            .markBoardAsOpened(notification.boardId!);
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -124,13 +129,13 @@ class NotificationsDropdown extends StatelessWidget {
     final difference = now.difference(date);
 
     if (difference.inDays > 0) {
-      return 'Il y a ${difference.inDays} jour${difference.inDays > 1 ? 's' : ''}';
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
     } else if (difference.inHours > 0) {
-      return 'Il y a ${difference.inHours} heure${difference.inHours > 1 ? 's' : ''}';
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
     } else if (difference.inMinutes > 0) {
-      return 'Il y a ${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''}';
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
     } else {
-      return "À l'instant";
+      return 'Just now';
     }
   }
 } 

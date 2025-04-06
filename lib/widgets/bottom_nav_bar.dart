@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({super.key});
 
@@ -21,6 +20,7 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.person),
           label: 'Profile',
         ),
+        
       ],
     );
   }

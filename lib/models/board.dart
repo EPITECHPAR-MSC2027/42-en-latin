@@ -30,7 +30,7 @@ class Board {  // desc est maintenant optionnel (String?)
       desc: json['desc'] ?? 'Pas de description',
       lastOpened: json['lastOpened'] != null 
           ? DateTime.parse(json['lastOpened'])
-          : null,
+          : DateTime.now(),
     );
   }
   /// The unique identifier of the board.
