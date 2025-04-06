@@ -75,8 +75,9 @@ class BoardsProvider with ChangeNotifier {
         developer.log('Board non trouvé dans la liste locale');
       }
 
-      // Rafraîchir les boards récents
-      _recentBoards = await _trelloService.getRecentBoards();
+      // Rafraîchir les boards récents (limite à 5)
+      final allRecentBoards = await _trelloService.getRecentBoards();
+      _recentBoards = allRecentBoards.take(5).toList();
       developer.log('Nombre de boards récents après mise à jour: ${_recentBoards.length}');
       notifyListeners();
     } catch (error) {
@@ -191,8 +192,9 @@ Future<bool> addBoard(
       _boards = await _trelloService.getBoards();
       developer.log('Nombre de boards récupérés: ${_boards.length}');
       
-      // Récupérer les boards récents
-      _recentBoards = await _trelloService.getRecentBoards();
+      // Récupérer les boards récents (limite à 5)
+      final allRecentBoards = await _trelloService.getRecentBoards();
+      _recentBoards = allRecentBoards.take(5).toList();
       developer.log('Nombre de boards récents: ${_recentBoards.length}');
       
       for (var board in _recentBoards) {
