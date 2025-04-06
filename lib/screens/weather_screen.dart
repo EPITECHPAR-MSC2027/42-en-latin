@@ -57,11 +57,16 @@ void initState()
 @override
 Widget build(BuildContext context)
 {
-  return Column(children: [
-    Text(_weather?.cityName ?? ''),
-    Text(_weather?.temperature.toString() ?? ''),
-    Text(_weather?.mainCondition ?? ''),
-  ],);
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(_weather?.cityName ?? '', style: const TextStyle(fontSize: 12)),
+      Text(
+        '${_weather?.temperature.toString() ?? ''}°C ${_weather?.mainCondition ?? ''}',
+        style: const TextStyle(fontSize: 12),
+      ),
+    ],
+  );
 }
 
 

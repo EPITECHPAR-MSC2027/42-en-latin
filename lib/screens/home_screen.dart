@@ -59,6 +59,7 @@ class HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           backgroundColor: themeProvider.beige,
           appBar: AppBar(
+            toolbarHeight: kToolbarHeight,
             title: Text(
               'Home Page',
               style: GoogleFonts.itim(
@@ -67,14 +68,14 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             backgroundColor: themeProvider.vertGris,
             actions: const <Widget>[
-              NotificationsDropdown(),
               WeatherScreen(),
+              NotificationsDropdown(),
             ],
           ),
           body: SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
