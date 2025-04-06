@@ -109,10 +109,19 @@ Future<bool> addBoard(
       final bool success = await _trelloService.updateBoard(boardId, newName, newDesc);
       
       if (success) {
+        // Mettre à jour le board dans la liste locale
+        final index = _boards.indexWhere((board) => board.id == boardId);
+        if (index != -1) {
+          _boards[index] = Board(
+            id: boardId,
+            name: newName,
+            desc: newDesc,
+            lastOpened: _boards[index].lastOpened,
+          );
+        }
         notifyListeners(); // Informe les widgets que les données ont changé
       } 
     } catch (error) {
-     
       throw Exception('Erreur lors de la modification du board : $error');
     }
   }

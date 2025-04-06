@@ -143,12 +143,11 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
         TextButton(
           onPressed: () async {
             await provider.editBoard(board.id, nameController.text, descController.text);
-           
-          
-
             if (mounted) {
               Navigator.pop(context);
-              setState(_initializeBoards); // Forcer le rafraîchissement
+              setState(() {
+                _initializeBoards(); // Forcer le rafraîchissement
+              });
             }
           },
           child: const Text('Enregistrer'),
