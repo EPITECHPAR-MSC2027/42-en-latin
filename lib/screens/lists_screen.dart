@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer' as developer;
 import 'package:fluter/models/card.dart';
 import 'package:fluter/models/list.dart';
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/card_provider.dart';
 import 'package:fluter/providers/list_provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
@@ -37,7 +39,13 @@ class ListsScreenState extends State<ListsScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.microtask(() async => _loadLists());
+    developer.log('ListsScreen: initState pour le board ${widget.boardId} (${widget.boardName})');
+    Future<void>.microtask(() async {
+      // Mettre à jour la date de dernière ouverture
+      developer.log('ListsScreen: Mise à jour de la date de dernière ouverture');
+      await Provider.of<BoardsProvider>(context, listen: false).markBoardAsOpened(widget.boardId);
+      await _loadLists();
+    });
   }
 
   Future<void> _loadLists() async {

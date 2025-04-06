@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
@@ -27,6 +28,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    developer.log('HomeScreen: initState');
     Future<void>.microtask(() async {
       await _loadData();
       // Charger les notifications au démarrage
@@ -38,9 +40,12 @@ class HomeScreenState extends State<HomeScreen> {
   /// **Charge les données nécessaires**
   Future<void> _loadData() async {
     try {
+      developer.log('HomeScreen: Chargement des boards');
       // Charger les boards pour le carousel
       await Provider.of<BoardsProvider>(context, listen: false).fetchBoards();
+      developer.log('HomeScreen: Boards chargés');
     } catch (e) {
+      developer.log('HomeScreen: Erreur lors du chargement des boards: $e');
       setState(() => _errorMessage = e.toString());
     } finally {
       setState(() => _isLoading = false);

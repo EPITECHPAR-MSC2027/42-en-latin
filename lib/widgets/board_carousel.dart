@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
@@ -6,22 +7,34 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
-  const BoardCarousel({super.key, this.maxBoards = 5});
-
   final int maxBoards;
+
+  const BoardCarousel({Key? key, this.maxBoards = 5}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    developer.log('Construction du BoardCarousel avec maxBoards: $maxBoards');
+    
     return Consumer2<BoardsProvider, ThemeProvider>(
       builder: (context, boardsProvider, themeProvider, child) {
-        final recentBoards = boardsProvider.getRecentBoards(limit: maxBoards);
+        developer.log('BoardCarousel rebuild avec ${boardsProvider.recentBoards.length} boards récents');
+        
+        if (boardsProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
+        if (boardsProvider.error != null) {
+          return Center(child: Text('Erreur: ${boardsProvider.error}'));
+        }
+
+        final recentBoards = boardsProvider.recentBoards;
+        
         if (recentBoards.isEmpty) {
+          developer.log('Aucun board récent trouvé');
           return Center(
             child: Text(
               'No recent boards',
               style: TextStyle(
-                // ignore: deprecated_member_use
                 color: themeProvider.vertText.withOpacity(0.5),
               ),
             ),
@@ -55,6 +68,7 @@ class BoardCarousel extends StatelessWidget {
                       final board = recentBoards[index];
                       return GestureDetector(
                         onTap: () async {
+                          await boardsProvider.markBoardAsOpened(board.id);
                           await Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -306,6 +306,7 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                         },
                       ),
                       onTap: () async {
+                        await Provider.of<BoardsProvider>(context, listen: false).markBoardAsOpened(board.id);
                         await Navigator.push(
                           context,
                           MaterialPageRoute(

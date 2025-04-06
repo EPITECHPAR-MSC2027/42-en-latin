@@ -192,14 +192,29 @@ class TrelloService {
       final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'lastOpened': DateTime.now().toIso8601String()}),
+        body: json.encode({
+          'lastOpened': DateTime.now().toUtc().toIso8601String(),
+        }),
       );
 
       return response.statusCode == 200;
     } catch (e) {
-      throw Exception(
-        "Erreur lors de la mise à jour de la date d'ouverture : $e",
-      );
+      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture : $e');
+    }
+  }
+
+  /// **Récupérer les boards récents**
+  Future<List<Board>> getRecentBoards({int limit = 5}) async {
+    final Uri url = Uri.parse(
+      '$baseUrl/members/me/boards?key=$apiKey&token=$token&sort=dateLastActivity&sortBy=dateLastActivity&sortOrder=desc&limit=$limit',
+    );
+    final http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> boardsJson = json.decode(response.body);
+      return boardsJson.map((dynamic json) => Board.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur: impossible de charger les boards récents');
     }
   }
 

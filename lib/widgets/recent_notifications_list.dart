@@ -1,3 +1,4 @@
+import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
@@ -74,6 +75,8 @@ class RecentNotificationsList extends StatelessWidget {
                       if (!context.mounted) return;
                       
                       if (notification.boardId != null) {
+                        await Provider.of<BoardsProvider>(context, listen: false)
+                            .markBoardAsOpened(notification.boardId!);
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
