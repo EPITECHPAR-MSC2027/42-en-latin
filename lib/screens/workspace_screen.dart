@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:fluter/models/board.dart';
+import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/boards_screen.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -74,40 +75,60 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
     await showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Créer un Workspace'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Nom'),
-                  onChanged: (String val) => name = val,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Nom affiché'),
-                  onChanged: (String val) => displayName = val,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  onChanged: (String val) => desc = val,
-                ),
-              ],
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          'Create a Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => name = val,
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Display name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
-              TextButton(
-                onPressed: () async {
-                  await provider.addWorkspace(name, displayName, desc);
-                  Navigator.pop(context);
-                },
-                child: const Text('Créer'),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => displayName = val,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Description',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
-            ],
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => desc = val,
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
           ),
+          TextButton(
+            onPressed: () async {
+              await provider.addWorkspace(name, displayName, desc);
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Create',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -121,42 +142,58 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
     await showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Modifier Workspace'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: TextEditingController(text: newDisplayName),
-                  decoration: const InputDecoration(labelText: 'Nom affiché'),
-                  onChanged: (String val) => newDisplayName = val,
-                ),
-                TextField(
-                  controller: TextEditingController(text: newDesc),
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  onChanged: (String val) => newDesc = val,
-                ),
-              ],
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          'Edit Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              controller: TextEditingController(text: newDisplayName),
+              decoration: InputDecoration(
+                labelText: 'Display name',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              ),
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => newDisplayName = val,
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+            TextField(
+              controller: TextEditingController(text: newDesc),
+              decoration: InputDecoration(
+                labelText: 'Description',
+                labelStyle: TextStyle(color: context.watch<ThemeProvider>().vertText),
               ),
-              TextButton(
-                onPressed: () async {
-                  await provider.editWorkspace(
-                    workspace.id,
-                    newDisplayName,
-                    newDesc,
-                  );
-                  Navigator.pop(context);
-                },
-                child: const Text('Enregistrer'),
-              ),
-            ],
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+              onChanged: (String val) => newDesc = val,
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
           ),
+          TextButton(
+            onPressed: () async {
+              await provider.editWorkspace(
+                workspace.id,
+                newDisplayName,
+                newDesc,
+              );
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Save',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -167,72 +204,99 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   ) async {
     await showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Supprimer Workspace'),
-            content: Text(
-              'Êtes-vous sûr de vouloir supprimer le workspace "${workspace.displayName}" ?',
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(
+          'Delete Workspace',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
+        content: Text(
+          'Are you sure you want to delete the workspace "${workspace.displayName}"?',
+          style: TextStyle(color: context.watch<ThemeProvider>().vertText),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.watch<ThemeProvider>().vertText),
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await provider.removeWorkspace(workspace.id);
-                  // ignore: duplicate_ignore
-                  // ignore: use_build_context_synchronously
-                  Navigator.pop(context);
-                },
-                child: const Text('Supprimer'),
-              ),
-            ],
           ),
+          TextButton(
+            onPressed: () async {
+              await provider.removeWorkspace(workspace.id);
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Delete',
+              style: TextStyle(color: context.watch<ThemeProvider>().rouge),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3),
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Utilisation d'un Column avec Expanded pour prendre tout l'espace
-          Column(
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          backgroundColor: themeProvider.beige,
+          body: Stack(
+            clipBehavior: Clip.none,
             children: [
-              AppBar(
-                backgroundColor: const Color(0xFFC0CDA9),
-                centerTitle: true,
-                elevation: 0,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Vos WorkSpaces',
-                      style: GoogleFonts.itim(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF889596),
+              Column(
+                children: [
+                  AppBar(
+                    backgroundColor: themeProvider.vertGris,
+                    centerTitle: true,
+                    elevation: 0,
+                    toolbarHeight: 80,
+                    title: Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Your WorkSpaces',
+                            style: GoogleFonts.itim(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: themeProvider.vertText,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 80),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else
-                _errorMessage != null
-                    ? Center(child: Text('Erreur: $_errorMessage'))
-                    : Expanded(
+                  ),
+                  const SizedBox(height: 5),
+                  if (_isLoading)
+                    Center(
+                      child: CircularProgressIndicator(
+                        color: themeProvider.vertText,
+                      ),
+                    )
+                  else if (_errorMessage != null)
+                    Center(
+                      child: Text(
+                        'Erreur: $_errorMessage',
+                        style: TextStyle(color: themeProvider.rouge),
+                      ),
+                    )
+                  else
+                    Expanded(
                       child: Consumer<WorkspaceProvider>(
                         builder: (context, provider, child) {
                           final workspaces = provider.workspaces;
                           if (workspaces.isEmpty) {
-                            return const Center(
-                              child: Text('Aucun workspace trouvé.'),
+                            return Center(
+                              child: Text(
+                                'No workspaces found.',
+                                style: TextStyle(
+                                  // ignore: deprecated_member_use
+                                  color: themeProvider.vertText.withOpacity(0.5),
+                                ),
+                              ),
                             );
                           }
                           return ListView.builder(
@@ -240,34 +304,29 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                             itemCount: workspaces.length,
                             itemBuilder: (context, index) {
                               final workspace = workspaces[index];
-                              final boards =
-                                  _workspaceBoards[workspace.id]
-                                      ?.take(3)
-                                      .toList() ??
-                                  [];
+                              final boards = _workspaceBoards[workspace.id]?.take(3).toList() ?? [];
                               return Card(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 3,
                                 margin: const EdgeInsets.only(bottom: 10),
-                                color: const Color(0XFFC9D2E3),
+                                color: themeProvider.bleuClair,
                                 child: Column(
                                   children: [
                                     ListTile(
                                       contentPadding: const EdgeInsets.all(16),
                                       title: Text(
                                         workspace.displayName,
-                                        style: const TextStyle(
-                                          color: Color(
-                                                          0xFFC27C88,
-                                                        ), 
+                                        style: TextStyle(
+                                          color: themeProvider.rouge,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       subtitle: Text(
-                                        workspace.desc ?? 'Aucune description',
+                                        workspace.desc ?? 'No description',
+                                        style: TextStyle(color: themeProvider.vertText),
                                       ),
                                       trailing: PopupMenuButton<String>(
                                         onSelected: (String value) async {
@@ -287,13 +346,19 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         },
                                         itemBuilder: (BuildContext context) {
                                           return [
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'edit',
-                                              child: Text('Modifier'),
+                                              child: Text(
+                                                'Edit',
+                                                style: TextStyle(color: themeProvider.vertText),
+                                              ),
                                             ),
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'delete',
-                                              child: Text('Supprimer'),
+                                              child: Text(
+                                                'Delete',
+                                                style: TextStyle(color: themeProvider.rouge),
+                                              ),
                                             ),
                                           ];
                                         },
@@ -302,12 +367,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder:
-                                                (context) => BoardsScreen(
-                                                  workspaceId: workspace.id,
-                                                  workspaceName:
-                                                      workspace.displayName,
-                                                ),
+                                            builder: (context) => BoardsScreen(
+                                              workspaceId: workspace.id,
+                                              workspaceName: workspace.displayName,
+                                            ),
                                           ),
                                         );
                                         _initializeWorkspaces();
@@ -316,47 +379,32 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                     if (boards.isNotEmpty)
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 16,
+                                          vertical: 10,
+                                          horizontal: 16,
                                         ),
-                                        child: Row(
-                                          children:
-                                              boards.map((board) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                        right: 5,
-                                                      ),
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      // Logique pour naviguer vers un board spécifique si nécessaire
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      minimumSize: const Size(
-                                                        100,
-                                                        40,
-                                                      ),
-                                                      backgroundColor:
-                                                          const Color(
-                                                            0xFF889596,
-                                                          ),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      board.name,
-                                                      style: const TextStyle(
-                                                        color: Color(
-                                                          0xFFD4F0CC,
-                                                        ), 
-                                                      ),
-                                                    ),
+                                        child: Wrap(
+                                          spacing: 5,
+                                          runSpacing: 5,
+                                          children: boards.map((board) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(right: 8),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: themeProvider.vertfavorite,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: Text(
+                                                  board.name,
+                                                  style: TextStyle(
+                                                    color: themeProvider.blanc,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                );
-                                              }).toList(),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
                                         ),
                                       ),
                                   ],
@@ -367,45 +415,46 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         },
                       ),
                     ),
+                ],
+              ),
+              Positioned(
+                left: -30,
+                top: 4,
+                child: SafeArea(
+                  child: Image.asset(
+                    'documentation/pic.png',
+                    height: 122,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ],
           ),
-          // Positionner l'image de façon fixe à gauche
-          Positioned(
-            left: 0,
-            top: -20,
-            child: SafeArea(
-              child: Image.asset(
-                'documentation/pic.png',
-                height: 130,
-                fit: BoxFit.contain,
+          floatingActionButton: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                bottom: 20,
+                left: 30,
+              ),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  await _addWorkspaceDialog(
+                    context,
+                    Provider.of<WorkspaceProvider>(context, listen: false),
+                  );
+                  _initializeWorkspaces();
+                },
+                backgroundColor: themeProvider.vertGris,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.add, color: themeProvider.rouge),
               ),
             ),
           ),
-        ],
-      ),
-      floatingActionButton: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            bottom: 80,
-            left: 20,
-          ), // Augmenter l'espacement en bas
-          child: FloatingActionButton(
-            onPressed: () async {
-              await _addWorkspaceDialog(
-                context,
-                Provider.of<WorkspaceProvider>(context, listen: false),
-              );
-              _initializeWorkspaces();
-            },
-            backgroundColor: const Color(0xFFC0CDA9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.add, color: Color(0xFFD97C83)),
-          ),
-        ),
-      ),
-      bottomNavigationBar: const BottomNavBar(),
+          bottomNavigationBar: const BottomNavBar(),
+        );
+      },
     );
   }
 }
