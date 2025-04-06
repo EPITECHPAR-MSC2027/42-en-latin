@@ -259,10 +259,13 @@ class ListsScreenState extends State<ListsScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Row(
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.add, color: themeProvider.vertText),
+                          icon: Icon(Icons.add, color: themeProvider.vertText, size: 18),
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(minWidth: 24, minHeight: 24),
                           onPressed: () async {
                             await _addCardDialog(
                               context,
@@ -275,7 +278,10 @@ class ListsScreenState extends State<ListsScreen> {
                           icon: Icon(
                             Icons.more_vert,
                             color: themeProvider.vertText,
+                            size: 18,
                           ),
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(minWidth: 24, minHeight: 24),
                           onSelected: (String value) async {
                             if (value == 'Modifier') {
                               await _editListDialog(context, list);
@@ -396,26 +402,35 @@ class ListsScreenState extends State<ListsScreen> {
                 ),
               ),
               // Ajouter un collaborateur depuis ce bouton
-              IconButton(
-                icon: Icon(
-                  Icons.person_add,
-                  color: themeProvider.vert,
-                  size: 16,
-                ),
-                onPressed: () async {
-                  await _updateCollaboratorsDialog(context, card.id, widget.boardId);
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
-                onPressed: () async {
-                  final cardProvider = Provider.of<CardProvider>(
-                    context,
-                    listen: false,
-                  );
-                  await cardProvider.removeCard(card.id);
-                  await cardProvider.fetchCardsByBoard(card.listId);
-                },
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.person_add,
+                      color: themeProvider.vert,
+                      size: 16,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                    onPressed: () async {
+                      await _updateCollaboratorsDialog(context, card.id, widget.boardId);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                    onPressed: () async {
+                      final cardProvider = Provider.of<CardProvider>(
+                        context,
+                        listen: false,
+                      );
+                      await cardProvider.removeCard(card.id);
+                      await cardProvider.fetchCardsByBoard(card.listId);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
