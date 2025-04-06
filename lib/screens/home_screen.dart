@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-
-/// **Home Screen**
+import 'package:fluter/screens/weather_screen.dart';
+/// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
   /// **HomeScreen Constructor**
   const HomeScreen({super.key});
@@ -68,6 +68,7 @@ class HomeScreenState extends State<HomeScreen> {
             backgroundColor: themeProvider.vertGris,
             actions: const <Widget>[
               NotificationsDropdown(),
+              WeatherScreen(),
             ],
           ),
           body: SafeArea(
