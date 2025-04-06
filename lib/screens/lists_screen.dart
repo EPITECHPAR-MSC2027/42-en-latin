@@ -39,10 +39,10 @@ class ListsScreenState extends State<ListsScreen> {
   @override
   void initState() {
     super.initState();
-    developer.log('ListsScreen: initState pour le board ${widget.boardId} (${widget.boardName})');
+    developer.log('ListsScreen: initState for board ${widget.boardId} (${widget.boardName})');
     Future<void>.microtask(() async {
-      // Mettre à jour la date de dernière ouverture
-      developer.log('ListsScreen: Mise à jour de la date de dernière ouverture');
+      // Update last opened date
+      developer.log('ListsScreen: Updating last opened date');
       await Provider.of<BoardsProvider>(context, listen: false).markBoardAsOpened(widget.boardId);
       await _loadLists();
     });
@@ -74,7 +74,7 @@ class ListsScreenState extends State<ListsScreen> {
           body: _isLoading
               ? Center(child: CircularProgressIndicator(color: themeProvider.vertText))
               : _errorMessage != null
-                  ? Center(child: Text('Erreur: $_errorMessage', style: TextStyle(color: themeProvider.rouge)))
+                  ? Center(child: Text('Error: $_errorMessage', style: TextStyle(color: themeProvider.rouge)))
                   : _buildBody(screenWidth, listWidthPercentage, themeProvider),
           floatingActionButton: _buildFloatingActionButton(themeProvider),
         );
@@ -286,11 +286,11 @@ class ListsScreenState extends State<ListsScreen> {
                           itemBuilder: (BuildContext context) => [
                             PopupMenuItem(
                               value: 'Modifier',
-                              child: Text('Modifier', style: TextStyle(color: themeProvider.vertText)),
+                              child: Text('Edit', style: TextStyle(color: themeProvider.vertText)),
                             ),
                             PopupMenuItem(
                               value: 'Supprimer',
-                              child: Text('Supprimer', style: TextStyle(color: themeProvider.rouge)),
+                              child: Text('Delete', style: TextStyle(color: themeProvider.rouge)),
                             ),
                           ],
                         ),
@@ -534,7 +534,7 @@ class ListsScreenState extends State<ListsScreen> {
       cardMembers = await trelloService.getCardMembers(cardId);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur lors du chargement des collaborateurs')),
+        const SnackBar(content: Text('Error loading collaborators')),
       );
       return;
     }

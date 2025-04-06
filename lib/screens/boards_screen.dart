@@ -3,8 +3,8 @@
 import 'dart:async';
 
 import 'package:fluter/models/board.dart';
-import 'package:fluter/providers/board_provider.dart'; // BoardProvider pour add, edit, remove
-import 'package:fluter/providers/workspace_provider.dart'; // WorkspaceProvider pour fetchBoardsByWorkspace
+import 'package:fluter/providers/board_provider.dart'; // BoardProvider for add, edit, remove
+import 'package:fluter/providers/workspace_provider.dart'; // WorkspaceProvider for fetchBoardsByWorkspace
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:fluter/utils/templates.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-/// Écran affichant les boards d'un workspace spécifique.
+/// Screen displaying boards of a specific workspace.
 class BoardsScreen extends StatefulWidget {
   const BoardsScreen({
     required this.workspaceId,
@@ -31,7 +31,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   late Future<List<Board>> _fetchBoardsFuture;
-  final bool _isTableView = true; // Gère l'affichage entre Table et Board
+  final bool _isTableView = true; // Manages display between Table and Board
 
   @override
   void initState() {
@@ -43,11 +43,11 @@ class _BoardsScreenState extends State<BoardsScreen> {
     _fetchBoardsFuture = Future.microtask(_fetchBoards);
   }
 
-  /// **Récupère les boards du workspace via WorkspaceProvider.**
+  /// **Fetches workspace boards via WorkspaceProvider.**
   Future<List<Board>> _fetchBoards() async {
     try {
       final WorkspaceProvider workspaceProvider =
-          Provider.of<WorkspaceProvider>(context, listen: false); // Utilisation de WorkspaceProvider
+          Provider.of<WorkspaceProvider>(context, listen: false); // Using WorkspaceProvider
       return await workspaceProvider.fetchBoardsByWorkspace(widget.workspaceId);
     } catch (e) {
       setState(() => _errorMessage = e.toString());
@@ -57,7 +57,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
     }
   }
 
-  /// **Méthode pour ajouter un board via BoardProvider**
+  /// **Method to add a board via BoardProvider**
   Future<void> _addBoardDialog(BuildContext context, BoardsProvider provider) async {
     String name = '';
     String desc = '';
@@ -66,12 +66,12 @@ class _BoardsScreenState extends State<BoardsScreen> {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Créer un Board'),
+        title: const Text('Create Board'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             TextField(
-              decoration: const InputDecoration(labelText: 'Nom du board'),
+              decoration: const InputDecoration(labelText: 'Board name'),
               onChanged: (val) => name = val,
             ),
             TextField(
@@ -81,7 +81,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
             const SizedBox(height: 10),
             DropdownButton<String>(
               value: selectedTemplateId,
-              hint: const Text('Sélectionner un template'),
+              hint: const Text('Select a template'),
               isExpanded: true,
               items: templateCards.keys.map((templateId) {
                 return DropdownMenuItem<String>(
@@ -98,83 +98,81 @@ class _BoardsScreenState extends State<BoardsScreen> {
           ],
         ),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () async {
-              // Création d'un board en utilisant BoardProvider
+              // Creating a board using BoardProvider
               await provider.addBoard(widget.workspaceId, name, desc, selectedTemplateId);
               // ignore: use_build_context_synchronously
               Navigator.pop(context);
-              setState(_initializeBoards); // Recharge les boards après ajout
+              setState(_initializeBoards); // Reload boards after adding
             },
-            child: const Text('Créer'),
+            child: const Text('Create'),
           ),
         ],
       ),
     );
   }
 
-Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
-  final TextEditingController nameController = TextEditingController(text: board.name);
-  final TextEditingController descController = TextEditingController(text: board.desc);
+  Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
+    final TextEditingController nameController = TextEditingController(text: board.name);
+    final TextEditingController descController = TextEditingController(text: board.desc);
 
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) => AlertDialog(
-      title: const Text('Modifier Board'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          TextField(
-            controller: nameController,
-            decoration: const InputDecoration(labelText: 'Nom'),
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Edit Board'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Description'),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          TextField(
-            controller: descController,
-            decoration: const InputDecoration(labelText: 'Description'),
+          TextButton(
+            onPressed: () async {
+              await provider.editBoard(board.id, nameController.text, descController.text);
+              if (mounted) {
+                Navigator.pop(context);
+                setState(() {
+                  _initializeBoards(); // Force refresh
+                });
+              }
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
-        ),
-        TextButton(
-          onPressed: () async {
-            await provider.editBoard(board.id, nameController.text, descController.text);
-            if (mounted) {
-              Navigator.pop(context);
-              setState(() {
-                _initializeBoards(); // Forcer le rafraîchissement
-              });
-            }
-          },
-          child: const Text('Enregistrer'),
-        ),
-      ],
-    ),
-  );
-}
+    );
+  }
 
-
-
-  /// **Méthode pour supprimer un board via BoardProvider**
+  /// **Method to delete a board via BoardProvider**
   Future<void> _deleteBoardDialog(BuildContext context, Board board, BoardsProvider provider) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Supprimer Board'),
-        content: Text('Voulez-vous supprimer "${board.name}" ?'),
+        title: const Text('Delete Board'),
+        content: Text('Do you want to delete "${board.name}"?'),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () async {
-              await provider.removeBoard(board.id); // Utilisation de BoardProvider
+              await provider.removeBoard(board.id); // Using BoardProvider
               Navigator.pop(context);
-              setState(_initializeBoards); // Recharge les boards après suppression
+              setState(_initializeBoards); // Reload boards after deletion
             },
-            child: const Text('Supprimer'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -184,9 +182,9 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFEDE3), // Fond beige rosé
+      backgroundColor: const Color(0xFFFFEDE3), // Beige pink background
       appBar: AppBar(
-        backgroundColor: const Color(0xFF889596), // Fond de l'AppBar
+        backgroundColor: const Color(0xFF889596), // AppBar background
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -204,7 +202,7 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
           ),
         ),
       ),
-      body: SingleChildScrollView(  // Enroulez le body avec un SingleChildScrollView
+      body: SingleChildScrollView(  // Wrap body with SingleChildScrollView
         child: Column(
           children: [
             const Padding(
@@ -216,38 +214,38 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                 ],
               ),
             ),
-            /// **Affichage du contenu selon le mode sélectionné**
+            /// **Display content based on selected mode**
             if (_isLoading) const Center(child: CircularProgressIndicator()) else _errorMessage != null
-                    ? Center(child: Text('Erreur: $_errorMessage'))
+                    ? Center(child: Text('Error: $_errorMessage'))
                     : FutureBuilder<List<Board>>(
                         future: _fetchBoardsFuture,
                         builder: (BuildContext context, AsyncSnapshot<List<Board>> snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
-                            return Center(child: Text('Erreur: ${snapshot.error}'));
+                            return Center(child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('Aucun board trouvé pour ce workspace.'));
+                            return const Center(child: Text('No boards found for this workspace.'));
                           }
 
                           return _isTableView
-                              ? _buildTableView(snapshot.data!) // Affichage Table
+                              ? _buildTableView(snapshot.data!) // Table display
                               : const Center(
-                                  child: Text('Mode Board non implémenté.'),
+                                  child: Text('Board mode not implemented.'),
                                 );
                         },
                       ),
           ],
         ),
       ),
-      /// **Bouton flottant pour créer un board**
+      /// **Floating button to create a board**
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 20, right: 20),
         child: FloatingActionButton(
           onPressed: () async {
-            // Affiche la fenêtre de création de board
+            // Show board creation window
             await _addBoardDialog(context, context.read<BoardsProvider>());
-            setState(_initializeBoards); // Recharge les boards après création
+            setState(_initializeBoards); // Reload boards after creation
           },
           backgroundColor: const Color(0xFFC0CDA9),
           shape: RoundedRectangleBorder(
@@ -264,17 +262,17 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Align(
-        alignment: Alignment.topCenter, // Évite d'étirer le conteneur sur toute la hauteur
+        alignment: Alignment.topCenter, // Prevents container from stretching full height
         child: Container(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.9, // Limite la largeur si besoin
+            maxWidth: MediaQuery.of(context).size.width * 0.9, // Limit width if needed
           ),
           decoration: BoxDecoration(
             color: Colors.blue[100],
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Ajuste la hauteur selon le contenu
+            mainAxisSize: MainAxisSize.min, // Adjust height based on content
             children: List.generate(
               boards.length,
               (index) {
@@ -296,11 +294,11 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                           return [
                             const PopupMenuItem<String>(
                               value: 'edit',
-                              child: Text('Modifier'),
+                              child: Text('Edit'),
                             ),
                             const PopupMenuItem<String>(
                               value: 'delete',
-                              child: Text('Supprimer'),
+                              child: Text('Delete'),
                             ),
                           ];
                         },
@@ -318,11 +316,11 @@ Future<void> _editBoardDialog(BuildContext context, Board board, BoardsProvider 
                         );
                       },
                     ),
-                    if (index < boards.length - 1) // Empêche un divider après le dernier élément
+                    if (index < boards.length - 1) // Prevents divider after last element
                       const Divider(
                         color: Color(0xFFD97C83),
                         thickness: 1,
-                        height: 10, // Espacement vertical
+                        height: 10, // Vertical spacing
                       ),
                   ],
                 );

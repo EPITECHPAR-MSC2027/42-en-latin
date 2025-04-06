@@ -11,16 +11,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 
-/// **Écran d'accueil**
+/// **Home Screen**
 class HomeScreen extends StatefulWidget {
-  /// **Constructeur de HomeScreen**
+  /// **HomeScreen Constructor**
   const HomeScreen({super.key});
 
   @override
   HomeScreenState createState() => HomeScreenState();
 }
 
-/// **État de HomeScreen**
+/// **HomeScreen State**
 class HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String? _errorMessage;
@@ -31,21 +31,21 @@ class HomeScreenState extends State<HomeScreen> {
     developer.log('HomeScreen: initState');
     Future<void>.microtask(() async {
       await _loadData();
-      // Charger les notifications au démarrage
+      // Load notifications at startup
       // ignore: use_build_context_synchronously
       await Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
     });
   }
 
-  /// **Charge les données nécessaires**
+  /// **Load necessary data**
   Future<void> _loadData() async {
     try {
-      developer.log('HomeScreen: Chargement des boards');
-      // Charger les boards pour le carousel
+      developer.log('HomeScreen: Loading boards');
+      // Load boards for the carousel
       await Provider.of<BoardsProvider>(context, listen: false).fetchBoards();
-      developer.log('HomeScreen: Boards chargés');
+      developer.log('HomeScreen: Boards loaded');
     } catch (e) {
-      developer.log('HomeScreen: Erreur lors du chargement des boards: $e');
+      developer.log('HomeScreen: Error loading boards: $e');
       setState(() => _errorMessage = e.toString());
     } finally {
       setState(() => _isLoading = false);
@@ -108,7 +108,7 @@ class HomeScreenState extends State<HomeScreen> {
                     else if (_errorMessage != null)
                       Center(
                         child: Text(
-                          'Erreur: $_errorMessage',
+                          'Error: $_errorMessage',
                           style: TextStyle(
                             color: themeProvider.rouge,
                           ),

@@ -13,24 +13,24 @@ class BoardCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    developer.log('Construction du BoardCarousel avec maxBoards: $maxBoards');
+    developer.log('Building BoardCarousel with maxBoards: $maxBoards');
     
     return Consumer2<BoardsProvider, ThemeProvider>(
       builder: (context, boardsProvider, themeProvider, child) {
-        developer.log('BoardCarousel rebuild avec ${boardsProvider.recentBoards.length} boards récents');
+        developer.log('BoardCarousel rebuild with ${boardsProvider.recentBoards.length} recent boards');
         
         if (boardsProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
         if (boardsProvider.error != null) {
-          return Center(child: Text('Erreur: ${boardsProvider.error}'));
+          return Center(child: Text('Error: ${boardsProvider.error}'));
         }
 
         final recentBoards = boardsProvider.recentBoards;
         
         if (recentBoards.isEmpty) {
-          developer.log('Aucun board récent trouvé');
+          developer.log('No recent boards found');
           return Center(
             child: Text(
               'No recent boards',
