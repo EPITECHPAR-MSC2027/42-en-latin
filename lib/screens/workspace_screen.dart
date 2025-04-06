@@ -252,14 +252,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                     centerTitle: true,
                     elevation: 0,
                     toolbarHeight: 80,
-                    automaticallyImplyLeading: false,
                     title: Padding(
-                      padding: const EdgeInsets.only(top: 5),
+                      padding: const EdgeInsets.only(top: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '          Your WorkSpaces',
+                            'Your WorkSpaces',
                             style: GoogleFonts.itim(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -420,11 +419,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
               ),
               Positioned(
                 left: -30,
-                top: 1,
+                top: 4,
                 child: SafeArea(
                   child: Image.asset(
                     'documentation/pic.png',
-                    height: 125,
+                    height: 122,
                     fit: BoxFit.contain,
                   ),
                 ),

@@ -28,7 +28,7 @@ class NotificationProvider with ChangeNotifier {
       _notifications = await _trelloService.getNotifications();
       notifyListeners();
     } catch (error) {
-      throw Exception('Erreur lors de la récupération des notifications : $error');
+      throw Exception('Error fetching notifications: $error');
     }
   }
 
@@ -52,7 +52,7 @@ class NotificationProvider with ChangeNotifier {
         }
       }
     } catch (error) {
-      throw Exception('Erreur lors du marquage de la notification comme lue : $error');
+      throw Exception('Error marking notification as read: $error');
     }
   }
 
@@ -73,7 +73,7 @@ class NotificationProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (error) {
-      throw Exception('Erreur lors du marquage de toutes les notifications comme lues : $error');
+      throw Exception('Error marking all notifications as read: $error');
     }
   }
 } 

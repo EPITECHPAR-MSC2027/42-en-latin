@@ -526,14 +526,14 @@ class TrelloService {
 
   /// Obtient un message par défaut si le texte n'est pas disponible
   String _getDefaultMessage(Map<String, dynamic> json) {
-    final memberName = json['memberCreator']?['fullName'] ?? "Quelqu'un";
+    final memberName = json['memberCreator']?['fullName'] ?? "Someone";
     final boardName = json['data']?['board']?['name'] ?? '';
     final cardName = json['data']?['card']?['name'] ?? '';
     final listName = json['data']?['list']?['name'] ?? '';
 
-    return '$memberName a effectué une action${boardName.isNotEmpty ? ' sur le board $boardName' : ''}'
-        '${cardName.isNotEmpty ? ' (carte: $cardName)' : ''}'
-        '${listName.isNotEmpty ? ' dans la liste $listName' : ''}';
+    return '$memberName performed an action${boardName.isNotEmpty ? ' on board $boardName' : ''}'
+        '${cardName.isNotEmpty ? ' (card: $cardName)' : ''}'
+        '${listName.isNotEmpty ? ' in list $listName' : ''}';
   }
 
   /// **Marquer une notification comme lue**
