@@ -199,7 +199,7 @@ class TrelloService {
 
       return response.statusCode == 200;
     } catch (e) {
-      throw Exception('Erreur lors de la mise à jour de la date d\'ouverture : $e');
+      throw Exception("Erreur lors de la mise à jour de la date d'ouverture : $e");
     }
   }
 
@@ -541,7 +541,7 @@ class TrelloService {
 
   /// Obtient un message par défaut si le texte n'est pas disponible
   String _getDefaultMessage(Map<String, dynamic> json) {
-    final memberName = json['memberCreator']?['fullName'] ?? "Someone";
+    final memberName = json['memberCreator']?['fullName'] ?? 'Someone';
     final boardName = json['data']?['board']?['name'] ?? '';
     final cardName = json['data']?['card']?['name'] ?? '';
     final listName = json['data']?['list']?['name'] ?? '';

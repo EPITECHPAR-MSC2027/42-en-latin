@@ -1,9 +1,7 @@
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
-import 'package:fluter/providers/theme_provider.dart';
 import 'package:fluter/screens/lists_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class NotificationsDropdown extends StatelessWidget {
@@ -86,6 +84,7 @@ class NotificationsDropdown extends StatelessWidget {
                         await Provider.of<BoardsProvider>(context, listen: false)
                             .markBoardAsOpened(notification.boardId!);
                         await Navigator.push(
+                          // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(
                             builder: (context) => ListsScreen(

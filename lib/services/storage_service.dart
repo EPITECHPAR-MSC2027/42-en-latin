@@ -9,7 +9,7 @@ class StorageService {
 
   /// Sauvegarder la date de dernière ouverture d'un board
   Future<void> saveBoardLastOpened(String boardId, DateTime date) async {
-    developer.log('Sauvegarde de la date d\'ouverture pour le board $boardId: ${date.toIso8601String()}');
+    developer.log("Sauvegarde de la date d'ouverture pour le board $boardId: ${date.toIso8601String()}");
     
     final prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> lastOpenedMap = {};
@@ -32,7 +32,7 @@ class StorageService {
 
   /// Récupérer la date de dernière ouverture d'un board
   Future<DateTime?> getBoardLastOpened(String boardId) async {
-    developer.log('Récupération de la date d\'ouverture pour le board $boardId');
+    developer.log("Récupération de la date d'ouverture pour le board $boardId");
     
     final prefs = await SharedPreferences.getInstance();
     final String? existingData = prefs.getString(_lastOpenedKey);
@@ -53,7 +53,7 @@ class StorageService {
 
   /// Récupérer toutes les dates de dernière ouverture des boards
   Future<Map<String, DateTime>> getAllBoardsLastOpened() async {
-    developer.log('Récupération de toutes les dates d\'ouverture');
+    developer.log("Récupération de toutes les dates d'ouverture");
     
     final prefs = await SharedPreferences.getInstance();
     final String? existingData = prefs.getString(_lastOpenedKey);
@@ -62,7 +62,7 @@ class StorageService {
       developer.log('Données récupérées: $existingData');
       final Map<String, dynamic> lastOpenedMap = json.decode(existingData) as Map<String, dynamic>;
       final result = lastOpenedMap.map((key, value) => MapEntry(key, DateTime.parse(value as String)));
-      developer.log('Nombre de boards avec date d\'ouverture: ${result.length}');
+      developer.log("Nombre de boards avec date d'ouverture: ${result.length}");
       return result;
     }
     

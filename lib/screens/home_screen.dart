@@ -1,7 +1,9 @@
 import 'dart:developer' as developer;
+
 import 'package:fluter/providers/board_provider.dart';
 import 'package:fluter/providers/notification_provider.dart';
 import 'package:fluter/providers/theme_provider.dart';
+import 'package:fluter/screens/weather_screen.dart';
 import 'package:fluter/widgets/board_carousel.dart';
 import 'package:fluter/widgets/bottom_nav_bar.dart';
 import 'package:fluter/widgets/notifications_dropdown.dart';
@@ -9,8 +11,6 @@ import 'package:fluter/widgets/recent_notifications_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-import 'package:fluter/screens/weather_screen.dart';
 /// **Écran d'accueil**
 class HomeScreen extends StatefulWidget {
   /// **HomeScreen Constructor**

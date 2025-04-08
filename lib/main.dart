@@ -10,7 +10,6 @@ import 'package:fluter/providers/user_provider.dart';
 import 'package:fluter/providers/workspace_provider.dart';
 import 'package:fluter/screens/home_screen.dart';
 import 'package:fluter/screens/profile_screen.dart';
-import 'package:fluter/screens/weather_screen.dart';
 import 'package:fluter/screens/workspace_screen.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:flutter/material.dart';

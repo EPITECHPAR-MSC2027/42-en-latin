@@ -145,9 +145,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
               await provider.editBoard(board.id, nameController.text, descController.text);
               if (mounted) {
                 Navigator.pop(context);
-                setState(() {
-                  _initializeBoards(); // Force refresh
-                });
+                setState(_initializeBoards);
               }
             },
             child: const Text('Save'),

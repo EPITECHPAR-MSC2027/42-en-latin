@@ -78,6 +78,7 @@ class RecentNotificationsList extends StatelessWidget {
                         await Provider.of<BoardsProvider>(context, listen: false)
                             .markBoardAsOpened(notification.boardId!);
                         await Navigator.push(
+                          // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(
                             builder: (context) => ListsScreen(

@@ -1,12 +1,12 @@
+import 'dart:async';
 import 'dart:developer' as developer;
+
 import 'package:fluter/models/board.dart';
 import 'package:fluter/services/storage_service.dart';
 import 'package:fluter/services/trello_service.dart';
 import 'package:fluter/utils/templates.dart'; // ✅ Import des templates en dur
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter/material.dart';
 
 /// **Classe BoardsProvider**
 class BoardsProvider with ChangeNotifier {
@@ -14,7 +14,7 @@ class BoardsProvider with ChangeNotifier {
   BoardsProvider({required TrelloService trelloService}) : _trelloService = trelloService {
     _storageService = StorageService();
     developer.log('BoardsProvider initialisé');
-    fetchBoards();
+    unawaited(fetchBoards());
   }
   final TrelloService _trelloService;
   late final StorageService _storageService;
@@ -61,7 +61,7 @@ class BoardsProvider with ChangeNotifier {
       // Mettre à jour dans la liste locale
       final index = _boards.indexWhere((board) => board.id == boardId);
       if (index != -1) {
-        developer.log('Board trouvé dans la liste locale à l\'index $index');
+        developer.log("Board trouvé dans la liste locale à l'index $index");
         final updatedBoard = Board(
           id: _boards[index].id,
           name: _boards[index].name,
@@ -81,7 +81,7 @@ class BoardsProvider with ChangeNotifier {
       developer.log('Nombre de boards récents après mise à jour: ${_recentBoards.length}');
       notifyListeners();
     } catch (error) {
-      developer.log('Erreur lors de la mise à jour de la date d\'ouverture: $error');
+      developer.log("Erreur lors de la mise à jour de la date d'ouverture: $error");
       throw Exception("Erreur lors de la mise à jour de la date d'ouverture du board : $error");
     }
   }
@@ -188,7 +188,7 @@ Future<bool> addBoard(
     notifyListeners();
 
     try {
-      developer.log('Chargement des boards depuis l\'API');
+      developer.log("Chargement des boards depuis l'API");
       _boards = await _trelloService.getBoards();
       developer.log('Nombre de boards récupérés: ${_boards.length}');
       
@@ -197,7 +197,7 @@ Future<bool> addBoard(
       _recentBoards = allRecentBoards.take(5).toList();
       developer.log('Nombre de boards récents: ${_recentBoards.length}');
       
-      for (var board in _recentBoards) {
+      for (final board in _recentBoards) {
         developer.log('Board récent: ${board.name}, ID: ${board.id}');
       }
     } catch (e) {

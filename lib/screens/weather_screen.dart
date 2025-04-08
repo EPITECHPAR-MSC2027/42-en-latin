@@ -1,11 +1,8 @@
-import 'dart:math';
 
+import 'package:fluter/models/weather.dart';
 import 'package:fluter/services/weather_service.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:developer';
-
-import 'package:fluter/models/weather.dart';
 
 
 class WeatherScreen extends StatefulWidget 
@@ -24,7 +21,7 @@ Weather? _weather;
 
 
 
-_fetchWeather() async {
+Future<void> _fetchWeather() async {
  ////parti geolocalisation
 
  try
@@ -32,25 +29,22 @@ _fetchWeather() async {
   ///print("1");
   //final weather = await _weatherService.getWeather('London');
   final weather = await _weatherService.getWeather('Le Kremlin-Bicêtre');
-   print(weather.temperature);
-   print(weather.cityName);
-   print(weather.mainCondition);
   setState(() {
     _weather = weather as Weather?;
   });
  }
  catch(e)
+ // ignore: empty_catches
  {
-  print(e);
  }
 }
 
 @override
-void initState()
-{
+Future<void> initState()
+async {
   super.initState();
 
-  _fetchWeather();
+  await _fetchWeather();
 }
 
 

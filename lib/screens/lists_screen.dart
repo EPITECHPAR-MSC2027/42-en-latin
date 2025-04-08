@@ -265,7 +265,7 @@ class ListsScreenState extends State<ListsScreen> {
                         IconButton(
                           icon: Icon(Icons.add, color: themeProvider.vertText, size: 18),
                           padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(minWidth: 24, minHeight: 24),
+                          constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
                           onPressed: () async {
                             await _addCardDialog(
                               context,
@@ -281,7 +281,7 @@ class ListsScreenState extends State<ListsScreen> {
                             size: 18,
                           ),
                           padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(minWidth: 24, minHeight: 24),
+                          constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
                           onSelected: (String value) async {
                             if (value == 'Modifier') {
                               await _editListDialog(context, list);
@@ -412,7 +412,7 @@ class ListsScreenState extends State<ListsScreen> {
                       size: 16,
                     ),
                     padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                    constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
                     onPressed: () async {
                       await _updateCollaboratorsDialog(context, card.id, widget.boardId);
                     },
@@ -420,7 +420,7 @@ class ListsScreenState extends State<ListsScreen> {
                   IconButton(
                     icon: Icon(Icons.delete, color: themeProvider.rouge, size: 16),
                     padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                    constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
                     onPressed: () async {
                       final cardProvider = Provider.of<CardProvider>(
                         context,

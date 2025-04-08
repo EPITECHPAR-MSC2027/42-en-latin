@@ -7,9 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class BoardCarousel extends StatelessWidget {
-  final int maxBoards;
 
+  // ignore: public_member_api_docs, use_super_parameters
   const BoardCarousel({Key? key, this.maxBoards = 5}) : super(key: key);
+  final int maxBoards;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +71,7 @@ class BoardCarousel extends StatelessWidget {
                         onTap: () async {
                           await boardsProvider.markBoardAsOpened(board.id);
                           await Navigator.push(
+                            // ignore: use_build_context_synchronously
                             context,
                             MaterialPageRoute(
                               builder: (context) => ListsScreen(
